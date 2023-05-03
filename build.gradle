@@ -16,7 +16,7 @@ buildscript {
     }
 }
 
-allprojects {
+/*allprojects {
     group = "com.github.dips361-evo"
     version = "v.1.0.1"
     repositories {
@@ -24,7 +24,7 @@ allprojects {
         mavenCentral()
         maven { url 'https://jitpack.io' }
     }
-}
+}*/
 
 subprojects {
     apply plugin: "maven-publish"
