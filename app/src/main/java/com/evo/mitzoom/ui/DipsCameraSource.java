@@ -337,6 +337,9 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
     }
 
     private Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG,100, baos);
+
         int width = bm.getWidth();
         int height = bm.getHeight();
 
@@ -362,12 +365,16 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
         if (width < height) {
             matrix.postScale(-1, 1);
         } else {
-            cx = (int) (height / 8);
+            /*cx = (int) (height / 8);
             cy = (int) (width / 10);
             widthB = (int) (height / 1.9);
-            heightB = (int) (width / 2.1);
+            heightB = (int) (width / 2.1);*/
+            cx = (int) (width / 9.5);
+            cy = (int) (height / 5);
+            widthB = (int) (width / 4);
+            heightB = (int) (height / 1.7);
+
             matrix.postScale(1, -1); //xiaomi cx itu brarti sudut Y dan cy brarti sudut X
-            //untuk cx dan width di hitung dari sisi kiri ke kanan dan cy dan height dari bawah ke atas
         }
 
         Log.e("CEK","getResizedBitmap cx : "+cx+" | cy : "+cy+" | widthB : "+widthB+" | heightB : "+heightB);
