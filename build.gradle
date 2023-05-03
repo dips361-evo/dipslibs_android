@@ -34,7 +34,7 @@ subprojects {
                 publications {
                     maven(MavenPublication) {
                         afterEvaluate {
-                            artifactId = "$project.name"
+                            artifactId = "dipslibs361"
                             if (plugins.hasPlugin("java")) {
                                 from components.java
                             } else if (plugins.hasPlugin("android-library")) {
