@@ -18,7 +18,7 @@ buildscript {
 
 allprojects {
     group = "com.github.DiPS361"
-    version = "1.0.5"
+    version = "1.0.6"
     repositories {
         google()
         mavenCentral()
@@ -45,10 +45,10 @@ subprojects {
                         }
                         repositories {
                             maven {
-                                url = "https://maven.pkg.github.com/githubgritrepo/dipslibs_android/"
+                                url = "https://maven.pkg.github.com/dips361-evo/dipslibs_android/"
                                 credentials {
                                     username = "mutaqin0714"
-                                    password = "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"
+                                    password = "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"
                                 }
                             }
                         }
