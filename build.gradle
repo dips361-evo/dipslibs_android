@@ -18,7 +18,7 @@ buildscript {
 
 allprojects {
     group = "com.github.DiPS361"
-    version = "1.0.6"
+    version = "1.0.7"
     repositories {
         google()
         mavenCentral()
@@ -43,7 +43,7 @@ subprojects {
                                 artifact("$rootDir/$project.name/mobilertc.aar")
                             }
                         }
-                        repositories {
+                        /*repositories {
                             maven {
                                 url = "https://maven.pkg.github.com/dips361-evo/dipslibs_android/"
                                 credentials {
@@ -51,7 +51,7 @@ subprojects {
                                     password = "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"
                                 }
                             }
-                        }
+                        }*/
                     }
                 }
             }
