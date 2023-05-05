@@ -43,6 +43,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.chaos.view.PinView;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.FormSpin;
@@ -150,6 +151,7 @@ public class frag_ready_account extends Fragment {
         String dataNasabah = sessions.getNasabah();
         Log.e("CEK",mContext+" formCode : "+formCode+" | NoCIF : "+NoCIF);
         Log.e("CEK",mContext+" dataNasabah : "+dataNasabah);
+        ConnectionRabbitHttp.init(mContext);
         if (!dataNasabah.isEmpty()) {
             try {
                 dataNasabahObj = new JSONObject(dataNasabah);
@@ -392,19 +394,23 @@ public class frag_ready_account extends Fragment {
                 if (formCode == 151) {
                     bundle.putInt("form_id",19);
                     sessions.saveFormCOde(150);
-                    RabbitMirroring.MirroringSendEndpoint(150);
+                    //RabbitMirroring.MirroringSendEndpoint(150);
+                    ConnectionRabbitHttp.mirroringEndpoint(150);
                 } else if (formCode == 152) {
                     bundle.putInt("form_id",29);
                     sessions.saveFormCOde(151);
-                    RabbitMirroring.MirroringSendEndpoint(151);
+                    //RabbitMirroring.MirroringSendEndpoint(151);
+                    ConnectionRabbitHttp.mirroringEndpoint(151);
                 } else if (formCode == 153) {
                     bundle.putInt("form_id",29);
                     sessions.saveFormCOde(151);
-                    RabbitMirroring.MirroringSendEndpoint(151);
+                    //RabbitMirroring.MirroringSendEndpoint(151);
+                    ConnectionRabbitHttp.mirroringEndpoint(151);
                 } else if (formCode == 154) {
                     bundle.putInt("form_id",29);
                     sessions.saveFormCOde(151);
-                    RabbitMirroring.MirroringSendEndpoint(151);
+                    //RabbitMirroring.MirroringSendEndpoint(151);
+                    ConnectionRabbitHttp.mirroringEndpoint(151);
                 } /*else if (formCode == 155) {
                     String tiperekening = "";
                     if (dataFormObj.has("tiperekening")) {
@@ -445,20 +451,24 @@ public class frag_ready_account extends Fragment {
                     if (tiperekening.toLowerCase().trim().equals("tabungan")) {
                         bundle.putInt("form_id", 21);
                         sessions.saveFormCOde(153);
-                        RabbitMirroring.MirroringSendEndpoint(153);
+                        //RabbitMirroring.MirroringSendEndpoint(153);
+                        ConnectionRabbitHttp.mirroringEndpoint(153);
                     } else if (tiperekening.toLowerCase().trim().equals("giro")) {
                         bundle.putInt("form_id",20);
                         sessions.saveFormCOde(152);
-                        RabbitMirroring.MirroringSendEndpoint(152);
+                        //RabbitMirroring.MirroringSendEndpoint(152);
+                        ConnectionRabbitHttp.mirroringEndpoint(152);
                     } else if (tiperekening.toLowerCase().trim().contains("jangka")) {
                         bundle.putInt("form_id",22);
                         sessions.saveFormCOde(154);
-                        RabbitMirroring.MirroringSendEndpoint(154);
+                        //RabbitMirroring.MirroringSendEndpoint(154);
+                        ConnectionRabbitHttp.mirroringEndpoint(154);
                     }
                 } else {
                     fragment = new frag_open_account_product();
                     sessions.saveFormCOde(201);
-                    RabbitMirroring.MirroringSendEndpoint(201);
+                    //RabbitMirroring.MirroringSendEndpoint(201);
+                    ConnectionRabbitHttp.mirroringEndpoint(201);
                 }
 
                 sendDataFragment(bundle, fragment);
@@ -594,7 +604,8 @@ public class frag_ready_account extends Fragment {
             if (formCode == 150) {
                 bundle.putInt("form_id",29);
                 sessions.saveFormCOde(151);
-                RabbitMirroring.MirroringSendEndpoint(151);
+                //RabbitMirroring.MirroringSendEndpoint(151);
+                ConnectionRabbitHttp.mirroringEndpoint(151);
             } else if (formCode == 151) {
                 String tiperekening = "";
                 try {
@@ -606,28 +617,34 @@ public class frag_ready_account extends Fragment {
                 if (tiperekening.toLowerCase().trim().equals("tabungan")) {
                     bundle.putInt("form_id", 21);
                     sessions.saveFormCOde(153);
-                    RabbitMirroring.MirroringSendEndpoint(153);
+                    //RabbitMirroring.MirroringSendEndpoint(153);
+                    ConnectionRabbitHttp.mirroringEndpoint(153);
                 } else if (tiperekening.toLowerCase().trim().equals("giro")) {
                     bundle.putInt("form_id",20);
                     sessions.saveFormCOde(152);
-                    RabbitMirroring.MirroringSendEndpoint(152);
+                    //RabbitMirroring.MirroringSendEndpoint(152);
+                    ConnectionRabbitHttp.mirroringEndpoint(152);
                 } else if (tiperekening.toLowerCase().trim().contains("jangka")) {
                     bundle.putInt("form_id",22);
                     sessions.saveFormCOde(154);
-                    RabbitMirroring.MirroringSendEndpoint(154);
+                    //RabbitMirroring.MirroringSendEndpoint(154);
+                    ConnectionRabbitHttp.mirroringEndpoint(154);
                 }
             } else if (formCode == 152) {
                 bundle.putInt("form_id",35);
                 sessions.saveFormCOde(156);
-                RabbitMirroring.MirroringSendEndpoint(156);
+                //RabbitMirroring.MirroringSendEndpoint(156);
+                ConnectionRabbitHttp.mirroringEndpoint(156);
             } else if (formCode == 153) {
                 bundle.putInt("form_id",35);
                 sessions.saveFormCOde(156);
-                RabbitMirroring.MirroringSendEndpoint(156);
+                //RabbitMirroring.MirroringSendEndpoint(156);
+                ConnectionRabbitHttp.mirroringEndpoint(156);
             } else if (formCode == 154) {
                 bundle.putInt("form_id",35);
                 sessions.saveFormCOde(156);
-                RabbitMirroring.MirroringSendEndpoint(156);
+                //RabbitMirroring.MirroringSendEndpoint(156);
+                ConnectionRabbitHttp.mirroringEndpoint(156);
             } /*else if (formCode == 155) {
                 bundle.putInt("form_id",35);
                 sessions.saveFormCOde(156);
@@ -691,7 +708,8 @@ public class frag_ready_account extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        RabbitMirroring.MirroringSendKey(dataMirr);
+                        //RabbitMirroring.MirroringSendKey(dataMirr);
+                        ConnectionRabbitHttp.mirroringKey(dataMirr);
                         processSendOTP();
 
                     } catch (JSONException e) {
@@ -774,7 +792,8 @@ public class frag_ready_account extends Fragment {
                             sessions.saveExchangeToken(exchangeToken);
                         }
                         transactionId = dataObj.getJSONObject("data").getString("transactionId");
-                        RabbitMirroring.MirroringSendEndpoint(11);
+                        //RabbitMirroring.MirroringSendEndpoint(11);
+                        ConnectionRabbitHttp.mirroringEndpoint(11);
                         pageOTP();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -841,7 +860,8 @@ public class frag_ready_account extends Fragment {
                     try {
                         Log.e("CEK","numberOTP : "+numberOTP);
                         otpObj.put("otp",numberOTP);
-                        RabbitMirroring.MirroringSendKey(otpObj);
+                        //RabbitMirroring.MirroringSendKey(otpObj);
+                        ConnectionRabbitHttp.mirroringKey(otpObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -926,7 +946,8 @@ public class frag_ready_account extends Fragment {
                         reqFormSend.put("pembukaanakun", dataObjAccount);
 
                         Log.e("CEK","dataObjAccount : "+ dataObjAccount);
-                        RabbitMirroring.MirroringSendKey(reqFormSend);
+                        //RabbitMirroring.MirroringSendKey(reqFormSend);
+                        ConnectionRabbitHttp.mirroringKey(reqFormSend);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -1013,7 +1034,8 @@ public class frag_ready_account extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    RabbitMirroring.MirroringSendEndpoint(131);
+                    //RabbitMirroring.MirroringSendEndpoint(131);
+                    ConnectionRabbitHttp.mirroringEndpoint(131);
                     Bundle bundle = new Bundle();
                     bundle.putInt("formCode",131);
                     bundle.putString("idForm", finalIdForm);
@@ -1408,7 +1430,8 @@ public class frag_ready_account extends Fragment {
                                                 objEl.put(nameDataEl, charSequence);
                                                 dataFormObj = dataReqForm();
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -1456,7 +1479,8 @@ public class frag_ready_account extends Fragment {
                                                     objEl.put(nameDataEl, results);
                                                     dataFormObj = dataReqForm();
                                                     if (isSessionZoom) {
-                                                        RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                        //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                        ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                                     }
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
@@ -1491,7 +1515,8 @@ public class frag_ready_account extends Fragment {
                                             dataFormObj = dataReqForm();
 
                                             if (isSessionZoom) {
-                                                RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                             }
                                         }
                                     });
@@ -1508,7 +1533,8 @@ public class frag_ready_account extends Fragment {
                                                 objEl.put(nameDataEl, results);
                                                 dataFormObj = dataReqForm();
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -1561,7 +1587,8 @@ public class frag_ready_account extends Fragment {
                                                         valSpin.put(nameDataEl, idData);
                                                     }
                                                     if (isSessionZoom) {
-                                                        RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                        //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                        ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                                     }
                                                     Log.e("CEK","flagStuckSpin : "+flagStuckSpin);
                                                     if (flagStuckSpin) {
@@ -1591,7 +1618,8 @@ public class frag_ready_account extends Fragment {
                                                 objEl.put(nameDataEl, results);
                                                 dataFormObj = dataReqForm();
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -1606,7 +1634,8 @@ public class frag_ready_account extends Fragment {
                                                 objEl.put(nameDataEl, results);
                                                 dataFormObj = dataReqForm();
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormObj);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormObj);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();

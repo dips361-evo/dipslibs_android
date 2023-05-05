@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.evo.mitzoom.API.Server;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.DownloadTaskHelper;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Helper.SingleMediaScanner;
@@ -160,7 +161,8 @@ public class frag_cif_resi extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.e("CEK","MASUK BUTTON OK");
-                RabbitMirroring.MirroringSendEndpoint(14);
+                //RabbitMirroring.MirroringSendEndpoint(14);
+                ConnectionRabbitHttp.mirroringEndpoint(14);
                 sessions.clearCIF();
                 sessions.clearPartData();
                 bytePhoto = null;

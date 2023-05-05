@@ -106,7 +106,7 @@ public class RabbitMirroring {
                                 if (sessions.getKEY_IdDips() != null) {
                                     jsons.put("idDips", sessions.getKEY_IdDips());
                                 }
-                                OutboundServiceNew.stopServiceSocket();
+                                //OutboundServiceNew.stopServiceSocket();
                                 Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                                 mContext.stopService(intentOutbound);
                             }

@@ -555,7 +555,7 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OutboundServiceNew.stopServiceSocket();
+                //OutboundServiceNew.stopServiceSocket();
                 Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                 mContext.stopService(intentOutbound);
 

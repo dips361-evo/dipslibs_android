@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
@@ -222,10 +223,12 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
             //Jika muka terdaftar maka langsung menuju ke portfolio
             session.clearCIF();
             getFragmentPage(new frag_portfolio_new());
-            RabbitMirroring.MirroringSendEndpoint(14);
+            //RabbitMirroring.MirroringSendEndpoint(14);
+            ConnectionRabbitHttp.mirroringEndpoint(14);
         }
         else{
-            RabbitMirroring.MirroringSendEndpoint(2);
+            //RabbitMirroring.MirroringSendEndpoint(2);
+            ConnectionRabbitHttp.mirroringEndpoint(2);
             getFragmentPage(new frag_list_produk());
         }
     }

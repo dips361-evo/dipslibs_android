@@ -58,6 +58,7 @@ import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterFile;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.FileModel;
@@ -180,6 +181,7 @@ public class frag_service_item_new extends Fragment {
 
         String dataNasabah = sessions.getNasabah();
         Log.e("CEK",mContext+" dataNasabah : "+dataNasabah);
+        ConnectionRabbitHttp.init(mContext);
         if (!dataNasabah.isEmpty()) {
             try {
                 dataNasabahObj = new JSONObject(dataNasabah);
@@ -314,7 +316,8 @@ public class frag_service_item_new extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RabbitMirroring.MirroringSendEndpoint(15);
+                //RabbitMirroring.MirroringSendEndpoint(15);
+                ConnectionRabbitHttp.mirroringEndpoint(15);
                 getFragmentPage(new frag_service_new());
             }
         });
@@ -536,7 +539,8 @@ public class frag_service_item_new extends Fragment {
                         objEl.put("namaibukandung", namaIbu);
                         dataForms.put(keys,objEl);
                         Log.e("CEK","DATA FORM : "+dataForms.toString());
-                        RabbitMirroring.MirroringSendKey(dataForms);
+                        //RabbitMirroring.MirroringSendKey(dataForms);
+                        ConnectionRabbitHttp.mirroringKey(dataForms);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -596,7 +600,8 @@ public class frag_service_item_new extends Fragment {
                                                 objEl.put(nameDataEl, charSequence);
                                                 dataForms.put(keys,objEl);
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataForms);
+                                                    //RabbitMirroring.MirroringSendKey(dataForms);
+                                                    ConnectionRabbitHttp.mirroringKey(dataForms);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -669,7 +674,8 @@ public class frag_service_item_new extends Fragment {
                                                     objEl.put(nameDataEl, results);
                                                     dataForms.put(keys,objEl);
                                                     if (isSessionZoom) {
-                                                        RabbitMirroring.MirroringSendKey(dataForms);
+                                                        //RabbitMirroring.MirroringSendKey(dataForms);
+                                                        ConnectionRabbitHttp.mirroringKey(dataForms);
                                                     }
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
@@ -707,7 +713,8 @@ public class frag_service_item_new extends Fragment {
                                                 e.printStackTrace();
                                             }
                                             if (isSessionZoom) {
-                                                RabbitMirroring.MirroringSendKey(dataForms);
+                                                //RabbitMirroring.MirroringSendKey(dataForms);
+                                                ConnectionRabbitHttp.mirroringKey(dataForms);
                                             }
                                         }
                                     });
@@ -724,7 +731,8 @@ public class frag_service_item_new extends Fragment {
                                                 objEl.put(nameDataEl, results);
                                                 dataForms.put(keys,objEl);
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataForms);
+                                                    //RabbitMirroring.MirroringSendKey(dataForms);
+                                                    ConnectionRabbitHttp.mirroringKey(dataForms);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -804,7 +812,8 @@ public class frag_service_item_new extends Fragment {
                                                     e.printStackTrace();
                                                 }
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataForms);
+                                                    //RabbitMirroring.MirroringSendKey(dataForms);
+                                                    ConnectionRabbitHttp.mirroringKey(dataForms);
                                                 }
                                                 Log.e("CEK","flagStuckSpin : "+flagStuckSpin);
                                                 if (flagStuckSpin) {
@@ -831,7 +840,8 @@ public class frag_service_item_new extends Fragment {
                                                 objEl.put(nameDataEl, results);
                                                 dataForms.put(keys,objEl);
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataForms);
+                                                    //RabbitMirroring.MirroringSendKey(dataForms);
+                                                    ConnectionRabbitHttp.mirroringKey(dataForms);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -846,7 +856,8 @@ public class frag_service_item_new extends Fragment {
                                                 objEl.put(nameDataEl, results);
                                                 dataForms.put(keys,objEl);
                                                 if (isSessionZoom) {
-                                                    RabbitMirroring.MirroringSendKey(dataForms);
+                                                    //RabbitMirroring.MirroringSendKey(dataForms);
+                                                    ConnectionRabbitHttp.mirroringKey(dataForms);
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -1191,6 +1202,7 @@ public class frag_service_item_new extends Fragment {
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.e("CEK","formComplaintMedia code : "+response.code());
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -1205,14 +1217,16 @@ public class frag_service_item_new extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    RabbitMirroring.MirroringSendKey(dataForms);
+                    //RabbitMirroring.MirroringSendKey(dataForms);
+                    ConnectionRabbitHttp.mirroringKey(dataForms);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             ((Activity) mContext).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    RabbitMirroring.MirroringSendEndpoint(130);
+                                    //RabbitMirroring.MirroringSendEndpoint(130);
+                                    ConnectionRabbitHttp.mirroringEndpoint(130);
                                     Bundle bundle = new Bundle();
                                     bundle.putBoolean("newComplain",true);
                                     Fragment fragment = new frag_service_resi();
@@ -1344,7 +1358,8 @@ public class frag_service_item_new extends Fragment {
                             sessions.saveExchangeToken(exchangeToken);
                         }
                         transactionId = dataObj.getJSONObject("data").getString("transactionId");
-                        RabbitMirroring.MirroringSendEndpoint(11);
+                        //RabbitMirroring.MirroringSendEndpoint(11);
+                        ConnectionRabbitHttp.mirroringEndpoint(11);
                         pageOTP();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1404,7 +1419,8 @@ public class frag_service_item_new extends Fragment {
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-                    RabbitMirroring.MirroringSendEndpoint(130);
+                    //RabbitMirroring.MirroringSendEndpoint(130);
+                    ConnectionRabbitHttp.mirroringEndpoint(130);
                     Bundle bundle = new Bundle();
                     bundle.putBoolean("newComplain",true);
                     Fragment fragment = new frag_service_resi();
@@ -1468,7 +1484,8 @@ public class frag_service_item_new extends Fragment {
                     try {
                         Log.e("CEK","numberOTP : "+numberOTP);
                         otpObj.put("otp",numberOTP);
-                        RabbitMirroring.MirroringSendKey(otpObj);
+                        //RabbitMirroring.MirroringSendKey(otpObj);
+                        ConnectionRabbitHttp.mirroringKey(otpObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -1877,7 +1894,8 @@ public class frag_service_item_new extends Fragment {
                                 fileArr.put(fileName);
                                 objEl.put(keyUpFile,fileArr);
                                 dataForms.put(keys,objEl);
-                                RabbitMirroring.MirroringSendKey(dataForms);
+                                //RabbitMirroring.MirroringSendKey(dataForms);
+                                ConnectionRabbitHttp.mirroringKey(dataForms);
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }
@@ -1895,7 +1913,8 @@ public class frag_service_item_new extends Fragment {
                                 fileArr.put(fileName);
                                 objEl.put(keyUpFile,fileArr);
                                 dataForms.put(keys,objEl);
-                                RabbitMirroring.MirroringSendKey(dataForms);
+                                //RabbitMirroring.MirroringSendKey(dataForms);
+                                ConnectionRabbitHttp.mirroringKey(dataForms);
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }
@@ -1939,7 +1958,8 @@ public class frag_service_item_new extends Fragment {
                     try {
                         objEl.put(keyUpFile,fileArr);
                         dataForms.put(keys,objEl);
-                        RabbitMirroring.MirroringSendKey(dataForms);
+                        //RabbitMirroring.MirroringSendKey(dataForms);
+                        ConnectionRabbitHttp.mirroringKey(dataForms);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -2008,7 +2028,8 @@ public class frag_service_item_new extends Fragment {
             try {
                 objEl.put(keyUpImage, imgBase64);
                 dataForms.put(keys,objEl);
-                RabbitMirroring.MirroringSendKey(dataForms);
+                //RabbitMirroring.MirroringSendKey(dataForms);
+                ConnectionRabbitHttp.mirroringKey(dataForms);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

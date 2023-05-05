@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.evo.mitzoom.Adapter.ItemServiceGridAdapter;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.ItemModel;
 import com.evo.mitzoom.R;
@@ -77,7 +78,8 @@ public class frag_service_new extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RabbitMirroring.MirroringSendEndpoint(14);
+                //RabbitMirroring.MirroringSendEndpoint(14);
+                ConnectionRabbitHttp.mirroringEndpoint(14);
                 getFragmentPage(new frag_portfolio_new());
             }
         });

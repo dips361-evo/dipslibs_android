@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.ItemOpenAccount;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.ItemModel;
 import com.evo.mitzoom.R;
@@ -80,6 +81,7 @@ public class frag_open_account_product extends Fragment {
         isCust = sessions.getKEY_iSCust();
         isSwafoto = sessions.getKEY_iSSwafoto();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+        ConnectionRabbitHttp.init(mContext);
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(mContext);
         }*/
@@ -132,10 +134,12 @@ public class frag_open_account_product extends Fragment {
             @Override
             public void onClick(View v) {
                 if (sessions.getNoCIF() == null || sessions.getNoCIF().isEmpty()) {
-                    RabbitMirroring.MirroringSendEndpoint(2);
+                    //RabbitMirroring.MirroringSendEndpoint(2);
+                    ConnectionRabbitHttp.mirroringEndpoint(2);
                     getFragmentPage(new frag_list_produk());
                 } else {
-                    RabbitMirroring.MirroringSendEndpoint(15);
+                    //RabbitMirroring.MirroringSendEndpoint(15);
+                    ConnectionRabbitHttp.mirroringEndpoint(15);
                     getFragmentPage(new frag_service_new());
                 }
             }
@@ -149,7 +153,8 @@ public class frag_open_account_product extends Fragment {
                     return;
                 }
                 if (flagViewTNC == false) {
-                    RabbitMirroring.MirroringSendEndpoint(361);
+                    //RabbitMirroring.MirroringSendEndpoint(361);
+                    ConnectionRabbitHttp.mirroringEndpoint(361);
                     PopUpTnc();
                 }
             }
@@ -314,7 +319,8 @@ public class frag_open_account_product extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    RabbitMirroring.MirroringSendKey(tncCheckObj);
+                    //RabbitMirroring.MirroringSendKey(tncCheckObj);
+                    ConnectionRabbitHttp.mirroringKey(tncCheckObj);
                 }
                 else {
                     Log.d("CHECK","FALSE");
@@ -326,7 +332,8 @@ public class frag_open_account_product extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    RabbitMirroring.MirroringSendKey(tncCheckObj);
+                    //RabbitMirroring.MirroringSendKey(tncCheckObj);
+                    ConnectionRabbitHttp.mirroringKey(tncCheckObj);
                 }
             }
         });
@@ -341,12 +348,14 @@ public class frag_open_account_product extends Fragment {
                         sessions.saveIsSwafoto(isSwafoto);
                         sessions.saveFormCOde(4);
                         Fragment fragment = new frag_cif_new();
-                        RabbitMirroring.MirroringSendEndpoint(4);
+                        //RabbitMirroring.MirroringSendEndpoint(4);
+                        ConnectionRabbitHttp.mirroringEndpoint(4);
                         getFragmentPage(fragment);
                     } else {
                         sessions.saveFormCOde(150);
                         Fragment fragment = new frag_ready_account();
-                        RabbitMirroring.MirroringSendEndpoint(150);
+                        //RabbitMirroring.MirroringSendEndpoint(150);
+                        ConnectionRabbitHttp.mirroringEndpoint(150);
                         getFragmentPage(fragment);
                         //Toast.makeText(mContext,"Halaman belum tersedia",Toast.LENGTH_SHORT).show();
                     }

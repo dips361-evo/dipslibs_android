@@ -793,7 +793,7 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
                     sweetAlertDialog.dismiss();
                     String csId = sessions.getCSID();
                     if (csId != null && !csId.isEmpty()) {
-                        DipsWaitingRoom.publishCallAccept(csId, "cancel"); //RabbitMQ
+                        DipsWaitingRoom.publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
                     }
                     sessions.saveIDSchedule(0);
                     DipsWaitingRoom.showProgress(true);

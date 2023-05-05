@@ -50,6 +50,7 @@ import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterFile;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.FileModel;
@@ -143,6 +144,7 @@ public class frag_inputdata_new extends Fragment {
         session = new SessionManager(mContext);
         isCust = session.getKEY_iSCust();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+        ConnectionRabbitHttp.init(mContext);
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(mContext);
         }*/
@@ -1352,7 +1354,8 @@ public class frag_inputdata_new extends Fragment {
                                     e.printStackTrace();
                                 }
                                 if (isSessionZoom) {
-                                    RabbitMirroring.MirroringSendKey(jsons);
+                                    //RabbitMirroring.MirroringSendKey(jsons);
+                                    ConnectionRabbitHttp.mirroringKey(jsons);
                                 }
                             }
                             isSwafoto = dataObj.getBoolean("isSwafoto");
@@ -1368,7 +1371,8 @@ public class frag_inputdata_new extends Fragment {
                                         Bundle bundle = new Bundle();
                                         fragment.setArguments(bundle);
                                         if (isSessionZoom) {
-                                            RabbitMirroring.MirroringSendEndpoint(3);
+                                            //RabbitMirroring.MirroringSendEndpoint(3);
+                                            ConnectionRabbitHttp.mirroringEndpoint(3);
                                             getFragmentPage(fragment);
                                         } else {
                                             getFragmentPageDefault(fragment);
@@ -1485,7 +1489,8 @@ public class frag_inputdata_new extends Fragment {
                     fragment.setArguments(bundle);
 
                     if (isSessionZoom) {
-                        RabbitMirroring.MirroringSendEndpoint(3);
+                        //RabbitMirroring.MirroringSendEndpoint(3);
+                        ConnectionRabbitHttp.mirroringEndpoint(3);
                         getFragmentPage(fragment);
                     } else {
                         getFragmentPageDefault(fragment);
@@ -1724,7 +1729,8 @@ public class frag_inputdata_new extends Fragment {
             JSONObject dataImg = new JSONObject();
             try {
                 dataImg.put(keys,imgBase64);
-                RabbitMirroring.MirroringSendKey(dataImg);
+                //RabbitMirroring.MirroringSendKey(dataImg);
+                ConnectionRabbitHttp.mirroringKey(dataImg);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

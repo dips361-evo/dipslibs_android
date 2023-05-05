@@ -27,6 +27,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.DownloadTaskHelper;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Helper.SingleMediaScanner;
@@ -150,7 +151,8 @@ public class frag_service_resi extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.e("CEK","MASUK BUTTON OK");
-                RabbitMirroring.MirroringSendEndpoint(14);
+                //RabbitMirroring.MirroringSendEndpoint(14);
+                ConnectionRabbitHttp.mirroringEndpoint(14);
                 sessions.clearCIF();
                 getFragmentPage(new frag_portfolio_new());
             }

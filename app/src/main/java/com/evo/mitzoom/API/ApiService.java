@@ -390,4 +390,35 @@ public interface ApiService {
     @GET("config/list")
     Call<JsonObject> ConfigList(@Header("Authorization") String authHeader,
                                     @Header("exchangeToken") String exchangeToken);
+
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("get-ticket-info")
+    Call<JsonObject> RabbHttpGetTicketCurrent(@Body RequestBody body,
+                                   @Header("Authorization") String authHeader,
+                                   @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("get-ticket")
+    Call<JsonObject> RabbHttpGetMyTicket(@Body RequestBody body,
+                                           @Header("Authorization") String authHeader,
+                                           @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("listen-call")
+    Call<JsonObject> RabbHttpListenCall(@Body RequestBody body,
+                                         @Header("Authorization") String authHeader,
+                                         @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("accept-call")
+    Call<JsonObject> RabbHttpAcceptCall(@Body RequestBody body,
+                                        @Header("Authorization") String authHeader,
+                                        @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("mirror-endpoint")
+    Call<JsonObject> RabbHttpMirroringEndpoint(@Body RequestBody body,
+                                        @Header("Authorization") String authHeader,
+                                        @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("mirror-key")
+    Call<JsonObject> RabbHttpMirroringKey(@Body RequestBody body,
+                                               @Header("Authorization") String authHeader,
+                                               @Header("exchangeToken") String exchangeToken);
 }
