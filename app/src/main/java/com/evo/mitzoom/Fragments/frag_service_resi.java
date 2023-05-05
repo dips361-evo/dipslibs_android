@@ -16,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +53,7 @@ public class frag_service_resi extends Fragment {
 
     private Context mContext;
     private SessionManager sessions;
-    private PhotoView imgResume;
+    private ImageView imgResume;
     private Button btnOK;
     private String idDips;
     private Button btnUnduh;
@@ -213,6 +215,14 @@ public class frag_service_resi extends Fragment {
                         filenames = pdfFile.substring(pdfFile.lastIndexOf("/") );
                         bytePhoto = Base64.decode(base64Image, Base64.DEFAULT);
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                        RelativeLayout.LayoutParams lpImg = new RelativeLayout.LayoutParams(250, 300);
+                        lpImg.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                        lpImg.setMargins(10,120,10,10);
+                        imgResume.setLayoutParams(lpImg);
+                        imgResume.setScaleX(2.5f);
+                        imgResume.setScaleY(3f);
+                        imgResume.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        imgResume.setImageBitmap(bitmap);
                         imgResume.setImageBitmap(bitmap);
                     } catch (JSONException e) {
                         e.printStackTrace();

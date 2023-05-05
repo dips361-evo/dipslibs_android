@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -332,6 +333,14 @@ public class frag_new_resi extends Fragment {
                                     String base64Image = obj.getString("image");
                                     bytePhoto = Base64.decode(base64Image, Base64.NO_WRAP);
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                                    RelativeLayout.LayoutParams lpImg = new RelativeLayout.LayoutParams(250, 300);
+                                    lpImg.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                                    lpImg.setMargins(10,120,10,10);
+                                    imgResume.setLayoutParams(lpImg);
+                                    imgResume.setScaleX(2.5f);
+                                    imgResume.setScaleY(3f);
+                                    imgResume.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                    imgResume.setImageBitmap(bitmap);
                                     imgResume.setImageBitmap(bitmap);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
