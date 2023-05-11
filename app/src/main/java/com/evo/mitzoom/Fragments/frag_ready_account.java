@@ -148,8 +148,6 @@ public class frag_ready_account extends Fragment {
         idDips = sessions.getKEY_IdDips();
         NoCIF = sessions.getNoCIF();
         String dataNasabah = sessions.getNasabah();
-        Log.e("CEK",mContext+" formCode : "+formCode+" | NoCIF : "+NoCIF);
-        Log.e("CEK",mContext+" dataNasabah : "+dataNasabah);
         if (!dataNasabah.isEmpty()) {
             try {
                 dataNasabahObj = new JSONObject(dataNasabah);
@@ -176,16 +174,10 @@ public class frag_ready_account extends Fragment {
                 e.printStackTrace();
             }
         }
-        Log.e("CEK",mContext+" namaLengkap : "+namaLengkap+" | alamat : "+alamat);
-        Log.e("CEK",mContext+" no_handphone : "+no_handphone+" | nik : "+nik+" | branchCode : "+branchCode);
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         if (no_handphone.isEmpty()) {
             no_handphone = "089637407882";
         }
-        Log.e("CEK",mContext+" isSessionZoom : "+isSessionZoom+" | no_handphone : "+no_handphone);
-        /*if (isSessionZoom) {
-            rabbitMirroring = new RabbitMirroring(mContext);
-        }*/
         
     }
 
@@ -199,7 +191,6 @@ public class frag_ready_account extends Fragment {
             public void onReceive(Context context, Intent intent) {
                 numberOTP = "";
                 String dataSMS = intent.getExtras().getString("smsMessage");
-                Log.e("CEK","MASUK dataSMS : "+dataSMS);
                 String[] sp = dataSMS.split(" ");
                 for (int i = 0; i < sp.length; i++) {
                     String word = sp[i];
@@ -314,7 +305,6 @@ public class frag_ready_account extends Fragment {
         }
 
         dataFormObj = dataReqForm();
-        Log.e("CEK","dataFormObj AWAL : "+dataFormObj.toString());
         if (dataFormObj.length() > 0) {
             if (formCode == 150) {
                 if (dataFormObj.has(keysData)) {
@@ -573,8 +563,6 @@ public class frag_ready_account extends Fragment {
                         }
                     }
 
-                    Log.e("CEK","flagNext : "+flagNext);
-                    Log.e("CEK","objEl : "+objEl.toString());
                     if (flagNext) {
                         processNext();
                     }
@@ -587,7 +575,6 @@ public class frag_ready_account extends Fragment {
     private void processNext() {
         dataFormObj = dataReqForm();
         if (formCode < 156) {
-            Log.e("CEK","dataFormObj : "+dataFormObj.toString());
             sessions.saveFormReq(dataFormObj.toString());
             Bundle bundle = new Bundle();
             Fragment fragment = new frag_ready_account();

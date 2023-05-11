@@ -596,10 +596,10 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
 
                 String[] timeArray = sp[i].split(":");
                 String[] spDate = Savetanggal.split("-");
-                String thn = spDate[0].toString().trim();
-                String getBln = spDate[1].toString().trim();
+                String thn = spDate[0].trim();
+                String getBln = spDate[1].trim();
                 int bln = Integer.parseInt(getBln) - 1;
-                String tgl = spDate[2].toString().trim();
+                String tgl = spDate[2].trim();
 
                 Log.e("CEK","DATETIMES-"+i+" : "+Savetanggal+" "+sp[i]);
 
@@ -613,10 +613,7 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
                 long timeInMilis = calendar.getTimeInMillis();
                 long timeDiff = timeInMilis - timeCurrentMilis;
 
-                boolean start = true;
-                if (i > 0) {
-                    start = false;
-                }
+                boolean start = i <= 0;
 
                 Data data = new Data.Builder()
                         .putBoolean(EXTRA_START,start)

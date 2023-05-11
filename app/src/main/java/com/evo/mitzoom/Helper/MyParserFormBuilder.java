@@ -68,7 +68,6 @@ public class MyParserFormBuilder {
         MyParserFormBuilder.llFormBuild = llFormBuild;
         sessions = new SessionManager(mContext);
         language = sessions.getLANG();
-        Log.e("CEK","language : "+language);
     }
 
     public static JSONArray getForm() {
@@ -140,11 +139,7 @@ public class MyParserFormBuilder {
                         }
                         else if (compObj.getJSONObject("props").has("disabled")) {
                             boolean getDisabled = compObj.getJSONObject("props").getBoolean("disabled");
-                            if (getDisabled) {
-                                compDisabled = false;
-                            } else {
-                                compDisabled = true;
-                            }
+                            compDisabled = !getDisabled;
                         }
                         else if (compObj.getJSONObject("props").has("hidden")) {
                             compHidden = compObj.getJSONObject("props").getBoolean("hidden");
@@ -196,7 +191,6 @@ public class MyParserFormBuilder {
                                         DatePickerDialog.OnDateSetListener dateDialog = new DatePickerDialog.OnDateSetListener() {
                                             @Override
                                             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                                                Log.e("CEK", "year : " + year + " | month : " + month + " | dayOfMonth : " + dayOfMonth);
                                                 currentTime.set(Calendar.YEAR, year);
                                                 currentTime.set(Calendar.MONTH, month);
                                                 currentTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -229,8 +223,6 @@ public class MyParserFormBuilder {
                                         if (indx >= 0) {
                                             valKurung = " " + lowLabel.substring(indx);
                                         }
-
-                                        Log.e("CEK", "lowLabel : " + lowLabel + " | valKurung : " + valKurung);
 
                                         if (lowLabel.equals("npwp" + valKurung)) {
                                             ed.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
@@ -286,7 +278,6 @@ public class MyParserFormBuilder {
                                     ed.setLayoutParams(lp);
                                     llFormBuild.addView(ed);
 
-                                    Log.e("CEK", "compName : " + elName + " | ids : " + ids);
                                     dataObjEl.put("id", ids);
                                     dataObjEl.put("name", keyLabelInd);
                                     dataObjEl.put("keyIndo", keyLabelInd);
@@ -320,7 +311,6 @@ public class MyParserFormBuilder {
                                     int ids = ed.getId();
                                     String elName = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                     String keyLabelInd = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
-                                    Log.e("CEK", "compName : " + elName + " | ids : " + ids);
                                     dataObjEl.put("id", ids);
                                     dataObjEl.put("name", keyLabelInd);
                                     dataObjEl.put("required", compRequired);
@@ -355,7 +345,6 @@ public class MyParserFormBuilder {
                                     int ids = ed.getId();
                                     String elName = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                     String keyLabelInd = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
-                                    Log.e("CEK", "compName : " + elName + " | ids : " + ids);
                                     dataObjEl.put("id", ids);
                                     dataObjEl.put("name", keyLabelInd);
                                     dataObjEl.put("required", compRequired);
@@ -386,7 +375,6 @@ public class MyParserFormBuilder {
                                         elNameRad = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                         keyLabelIndRad = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
 
-                                        Log.e("CEK", "compLen Radio : " + compLen);
                                         for (int k = j; k < compLen; k++) {
                                             int loopP = k + 1;
                                             jkRad++;
@@ -394,7 +382,6 @@ public class MyParserFormBuilder {
                                                 finishRad = true;
                                                 break;
                                             }
-                                            Log.e("CEK", "Loop Radio : " + loopP);
                                             String compP = components.get(loopP).toString();
                                             JSONObject compObjP = new JSONObject(compP);
                                             String compLabelP = compObjP.getString("label");
@@ -450,8 +437,6 @@ public class MyParserFormBuilder {
 
                                     radioGroup.addView(rb);
 
-                                    Log.e("CEK", "finishRad : " + finishRad + " | jkRad : " + jkRad + " | radB : " + radB);
-
                                     if (finishRad && radB == jkRad - 1) {
                                         llFormBuild.addView(radioGroup);
 
@@ -470,7 +455,6 @@ public class MyParserFormBuilder {
                                         }
 
                                         int ids = radioGroup.getId();
-                                        Log.e("CEK", "compName : " + elNameRad + " | ids : " + ids);
                                         dataObjEl.put("id", ids);
                                         dataObjEl.put("name", keyLabelIndRad);
                                         dataObjEl.put("nameGab", compLabelGabIndo);
@@ -510,7 +494,6 @@ public class MyParserFormBuilder {
                                         elName = compPlaceholder.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                         keyLabelInd = pcPlaceIdn.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                     }
-                                    Log.e("CEK", "compName : " + elName + " | ids : " + ids);
                                     dataObjEl.put("id", ids);
                                     dataObjEl.put("name", keyLabelInd);
                                     dataObjEl.put("required", compRequired);
@@ -594,7 +577,6 @@ public class MyParserFormBuilder {
 
                                     int ids = ln.getId();
 
-                                    Log.e("CEK", "compName : " + elName + " | ids : " + ids);
                                     dataObjEl.put("id", ids);
                                     dataObjEl.put("name", keyLabelInd);
                                     dataObjEl.put("required", compRequired);
@@ -619,8 +601,8 @@ public class MyParserFormBuilder {
                                     if (compObj.has("currency")) {
                                         String locale = compObj.getJSONObject("currency").getString("locale");
                                         String prefix = compObj.getJSONObject("currency").getString("prefix");
-                                        TextView tvCurr = (TextView) lnCurr.findViewById(R.id.tvCurrency);
-                                        EditText tvContentCurr = (EditText) lnCurr.findViewById(R.id.tvContentCurr);
+                                        TextView tvCurr = lnCurr.findViewById(R.id.tvCurrency);
+                                        EditText tvContentCurr = lnCurr.findViewById(R.id.tvContentCurr);
 
                                         tvCurr.setText(prefix);
 
@@ -685,7 +667,6 @@ public class MyParserFormBuilder {
                                 llFormBuild.addView(ed);
 
                                 int getIdArea = ed.getId();
-                                Log.e("CEK", "compName : " + compPlaceholder + " | ids : " + getIdArea);
                                 String elNameArea = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 String keyLabelInd = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 JSONObject dataObjElArea = new JSONObject();
@@ -758,7 +739,6 @@ public class MyParserFormBuilder {
                                 llFormBuild.addView(relativeLayout);
 
                                 int ids = relativeLayout.getId();
-                                Log.e("CEK", "compName : " + compPlaceholder + " | ids : " + ids);
                                 String elName = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 String keyLabelIndOpt = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 JSONObject dataObjElOpt = new JSONObject();
@@ -787,11 +767,7 @@ public class MyParserFormBuilder {
                                     dataAuto.add(new FormSpin(idOpt, kodeOpt, labelOpt, labelOpt));
                                 }
 
-                            /*LinearLayout.LayoutParams lpAutoList = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                            lpAutoList.setMargins(0,0,0,10);*/
-
                                 int intAplhabetAuto = randomId();
-                                Log.e("CEK", "intAplhabetAuto : " + intAplhabetAuto);
                                 AutoCompleteTextView autoText = new AutoCompleteTextView(mContext);
                                 lp.setMargins(0, 0, 0, 0);
                                 autoText.setId(intAplhabetAuto);
@@ -824,7 +800,6 @@ public class MyParserFormBuilder {
                                 llFormBuild.addView(autoText);
 
                                 int idsAuto = autoText.getId();
-                                Log.e("CEK", "compName : " + compPlaceholder + " | ids : " + idsAuto);
                                 String elName2 = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 String keyLabelIndAuto = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 JSONObject dataObjElAuto = new JSONObject();

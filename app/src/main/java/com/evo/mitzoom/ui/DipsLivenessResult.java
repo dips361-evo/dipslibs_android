@@ -188,15 +188,12 @@ public class DipsLivenessResult extends AppCompatActivity {
 
         ApiService API = Server.getAPIService2();
         Call<JsonObject> call = API.CaptureAuth(requestBody);
-        Log.e("CEK","REQUEST CALL : "+call.request().url());
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("CEK","RESPONSE CODE: "+response.code());
                 if (response.isSuccessful()) {
                     
                     String dataS = response.body().toString();
-                    Log.e("CEK","CaptureIdentifyAuth dataS: "+dataS);
                     try {
                         JSONObject dataObj = new JSONObject(dataS);
 
@@ -227,7 +224,6 @@ public class DipsLivenessResult extends AppCompatActivity {
                             tip_text_view.setVisibility(View.GONE);
                             boolean isSwafoto = dataCustomer.getBoolean("isSwafoto");
                             isSwafoto = false;
-                            Log.e("CEK", "idDipsNew : " + idDipsNew + " | idDips : " + idDips);
                             String accessToken = "";
                             String exchangeToken = "";
                             if (dataToken.has("accessToken")) {
@@ -295,7 +291,6 @@ public class DipsLivenessResult extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("CEK","onFailure MESSAGE : "+t.getMessage());
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
                 if (t.getMessage().contains("connect")) {
                     new Handler().postDelayed(new Runnable() {
@@ -316,12 +311,10 @@ public class DipsLivenessResult extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.e("CEK","processH5Advance");
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
         Server.getAPIService().H5Advance(requestBody).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("CEK","processH5Advance code : "+response.code());
                 if (response.isSuccessful()) {
                     processCaptureIdentifyAuth(imgBase64);
                 }
@@ -348,9 +341,7 @@ public class DipsLivenessResult extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                    Log.e("CEK","msg ERROR : "+msg);
                     String licenseAI = sessions.getAuthAdvanceAI();
-                    Log.e(TAG,"licenseAI : "+licenseAI);
                     if (licenseAI != null) {
                         dialogShowError(licenseAI);
                     } else {
@@ -362,7 +353,6 @@ public class DipsLivenessResult extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("CEK","onFailure MESSAGE : "+t.getMessage());
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -403,17 +393,13 @@ public class DipsLivenessResult extends AppCompatActivity {
         GuardianLivenessDetectionSDK.init(getApplication(), yourMarket);
         GuardianLivenessDetectionSDK.letSDKHandleCameraPermission();
         String yourLicense = licenseAI;
-        Log.e(TAG,"yourLicense : "+yourLicense);
         GuardianLivenessDetectionSDK.setCameraType(CameraType.FRONT);// The back camera is CameraType.BACK
         GuardianLivenessDetectionSDK.setActionSequence(true, Detector.DetectionType.BLINK);
         GuardianLivenessDetectionSDK.setResultPictureSize(300); // Settable input range: [300,1000], unit: pixels
         GuardianLivenessDetectionSDK.setActionTimeoutMills(20000);
         String checkResult = GuardianLivenessDetectionSDK.setLicenseAndCheck(yourLicense);
-        Log.e(TAG,"checkResult : "+checkResult);
         if ("SUCCESS".equals(checkResult)) {
             startActivityForResult(new Intent(this, LivenessActivity.class), REQUEST_CODE_LIVENESS);
-        } else {
-            Log.e("LivenessSDK", "License check failed:" + checkResult);
         }
     }
 

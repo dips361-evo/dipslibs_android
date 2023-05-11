@@ -72,8 +72,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
             MyParserFormBuilder parseForm = new MyParserFormBuilder(mContext, dataListForm.toString(), holder.container);
             expansionsCollection.add(holder.expansionLayout);
             dataElement = MyParserFormBuilder.getForm();
-            Log.e("CEK","dataElement : "+ dataElement);
-            Log.e("CEK","nameForm : "+nameForm);
             holder.tv_nama_product.setText(labelForm);
             JSONObject objEl = objValCIF.getJSONObject(nameForm);
             processValidationActionForm(holder.container,objEl,nameForm);
@@ -113,7 +111,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
 
                                         @Override
                                         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                            Log.e("CEK",nameDataEl+" : "+charSequence);
                                             try {
                                                 objEl.put(nameDataEl, charSequence);
                                                 dataFormCIF.put(nameForm,objEl);
@@ -132,7 +129,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                 backSpaceChar = lasLenChar > s.length();
                                                 if (!backSpaceChar) {
                                                     String dataNPWP = s.toString();
-                                                    Log.e("CEK", "dataNPWP : " + dataNPWP);
                                                     String formatNPWP = "";
                                                     if (dataNPWP.length() == 2 || dataNPWP.length() == 6 || dataNPWP.length() == 10 || dataNPWP.length() == 16) {
                                                         formatNPWP = ".";
@@ -221,7 +217,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                         spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                             @Override
                                             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                                Log.e("CEK","getSelectedItem : "+spin.getSelectedItem().toString());
                                                 String results = spin.getSelectedItem().toString();
                                                 try {
                                                     objEl.put(nameDataEl, results);
@@ -276,43 +271,7 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
 
                                     break;
                                 } else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
-                                    /*LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
-                                    Log.e("CEK", "LinearLayout getChildCount : " + ll.getChildCount());
-                                    if (ll.getChildCount() > 1) {
-                                        if (ll.getChildAt(0) instanceof LinearLayout) {
-                                            LinearLayout ll2 = (LinearLayout) ll.getChildAt(0);
-                                            Log.e("CEK", "MASUK LinearLayout CHILD ke-" + i);
 
-                                            TextView tvll = (TextView) ll2.getChildAt(1);
-                                            String txt = tvll.getText().toString();
-                                            Log.e("CEK", "tvll : " + txt);
-                                            if (txt.toLowerCase().indexOf("gambar") > 0 || txt.toLowerCase().indexOf("image") > 0) {
-                                                tvSavedImg = (TextView) ll.getChildAt(1);
-                                                ll2.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        REQUESTCODE_GALLERY = 201;
-                                                        chooseFromSD();
-                                                    }
-                                                });
-                                            } else {
-                                                tvSavedFile = (TextView) ll.getChildAt(1);
-                                                ll2.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View view) {
-                                                        Intent intent = new Intent();*/
-                                                        //intent.setType("*/*");
-                                                        /*intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                                                        intent.addCategory(Intent.CATEGORY_OPENABLE);
-                                                        String[] mimetypes = { "application/pdf", "application/doc", "text/*" };
-
-                                                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
-                                                        startActivityForResult(intent, REQUESTCODE_FILE);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                    }*/
                                 }
                             }
                         } catch (JSONException e) {
@@ -363,7 +322,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
 
     private void processMatchData(ViewHolder holder, JSONObject objEl, String nameForm) {
         if (objEl != null) {
-            Log.e("CEK", "processDataFromOCR : " + objEl);
             LinearLayout llFormBuild = holder.container;
             int child = llFormBuild.getChildCount();
 
@@ -379,7 +337,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                     if (llFormBuild.getChildAt(i) instanceof EditText) {
                                         EditText ed = (EditText) llFormBuild.getChildAt(i);
                                         String valEl = objEl.getString(nameDataEl);
-                                        Log.e("CEK", "processMatchData "+nameDataEl+" : "+valEl);
                                         ed.setText(valEl);
                                         if (nameForm.equals("datadiri")) {
                                             boolean chkEnable = checkOCREnabled(nameDataEl);
@@ -395,7 +352,6 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                             RadioButton rb = rg.findViewById(idRad);
                                             String labelRad = rb.getText().toString();
                                             String valEl = objEl.getString(nameDataEl);
-                                            Log.e("CEK", "labelRad : " + labelRad + " | valEl : " + valEl);
                                             if (labelRad.equals(valEl)) {
                                                 rb.setChecked(true);
                                                 if (nameForm.equals("datadiri")) {

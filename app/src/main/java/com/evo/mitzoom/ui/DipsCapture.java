@@ -133,7 +133,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             //requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE,Manifest.permission.READ_SMS,Manifest.permission.READ_PHONE_NUMBERS}, REQUEST_ALL);
         }
         String mPhoneNumber = tMgr.getLine1Number();
-        Log.e("CEK","mPhoneNumber : "+mPhoneNumber);
 
     }
 
@@ -210,7 +209,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
     }
 
     private void setupSurfaceHolder() {
-        Log.e("CEK","setupSurfaceHolder");
         useFacing = CameraSource.CAMERA_FACING_FRONT;
         cameraSource = new CameraSource.Builder(this, detector)
                 .setFacing(useFacing)
@@ -256,7 +254,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
-            Log.e("CEK","START CAMERA");
             cameraSource.start(previewHolder);
             detector.setProcessor(new LargestFaceFocusingProcessor(detector,
                     new GraphicFaceTracker(mContext,"capture")));
@@ -343,7 +340,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
     SurfaceHolder.Callback surfaceCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(@NonNull SurfaceHolder holder) {
-            Log.e("CEK","surfaceCreated START CAMERA");
             startCamera();
         }
 
@@ -366,8 +362,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
 
         @Override
         public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
-            Log.e("CEK","width : "+width);
-            Log.e("CEK","height : "+height);
             Canvas canvas = transHolder.lockCanvas();
 
             int diff1 = 4;
@@ -382,8 +376,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             //float marginTop = (float) (cTop * 3) / diff1;
             //int margins = MarginSurf * 2;
             float rad = (float) width / 2;
-
-            Log.e("CEK","rad : "+rad);
             //double cy = rad + MarginSurf;
 
             int NUM_DASHES = 20;
@@ -394,8 +386,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             float[] intervals = new float[]{ 5, 5 };
             intervals[0] = dashPlusGapSize * DASH_PORTION;
             intervals[1] = dashPlusGapSize * GAP_PORTION;
-            Log.e("CEK","intervals 0 : "+intervals[0]);
-            Log.e("CEK","intervals 1 : "+intervals[1]);
             DashPathEffect dashPath = new DashPathEffect(intervals, 0);
 
             Paint p = new Paint();
@@ -410,7 +400,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             float tops = cTop;
             float rights = (width - leftright);
             float bottoms = (height - cTop);
-            Log.e("CEK","lefts : "+lefts+" | lefts : "+tops+" | rights : "+rights+" | bottoms : "+bottoms);
 
             RectF rect = new RectF(leftright, tops, rights, bottoms);
             canvas.drawOval(rect,p);
@@ -599,15 +588,12 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
 
         ApiService API = Server.getAPIService2();
         Call<JsonObject> call = API.CaptureAuth(requestBody);
-        Log.e("CEK","REQUEST CALL : "+call.request().url());
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 showProgress(false);
-                Log.e("CEK","RESPONSE CODE: "+response.code());
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
-                    Log.e("CEK","dataS: "+dataS);
                     try {
                         JSONObject dataObj = new JSONObject(dataS);
                         JSONObject dataCustomer = dataObj.getJSONObject("data").getJSONObject("customer");
@@ -624,7 +610,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
                         }
                         custName = dataCustomer.getString("namaLengkap");
                         String idDipsNew = dataCustomer.getString("idDips");
-                        Log.e("CEK","idDipsNew : "+idDipsNew+" | idDips : "+idDips);
                         String accessToken = dataToken.getString("accessToken");
 
                         sessions.saveIdDips(idDipsNew);
@@ -660,7 +645,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        Log.e("CEK", "dataErr : " + dataErr);
                         if (dataErr != null) {
                             try {
                                 JSONObject dataObj = new JSONObject(dataErr);
@@ -684,7 +668,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 showProgress(false);
-                Log.e("CEK","onFailure MESSAGE : "+t.getMessage());
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -705,15 +688,10 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
         ApiService API = Server.getAPIService();
         //Call<CaptureIdentify> call = API.CaptureAdvanceAI(jsons);
         Call<CaptureIdentify> call = API.CaptureIdentify(jsons);
-        Log.e("CEK","REQUEST CALL : "+call.request().url());
         call.enqueue(new Callback<CaptureIdentify>() {
             @Override
             public void onResponse(Call<CaptureIdentify> call, Response<CaptureIdentify> response) {
                 flagCapture = false;
-                Log.e("CEK","RESPONSE CODE: "+response.code());
-                if (response.body() != null) {
-                    Log.e("CEK","Response Body : "+ response.body());
-                }
                 showProgress(false);
                 if (response.isSuccessful() && response.body() != null) {
                     int errCode = response.body().getErr_code();
@@ -767,13 +745,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
 
             @Override
             public void onFailure(Call<CaptureIdentify> call, Throwable t) {
-                /*String filename = "base64_capture.txt";
-                try {
-                    createTemporaryFile(imgBase64,filename);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
-                Log.e("CEK","onFailure MESSAGE : "+t.getMessage());
                 flagCapture = false;
                 showProgress(false);
                 startCamera();

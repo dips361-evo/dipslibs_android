@@ -80,11 +80,6 @@ public class frag_open_account_product extends Fragment {
         isCust = sessions.getKEY_iSCust();
         isSwafoto = sessions.getKEY_iSSwafoto();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-        /*if (isSessionZoom) {
-            rabbitMirroring = new RabbitMirroring(mContext);
-        }*/
-
-        Log.e("CEK_FRAG_OPEN","getNoCIF : "+sessions.getNoCIF());
 
     }
 
@@ -251,7 +246,6 @@ public class frag_open_account_product extends Fragment {
 
     private void PopUpTnc(){
         flagViewTNC = true;
-        Log.e("CEK","MASUK PopUpTnc");
         LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.item_tnc, null);
         SweetAlertDialog sweetAlertDialogTNC = new SweetAlertDialog(mContext, SweetAlertDialog.NORMAL_TYPE);
@@ -287,10 +281,8 @@ public class frag_open_account_product extends Fragment {
         int width = mContext.getResources().getDisplayMetrics().widthPixels;
         int height = mContext.getResources().getDisplayMetrics().heightPixels;
 
-        Log.e("CEK","PopUpTnc width : "+width+" | height : "+height);
         int newWidth = (int)(width*0.8);
         int newHeight = (int)(height*0.85);
-        Log.e("CEK","PopUpTnc newWidth : "+newWidth+" | newHeight : "+newHeight);
 
         //sweetAlertDialogTNC.getWindow().setGravity(Gravity.CENTER_HORIZONTAL);
         sweetAlertDialogTNC.getWindow().setLayout(newWidth,newHeight);

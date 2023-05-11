@@ -70,7 +70,6 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
         mContext = this;
         sessions = new SessionManager(mContext);
         String lang = sessions.getLANG();
-        Log.e("CEK","LANG : "+lang);
         setLocale(this, lang);
         //LocaleHelper.setLocale(this,lang);
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -164,10 +163,10 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
         }
     };
 
-    private int posCX = 0;
-    private int posCY = 0;
-    private int posWidth = 0;
-    private int posHeight = 0;
+    private final int posCX = 0;
+    private final int posCY = 0;
+    private final int posWidth = 0;
+    private final int posHeight = 0;
     SurfaceHolder.Callback surfaceCallbackTrans = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(@NonNull SurfaceHolder holder) {
@@ -177,8 +176,6 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
         @Override
         public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width, int height) {
             float rad = (float) width / 2;
-
-            Log.e("CEK","rad : "+rad);
 
             int NUM_DASHES = 20;
             float DASH_PORTION = (float) 0.3;
@@ -197,15 +194,11 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(10);
 
-            Log.e("CEK","surfaceChanged width : "+width+" | height : "+height);
-
             double diffH = Math.ceil(height / 1.5);
             double diffw = Math.ceil(width / 5);
 
             double surfRight = (width - diffw);
             double surfBottom = Math.ceil(height / 1.1);
-
-            Log.e("CEK","surfaceChanged diffw : "+diffw+" | diffH : "+diffH+" | surfRight : "+surfRight+" | surfBottom : "+surfBottom);
 
             RectF rect = new RectF((float) diffw,(float) diffH,(float) surfRight,(float) surfBottom);
 
@@ -241,7 +234,6 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
     }
 
     public void captureImage() {
-        Log.e("CEK",this+" MASUK captureImage");
         flagCapture = true;
         // We add a delay of 200ms so that image captured is stable.
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
@@ -306,8 +298,6 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
 
                     String filePath = fileImage.getAbsolutePath();
                     String filePathCrop = fileImageCrop.getAbsolutePath();
-                    Log.e("CEK","filePath : "+filePath);
-                    Log.e("CEK","filePathCrop : "+filePathCrop);
 
                     if (mediaFile.exists()) {
                         try {
@@ -343,8 +333,6 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
         int width = bm.getWidth();
         int height = bm.getHeight();
 
-        Log.e("CEK","getResizedBitmap width : "+width+" | height : "+height+" | newWidth : "+newWidth+" | newHeight : "+newHeight);
-
         float sx = 0;
         float sy = 0;
         if (useFacing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
@@ -370,14 +358,12 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
             widthB = (int) (height / 1.9);
             heightB = (int) (width / 2.1);*/
             cx = (int) (width / 9.5);
-            cy = (int) (height / 5);
-            widthB = (int) (width / 4);
+            cy = height / 5;
+            widthB = width / 4;
             heightB = (int) (height / 1.7);
 
             matrix.postScale(1, -1); //xiaomi cx itu brarti sudut Y dan cy brarti sudut X
         }
-
-        Log.e("CEK","getResizedBitmap cx : "+cx+" | cy : "+cy+" | widthB : "+widthB+" | heightB : "+heightB);
 
         // "RECREATE" THE NEW BITMAP
         Bitmap resizedBitmap = Bitmap.createBitmap(

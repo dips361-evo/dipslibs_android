@@ -189,13 +189,11 @@ public class frag_cif_new extends Fragment {
     JSONObject dataObjProDesa = new JSONObject();
     private boolean ocrKTP = false;
     private boolean flagMother = false;
-    private int loopValidMother = 0;
+    private final int loopValidMother = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Log.e("CEK","frag_cif_new onCreate");
 
         mContext = getContext();
         sessions = new SessionManager(mContext);
@@ -205,18 +203,12 @@ public class frag_cif_new extends Fragment {
         idDips = sessions.getKEY_IdDips();
 
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-        Log.e("CEK",mContext+" isSessionZoom : "+isSessionZoom);
-        /*if (isSessionZoom) {
-            rabbitMirroring = new RabbitMirroring(mContext);
-        }*/
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View views = inflater.inflate(R.layout.fragment_frag_cif, container, false);
-
-        Log.e("CEK","frag_cif_new onCreateView");
 
         inclHead = views.findViewById(R.id.inclHead);
         TopBar = views.findViewById(R.id.TopBar);
@@ -261,8 +253,6 @@ public class frag_cif_new extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.e("CEK","frag_cif_new onViewCreated");
-
         if (getArguments() != null) {
             if (getArguments().containsKey("form_id")) {
                 form_id = getArguments().getInt("form_id");
@@ -284,12 +274,6 @@ public class frag_cif_new extends Fragment {
         else if (formCode == 803) {
             keysData = "keuangan";
         }
-
-        Log.e("CEK", mContext + " isCust : " + isCust);
-        Log.e("CEK", mContext + " isSwafoto : " + isSwafoto);
-        Log.e("CEK", mContext + " formCode : " + formCode);
-        Log.e("CEK", mContext + " idDips : " + idDips);
-        Log.e("CEK", mContext + " form_id : " + form_id);
 
         if (formCode == 22) {
             tvFotoKTP.setText(R.string.ktp_swafoto);
@@ -436,7 +420,6 @@ public class frag_cif_new extends Fragment {
             btnNext.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.e("CEK","btnNext formCode : "+formCode+" | IMG_BYTE : "+IMG_BYTE.length);
                     if (formCode == 22) {
                         IMG_BYTE = imageBytes;
                         isSwafoto = true;
@@ -670,8 +653,6 @@ public class frag_cif_new extends Fragment {
                         }
                     }
 
-                    Log.e("CEK","flagNext : "+flagNext);
-                    Log.e("CEK","objEl : "+objEl.toString());
                     if (flagNext) {
                         processNext();
                     }
@@ -689,7 +670,6 @@ public class frag_cif_new extends Fragment {
             public void onReceive(Context context, Intent intent) {
                 numberOTP = "";
                 String dataSMS = intent.getExtras().getString("smsMessage");
-                Log.e("CEK","MASUK dataSMS : "+dataSMS);
                 String[] sp = dataSMS.split(" ");
                 for (int i = 0; i < sp.length; i++) {
                     String word = sp[i];
@@ -723,7 +703,6 @@ public class frag_cif_new extends Fragment {
     }
 
     private void processNext() {
-        Log.e("CEK","MASUK NEXT");
         String getCif = sessions.getCIF();
         try {
             JSONObject dataCIF = null;
@@ -806,19 +785,15 @@ public class frag_cif_new extends Fragment {
     }
 
     private void processGetForm(int formId) {
-        Log.e("CEK", this+" MASUK processGetForm formId : "+formId);
-        Log.e("CEK", this+" MASUK formCode : "+formCode);
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIWAITING_PRODUCT().getFormBuilder(formId,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 swipe.setRefreshing(false);
-                Log.e("CEK","response processGetForm : "+response.code());
                 if (response.isSuccessful()) {
                     btnProses.setVisibility(View.VISIBLE);
                     String dataS = response.body().toString();
-                    Log.e("CEK","response dataS : "+dataS);
                     llFormBuild.removeAllViewsInLayout();
                     try {
                         JSONObject dataObj = new JSONObject(dataS);
@@ -830,20 +805,15 @@ public class frag_cif_new extends Fragment {
                         }
                         JSONObject dataObjForm = dataObj.getJSONObject("data");
                         String dataForm = dataObjForm.getString("data");
-                        Log.e("CEK","dataForm : "+dataForm);
                         MyParserFormBuilder parseForm = new MyParserFormBuilder(mContext, dataForm, llFormBuild);
                         idElement = MyParserFormBuilder.getForm();
-                        Log.e("CEK","dataElement : "+ idElement);
                         processValidationActionForm();
                         dataFormCIF.put(keysData,objEl);
                         reqFormMirroring = dataReqFormMirroring();
-                        Log.e("CEK","DATA dataFormCIF : "+dataFormCIF.toString());
-                        Log.e("CEK","DATA reqFormMirroring : "+reqFormMirroring.toString());
                         RabbitMirroring.MirroringSendKey(reqFormMirroring);
                         if (formCode == 8) {
                             if (sessions.getOCR() != null) {
                                 String dataOCR = sessions.getOCR();
-                                Log.e("CEK","dataOCR : "+ dataOCR);
                                 try {
                                     JSONObject dataObjOCR = new JSONObject(dataOCR);
                                     desa_kelurahan = dataObjOCR.getString("desakelurahan");
@@ -871,7 +841,6 @@ public class frag_cif_new extends Fragment {
     }
 
     private void processValidationActionForm() {
-        Log.e("CEK","processValidationActionForm");
         try {
             objEl.put("idDips",idDips);
         } catch (JSONException e) {
@@ -909,7 +878,7 @@ public class frag_cif_new extends Fragment {
                                     ed.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                                         @Override
                                         public void onFocusChange(View view, boolean b) {
-                                            Log.e("CEK","onFocusChange : "+b);
+
                                         }
                                     });
                                     ed.addTextChangedListener(new TextWatcher() {
@@ -922,7 +891,6 @@ public class frag_cif_new extends Fragment {
 
                                         @Override
                                         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                            Log.e("CEK",nameDataEl+" : "+charSequence);
                                             try {
                                                 objEl.put(nameDataEl, charSequence);
                                                 dataFormCIF.put(keysData,objEl);
@@ -945,7 +913,6 @@ public class frag_cif_new extends Fragment {
                                                 backSpaceChar = lasLenChar > s.length();
                                                 if (!backSpaceChar) {
                                                     String dataNPWP = s.toString();
-                                                    Log.e("CEK", "dataNPWP : " + dataNPWP);
                                                     String formatNPWP = "";
                                                     if (dataNPWP.length() == 2 || dataNPWP.length() == 6 || dataNPWP.length() == 10 || dataNPWP.length() == 16) {
                                                         formatNPWP = ".";
@@ -1078,7 +1045,6 @@ public class frag_cif_new extends Fragment {
                                         spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                             @Override
                                             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                                Log.e("CEK","getSelectedItem : "+spin.getSelectedItem().toString());
                                                 FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
                                                 int idData = dataSpin.getId();
                                                 String results = dataSpin.getName();
@@ -1111,7 +1077,6 @@ public class frag_cif_new extends Fragment {
                                                         reqFormMirroring = dataReqFormMirroring();
                                                         RabbitMirroring.MirroringSendKey(reqFormMirroring);
                                                     }
-                                                    Log.e("CEK","flagStuckSpin : "+flagStuckSpin);
                                                     if (flagStuckSpin) {
                                                         processGetSpinChild(nameDataEl);
                                                     }
@@ -1169,15 +1134,12 @@ public class frag_cif_new extends Fragment {
                                 }
                                 else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
                                     LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
-                                    Log.e("CEK", "LinearLayout getChildCount : " + ll.getChildCount());
                                     if (ll.getChildCount() > 1) {
                                         if (ll.getChildAt(0) instanceof LinearLayout) {
                                             LinearLayout ll2 = (LinearLayout) ll.getChildAt(0);
-                                            Log.e("CEK", "MASUK LinearLayout CHILD ke-" + i);
 
                                             TextView tvll = (TextView) ll2.getChildAt(1);
                                             String txt = tvll.getText().toString();
-                                            Log.e("CEK", "tvll : " + txt);
                                             if (txt.toLowerCase().indexOf("gambar") > 0 || txt.toLowerCase().indexOf("image") > 0) {
                                                 tvSavedImg = (TextView) ll.getChildAt(1);
                                                 ll2.setOnClickListener(new View.OnClickListener() {
@@ -2363,9 +2325,9 @@ public class frag_cif_new extends Fragment {
         EditText et_warga= dialogView.findViewById(R.id.et_warga);
         EditText et_work= dialogView.findViewById(R.id.et_work);
         EditText et_nama_ibuKandung = dialogView.findViewById(R.id.et_nama_ibu_kandung);
-        TextView tvError = (TextView) dialogView.findViewById(R.id.tvError);
-        TextView tvMandatory = (TextView) dialogView.findViewById(R.id.tvMandatory);
-        CheckBox chkDataCorrect = (CheckBox) dialogView.findViewById(R.id.chkDataCorrect);
+        TextView tvError = dialogView.findViewById(R.id.tvError);
+        TextView tvMandatory = dialogView.findViewById(R.id.tvMandatory);
+        CheckBox chkDataCorrect = dialogView.findViewById(R.id.chkDataCorrect);
         Button btnOCRCancel = dialogView.findViewById(R.id.btncncl);
         Button btnOCRNext = dialogView.findViewById(R.id.btnlnjt);
 
@@ -3108,7 +3070,7 @@ public class frag_cif_new extends Fragment {
             e.printStackTrace();
         }
 
-        Log.e("CEK","dataReqValidateIbu : "+jsons.toString());
+        Log.e("CEK","dataReqValidateIbu : "+ jsons);
 
         return jsons;
     }
@@ -3124,7 +3086,7 @@ public class frag_cif_new extends Fragment {
             e.printStackTrace();
         }
 
-        Log.e("CEK","dataReqValidateFace : "+jsons.toString());
+        Log.e("CEK","dataReqValidateFace : "+ jsons);
 
         return jsons;
     }
@@ -3648,7 +3610,7 @@ public class frag_cif_new extends Fragment {
             e.printStackTrace();
         }
 
-        Log.e("CEL","REQUEST CekDataByNIK : "+jsons.toString());
+        Log.e("CEL","REQUEST CekDataByNIK : "+ jsons);
 
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();

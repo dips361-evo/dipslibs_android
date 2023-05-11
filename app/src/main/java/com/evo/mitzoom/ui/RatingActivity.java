@@ -44,7 +44,7 @@ public class RatingActivity extends AppCompatActivity {
     private EditText kritik;
     private Context mContext;
     private SessionManager sessions;
-    private String thumb = "";
+    private final String thumb = "";
     private String idDips = "";
     private String idAgent = "";
     private RelativeLayout rlprogress;
@@ -174,7 +174,6 @@ public class RatingActivity extends AppCompatActivity {
         String getKritik = kritik.getText().toString().trim();
         int getStar = (int) rating.getRating();
         String stars = String.valueOf(getStar);
-        Log.e(TAG,"KRITIK : "+getKritik+" | stars : "+stars);
 
         JSONObject jsons = new JSONObject();
         try {
@@ -187,7 +186,6 @@ public class RatingActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Log.e(TAG,"RatingAgent : "+ jsons);
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
 
@@ -196,7 +194,6 @@ public class RatingActivity extends AppCompatActivity {
         Server.getAPIService().RateAgent(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e(TAG,"RatingAgent ResponCode : "+response.code());
                 if (response.isSuccessful()) {
                     //RatingApps();
                     sessions.clearIdDiPSCSID();
@@ -217,7 +214,6 @@ public class RatingActivity extends AppCompatActivity {
         String getKritik = kritik.getText().toString().trim();
         int getStar = (int) rating.getRating();
         String stars = String.valueOf(getStar);
-        Log.e(TAG,"KRITIK : "+getKritik+" | stars : "+stars);
         JSONObject jsons = new JSONObject();
         try {
             jsons.put("idDips",idDips);
@@ -227,7 +223,6 @@ public class RatingActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Log.e(TAG,"RatingApps : "+ jsons);
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
 
@@ -236,7 +231,6 @@ public class RatingActivity extends AppCompatActivity {
         Server.getAPIService().RateApp(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e(TAG,"RatingApps ResponCode : "+response.code());
                 showProgress(false);
                 if (response.isSuccessful()) {
                     sessions.clearIdDiPSCSID();

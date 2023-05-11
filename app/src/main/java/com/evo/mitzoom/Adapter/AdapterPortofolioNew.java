@@ -54,8 +54,6 @@ public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolio
                 linkIcon = dataList.getJSONObject(position).getString("icon");
             }
             JSONArray dataListPorto = dataList.getJSONObject(position).getJSONArray("dataList");
-            //Log.e("CEK","dataListPorto length : "+dataListPorto.length());
-            //Log.e("CEK","dataListPorto : "+dataListPorto.toString());
 
             holder.tv_nama_product.setText(typeProd);
 
@@ -80,7 +78,6 @@ public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolio
             for (int i = 0; i < dataListPorto.length(); i++) {
                 String idRelatifs = "11" + i;
                 int idRelatif = Integer.valueOf(idRelatifs);
-                //Log.e("CEK","dataListPorto ke-"+i+" | idRelatif : "+idRelatif);
                 String namaProduk = "";
                 String noRekening = "";
                 String jumlahDana = "";
@@ -178,13 +175,10 @@ public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolio
             expansionsCollection.add(holder.expansionLayout);
 
             int countChild = holder.container.getChildCount();
-            Log.e("CEK",typeProd+" countChild : "+countChild);
             for (int i = 0; i < countChild; i++) {
                 int getId = holder.container.getChildAt(i).getId();
-                Log.e("CEK","getId ke-"+i+" | "+getId);
                 if (getId > 0) {
                     RelativeLayout rlExpandLayout = (RelativeLayout) holder.container.getChildAt(i);
-                    Log.e("CEK","rlExpandLayout getChildCount : "+rlExpandLayout.getChildCount());
                     LinearLayout llExp = (LinearLayout) rlExpandLayout.getChildAt(0);
                     TextView tvNominal = (TextView) llExp.getChildAt(1);
                     String getNominal = tvNominal.getText().toString();
@@ -194,7 +188,6 @@ public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolio
                             @Override
                             public void onClick(View view) {
                                 String getNominal2 = tvNominal.getText().toString();
-                                Log.e("CEK","MASUK EYE OPEN : "+getNominal2);
                                 String[] sp = getNominal2.split(" ");
                                 String nominal = sp[1];
                                 nominal = nominal.replace(nominal,"XXXXXX");
@@ -210,7 +203,6 @@ public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolio
                         rlExpandLayout.getChildAt(2).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Log.e("CEK","MASUK EYE CLOSE : "+getNominal);
                                 tvNominal.setText(getNominal);
                                 view.setVisibility(View.GONE);
                                 rlExpandLayout.getChildAt(1).setVisibility(View.VISIBLE);

@@ -290,13 +290,13 @@ public class frag_portfolio_new extends Fragment {
                     persentase = 100;
                 }
 
-                if (type.toLowerCase().equals("tabungan") || type.toLowerCase().equals("saving")) {
+                if (type.equalsIgnoreCase("tabungan") || type.equalsIgnoreCase("saving")) {
                     colorsProd.add(mContext.getColor(R.color.zm_tabungan));
-                } else if (type.toLowerCase().equals("deposito") || type.toLowerCase().equals("deposit")) {
+                } else if (type.equalsIgnoreCase("deposito") || type.equalsIgnoreCase("deposit")) {
                     colorsProd.add(mContext.getColor(R.color.zm_deposito));
-                } else if (type.toLowerCase().equals("pinjaman") || type.toLowerCase().equals("loan")) {
+                } else if (type.equalsIgnoreCase("pinjaman") || type.equalsIgnoreCase("loan")) {
                     colorsProd.add(mContext.getColor(R.color.zm_kredit));
-                } else if (type.toLowerCase().equals("giro")) {
+                } else if (type.equalsIgnoreCase("giro")) {
                     colorsProd.add(mContext.getColor(R.color.zm_giro));
                 } else if (type.toLowerCase().contains("banca")) {
                     colorsProd.add(mContext.getColor(R.color.zm_banca));
@@ -347,13 +347,13 @@ public class frag_portfolio_new extends Fragment {
         if (listTypeProduk.length() == 1 && !typeProduct.isEmpty() && !percentProduct.isEmpty()) {
             Log.e("CEK","MASUK IF PERCENT : "+percentProduct);
             if (percentProduct.equals("0,0") || percentProduct.equals("0.0")) {
-                if (typeProduct.toLowerCase().equals("tabungan") || typeProduct.toLowerCase().equals("saving")) {
+                if (typeProduct.equalsIgnoreCase("tabungan") || typeProduct.equalsIgnoreCase("saving")) {
                     pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_tabungan));
-                } else if (typeProduct.toLowerCase().equals("deposito") || typeProduct.toLowerCase().equals("deposit")) {
+                } else if (typeProduct.equalsIgnoreCase("deposito") || typeProduct.equalsIgnoreCase("deposit")) {
                     pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_deposito));
-                } else if (typeProduct.toLowerCase().equals("pinjaman") || typeProduct.toLowerCase().equals("loan")) {
+                } else if (typeProduct.equalsIgnoreCase("pinjaman") || typeProduct.equalsIgnoreCase("loan")) {
                     pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_kredit));
-                } else if (typeProduct.toLowerCase().equals("giro")) {
+                } else if (typeProduct.equalsIgnoreCase("giro")) {
                     pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_giro));
                 } else if (typeProduct.toLowerCase().contains("banca")) {
                     pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_banca));
@@ -373,7 +373,7 @@ public class frag_portfolio_new extends Fragment {
 
     private JSONArray parseGetProduct(String type) throws JSONException {
         JSONArray prod = null;
-        if (type.toLowerCase().equals("tabungan") || type.toLowerCase().equals("saving")) {
+        if (type.equalsIgnoreCase("tabungan") || type.equalsIgnoreCase("saving")) {
             prod = dataNasabah.getJSONArray("portotabungan");
             JSONArray rekTabungan = new JSONArray();
             for (int i = 0; i < prod.length()+1; i++) {
@@ -388,11 +388,11 @@ public class frag_portfolio_new extends Fragment {
                     rekTabungan.put(jsonObject);
                 }
             }
-            Log.e("CEK","rekTabungan : "+rekTabungan.toString());
+            Log.e("CEK","rekTabungan : "+ rekTabungan);
             sessions.saveRekNasabah(rekTabungan.toString());
-        } else if (type.toLowerCase().equals("deposito") || type.toLowerCase().equals("deposit")) {
+        } else if (type.equalsIgnoreCase("deposito") || type.equalsIgnoreCase("deposit")) {
             prod = dataNasabah.getJSONArray("portodeposito");
-        } else if (type.toLowerCase().equals("pinjaman") || type.toLowerCase().equals("loan")) {
+        } else if (type.equalsIgnoreCase("pinjaman") || type.equalsIgnoreCase("loan")) {
             prod = dataNasabah.getJSONArray("portoloan");
         }
 
@@ -401,7 +401,7 @@ public class frag_portfolio_new extends Fragment {
         for (int i = 0; i < prod.length(); i++) {
             String prodName = "";
             String accountName = "";
-            if (type.toLowerCase().equals("pinjaman") || type.toLowerCase().equals("loan")) {
+            if (type.equalsIgnoreCase("pinjaman") || type.equalsIgnoreCase("loan")) {
                 prodName = prod.getJSONObject(i).getString("loanProductName");
                 if (prod.getJSONObject(i).has("accountName")) {
                     accountName = prod.getJSONObject(i).getString("accountName");
@@ -416,19 +416,19 @@ public class frag_portfolio_new extends Fragment {
             String noRekening = "";
             long jumlahDana = 0;
             String kurs = "";
-            if (type.toLowerCase().equals("tabungan") || type.toLowerCase().equals("saving")) {
+            if (type.equalsIgnoreCase("tabungan") || type.equalsIgnoreCase("saving")) {
                 noRekening = prod.getJSONObject(i).getString("accountNo");
                 String balance = prod.getJSONObject(i).getString("availBalance");
                 jumlahDana = (long) Double.parseDouble(balance);
                 kurs = prod.getJSONObject(i).getString("acctCur");
 
 
-            } else if (type.toLowerCase().equals("deposito") || type.toLowerCase().equals("deposit")) {
+            } else if (type.equalsIgnoreCase("deposito") || type.equalsIgnoreCase("deposit")) {
                 noRekening = prod.getJSONObject(i).getString("rekKredit");
                 String balance = prod.getJSONObject(i).getString("nominal");
                 jumlahDana = (long) Double.parseDouble(balance);
                 kurs = prod.getJSONObject(i).getString("mataUang");
-            } else if (type.toLowerCase().equals("pinjaman") || type.toLowerCase().equals("loan")) {
+            } else if (type.equalsIgnoreCase("pinjaman") || type.equalsIgnoreCase("loan")) {
                 noRekening = prod.getJSONObject(i).getString("loanNo");
                 String balance = prod.getJSONObject(i).getString("plafond");
                 jumlahDana = (long) Double.parseDouble(balance);

@@ -45,7 +45,6 @@ public abstract class CmdRequest {
             int type = Integer.parseInt(strings[0]);
             cmdType = CmdType.values()[type];
         } catch (Exception e) {
-            Log.e(TAG, "the cmd type can not be Recognized");
             return null;
         }
 

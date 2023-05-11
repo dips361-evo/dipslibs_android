@@ -288,7 +288,6 @@ public class DipsChooseLanguage extends AppCompatActivity {
 
                 ActivityCompat.requestPermissions(this, new String[]{readImagePermission}, READ_EXTERNAL_STORAGE);
             } else if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG,"MASUK ELSE reqPermission RECEIVE_SMS");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_RECEIVE_SMS);
             } else if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
@@ -350,38 +349,14 @@ public class DipsChooseLanguage extends AppCompatActivity {
             }
         } else if (requestCode == READ_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.e(TAG,"READ_EXTERNAL_STORAGE PERMISSION_GRANTED");
-                /*if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    Log.e(TAG,"READ_EXTERNAL_STORAGE PERMISSION_GRANTED CAMERA");
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
-                } else {
-                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE);
-                    }
-                }*/
             }
         } else if (requestCode == REQUEST_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                /*if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_VIDEO_AUDIO_CODE);
-                }*/
+
             }
         } else if (requestCode == REQUEST_VIDEO_AUDIO_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                /*if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE);
-                } else {
-                    if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            if (!Environment.isExternalStorageManager()){
-                                Intent getpermission = new Intent();
-                                getpermission.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                                startActivityForResult(getpermission,ATTACHMENT_MANAGE_ALL_FILE);
-                            }
-                        }
-                    }
-                }*/
             }
         } else if (requestCode == WRITE_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

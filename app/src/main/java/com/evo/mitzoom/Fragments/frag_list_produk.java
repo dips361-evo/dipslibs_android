@@ -77,10 +77,6 @@ public class frag_list_produk extends Fragment {
         isCust = sessions.getKEY_iSCust();
         isSwafoto = sessions.getKEY_iSSwafoto();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-        /*if (isSessionZoom) {
-            rabbitMirroring = new RabbitMirroring(context);
-        }*/
-        Log.e("CEK_FRAG_LIST_PROD","getNoCIF : "+sessions.getNoCIF());
     }
     @Nullable
     @Override
@@ -194,7 +190,6 @@ public class frag_list_produk extends Fragment {
     }
 
     private void PopUpTnc(){
-        Log.e("CEK","MASUK PopUpTnc");
         LayoutInflater inflater = ((Activity) context).getLayoutInflater();
         if (sweetAlertDialogTNC == null) {
             dialogView = inflater.inflate(R.layout.item_tnc,null);
@@ -351,7 +346,6 @@ public class frag_list_produk extends Fragment {
     }
 
     private void setRecylerList() {
-        Log.e("CEK","MASUK setRecylerList");
 
         ItemSavingAdapter dataList = new ItemSavingAdapter(context, dataProduct);
 

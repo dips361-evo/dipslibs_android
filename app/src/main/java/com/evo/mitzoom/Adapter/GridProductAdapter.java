@@ -96,8 +96,6 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
     }
 
     private void PopUPData(String finalNamaProduk, String finalDataBody) {
-        Log.e("CEK","finalDataBody : "+finalDataBody);
-
         View views = LayoutInflater.from(ctx).inflate(R.layout.item_ads,null);
 
         TextView tvContent = views.findViewById(R.id.tvContents);
@@ -135,10 +133,8 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
         int width = ctx.getResources().getDisplayMetrics().widthPixels;
         int height = ctx.getResources().getDisplayMetrics().heightPixels;
 
-        Log.e("CEK","PopUpTnc width : "+width+" | height : "+height);
         int newWidth = (int)(width*0.8);
         int newHeight = (int)(height*0.85);
-        Log.e("CEK","PopUpTnc newWidth : "+newWidth+" | newHeight : "+newHeight);
 
         sweet.getWindow().setGravity(Gravity.CENTER_HORIZONTAL);
         sweet.getWindow().setLayout(newWidth,newHeight);
@@ -148,7 +144,6 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
     }
 
     private void processProductMedia(int produkId, GriViewHolder holder) {
-        Log.e("CEK","processProductMedia : "+produkId);
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIWAITING_PRODUCT().getProductMedia(produkId,authAccess,exchangeToken).enqueue(new Callback<ResponseBody>() {
@@ -156,7 +151,6 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.code() == 200) {
                     String Content_Type = response.headers().get("Content-Type");
-                    Log.e("CEK","processProductMedia Content_Type : "+Content_Type);
                     if (!Content_Type.contains("json")) {
                         InputStream in = response.body().byteStream();
                         processParsingMedia(in, Content_Type,holder);

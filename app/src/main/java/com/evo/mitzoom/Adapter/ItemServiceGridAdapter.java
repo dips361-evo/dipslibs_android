@@ -57,7 +57,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
         this.mContext = mContext;
         this.rabbitMirroring = rabbitMirroring;
         this.isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-        Log.e("CEK","ItemServiceGridAdapter isSessionZoom : "+isSessionZoom);
     }
 
     @NonNull
@@ -67,7 +66,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
         sessions = new SessionManager(mContext);
         idDips = sessions.getKEY_IdDips();
         String dataNasabah = sessions.getNasabah();
-        Log.e("CEK",mContext+" dataNasabah : "+dataNasabah);
         if (!dataNasabah.isEmpty()) {
             try {
                 dataNasabahObj = new JSONObject(dataNasabah);
@@ -144,19 +142,15 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
             e.printStackTrace();
         }
 
-        Log.e("CEK","REQUEST processInqCIFbyNIK : "+dataObj.toString());
-
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataObj.toString());
 
         ApiService API = Server.getAPIService();
         Call<JsonObject> call = API.InquieryCIFbyNIK(requestBody,authAccess,exchangeToken);
-        Log.e("CEK","REQUEST processInqCIFbyNIK URL : "+call.request().url());
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("CEK","RESPONSE CODE processInqCIFbyNIK : "+response.code());
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -164,7 +158,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                 }
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
-                    Log.e("CEK","RESPONSE processInqCIFbyNIK : "+dataS);
                     try {
                         JSONObject dataObj = new JSONObject(dataS);
                         String tempatLahir = dataObj.getJSONObject("data").getString("tempatLahir");
