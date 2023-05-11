@@ -26,6 +26,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolioNew.ViewHolder> {
 
@@ -127,8 +129,14 @@ public class AdapterPortofolioNew extends RecyclerView.Adapter<AdapterPortofolio
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
                 linearLayout.addView(tv);
 
-                BigDecimal parsed = frag_portfolio_new.parseCurrencyValue(jumlahDana);
-                String formatted = frag_portfolio_new.numberFormat.format(parsed);
+                /*BigDecimal parsed = frag_portfolio_new.parseCurrencyValue(jumlahDana);
+                String formatted = frag_portfolio_new.numberFormat.format(parsed);*/
+
+                Double d = (double) dataListPorto.getJSONObject(i).getLong("jumlahDana") / 100;
+                NumberFormat formatter = NumberFormat.getInstance(new Locale("id","ID"));
+                formatter.setMinimumFractionDigits(2);
+                String formatted = formatter.format(d);
+
 
                 String dataN = kurs + " " + formatted;
                 TextView tv2 = new TextView(mContext);

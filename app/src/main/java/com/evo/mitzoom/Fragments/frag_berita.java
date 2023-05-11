@@ -83,7 +83,6 @@ import retrofit2.Response;
 
 public class frag_berita extends Fragment implements com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener {
     private Context context;
-    int [] gambar = {R.drawable.rtgs, R.drawable.pembukaanakun, R.drawable.formulirkomplain, R.drawable.ads1,R.drawable.ads2, R.drawable.ads3, R.drawable.ads4, R.drawable.ads1,R.drawable.ads2, R.drawable.ads3, R.drawable.ads4, R.drawable.ads1,R.drawable.ads2, R.drawable.ads3, R.drawable.ads4, R.drawable.ads1};
     private RecyclerView rv_product;
     private ViewPager2 mPager;
     private GridProductAdapter gridAdapter;
@@ -466,7 +465,7 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
                             boolean includeEdge = true;
                             rv_product.setLayoutManager(new GridLayoutManager(context,spanCount));
                             rv_product.addItemDecoration(new GridSpacingItemDecoration(spanCount, spacing, includeEdge));
-                            gridAdapter = new GridProductAdapter(context,gambar,newDataProd);
+                            gridAdapter = new GridProductAdapter(context,newDataProd);
                             rv_product.setAdapter(gridAdapter);
                         }
                     } catch (JSONException e) {
@@ -696,7 +695,7 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
                     sweetAlertDialog.dismiss();
                     String csId = sessions.getCSID();
                     if (csId != null && !csId.isEmpty()) {
-                        DipsWaitingRoom.publishCallAccept(csId, "cancel"); //RabbitMQ
+                        DipsWaitingRoom.publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
                     }
                     sessions.saveIDSchedule(0);
                     DipsWaitingRoom.showProgress(true);

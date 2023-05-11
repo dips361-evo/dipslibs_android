@@ -14,8 +14,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
@@ -81,8 +83,73 @@ public class OutboundServiceNew extends Service {
         mContext = this;
         sessions = new SessionManager(mContext);
         idDips = sessions.getKEY_IdDips();
-        setupConnectionFactory(); //RabbitMQ
-        subscribeCall();
+        //setupConnectionFactory(); //RabbitMQ
+        ConnectionRabbitHttp.init(mContext);
+        //subscribeCall();
+        ConnectionRabbitHttp.listenCall(new ConnectionRabbitHttp.getTicketInfoCallbacks() {
+            @Override
+            public void onSuccess(@NonNull String dataS) {
+                try {
+                    JSONObject bodyObj = new JSONObject(dataS);
+                    String getTicket = bodyObj.getString("ticket");
+                    String actionCall = bodyObj.getString("action");
+
+                    if (actionCall.equals("info")) {
+                        String csId = bodyObj.getString("csId");
+                        sessions.saveCSID(csId);
+                    } else {
+                        if (bodyObj.has("sessionId")) {
+                            sessionId = bodyObj.getString("sessionId");
+                            sessions.saveSessionIdDips(sessionId);
+                        }
+                        int getTicketInt = Integer.parseInt(getTicket);
+                        String getQueue = String.format("%03d", getTicketInt);
+                        csId = bodyObj.getString("csId");
+                        String password = bodyObj.getString("password");
+                        String agentImage = "";
+                        String namaAgen = "Fulan";
+                        if (bodyObj.has("agentImage")) {
+                            agentImage = bodyObj.getString("agentImage");
+                        }
+                        if (bodyObj.has("namaAgen")) {
+                            namaAgen = bodyObj.getString("namaAgen");
+                        }
+
+                        password_session = password;
+                        customerName = sessions.getNasabahName();
+                        imagesAgent = agentImage;
+                        nameAgent = namaAgen;
+                        sessions.saveCSID(csId);
+
+                        Intent intent = new Intent(getApplicationContext(), MyBroadcastReceiver.class);
+                        intent.setAction("calloutbound");
+
+                        PendingIntent pendingIntent = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                            pendingIntent = PendingIntent.getBroadcast
+                                    (mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                        } else {
+                            pendingIntent = PendingIntent.getBroadcast
+                                    (mContext, 0, intent, 0);
+                        }
+
+                        long addTimes = System.currentTimeMillis() + 1000;
+
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, addTimes, pendingIntent);
+
+                        showNotificationOutbound();
+                    }
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            public void onError(@NonNull Throwable throwable) {
+
+            }
+        });
         final PowerManager pm = ContextCompat.getSystemService(mContext, PowerManager.class);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Outbound:Service");
 
@@ -417,7 +484,7 @@ public class OutboundServiceNew extends Service {
                         ch.waitForConfirmsOrDie();
 
                         if (kodeEndPoint == 99) {
-                            OutboundServiceNew.stopServiceSocket();
+                            //OutboundServiceNew.stopServiceSocket();
                             Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                             mContext.stopService(intentOutbound);
                         }
@@ -449,6 +516,18 @@ public class OutboundServiceNew extends Service {
         }
 
         return jsObj;
+    }
+
+    public static void publishCallAcceptHttp(String labelAction) {
+        JSONObject dataObj = new JSONObject();
+        try {
+            dataObj.put("custId", idDips);
+            dataObj.put("csId", csId);
+            dataObj.put("action", labelAction);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        ConnectionRabbitHttp.acceptCall(dataObj);
     }
 
     private static void publishCallAccept(String labelAction) {
@@ -509,7 +588,8 @@ public class OutboundServiceNew extends Service {
 
     public static void acceptCall() {
         if (sessions.getIDSchedule() > 0) {
-            publishCallAccept("accept");
+            //publishCallAccept("accept");
+            publishCallAcceptHttp("accept");
         } else {
             Toast.makeText(mContext,"Tidak berhasil Call",Toast.LENGTH_SHORT).show();
         }
@@ -517,7 +597,8 @@ public class OutboundServiceNew extends Service {
 
     public static void rejectCall() {
         if (sessions.getIDSchedule() > 0) {
-            publishCallAccept("cancel");
+            //publishCallAccept("cancel");
+            publishCallAcceptHttp("cancel");
         }
     }
 
@@ -597,7 +678,8 @@ public class OutboundServiceNew extends Service {
     }
 
     public static void OutConference() {
-        MirroringSendEndpoint(99);
+        //MirroringSendEndpoint(99);
+        ConnectionRabbitHttp.mirroringEndpoint(99);
     }
 
     public static String getSessionID_Zoom(){

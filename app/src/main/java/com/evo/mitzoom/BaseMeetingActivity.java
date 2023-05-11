@@ -53,6 +53,7 @@ import com.evo.mitzoom.Adapter.ChatMsgAdapter;
 import com.evo.mitzoom.Adapter.UserVideoAdapter;
 import com.evo.mitzoom.Fragments.frag_conferee_agree;
 import com.evo.mitzoom.Fragments.frag_file;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.NotificationMgr;
 import com.evo.mitzoom.Helper.NotificationService;
 import com.evo.mitzoom.Helper.OutboundServiceNew;
@@ -241,7 +242,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         initView();
         initMeeting();
         updateSessionInfo();
-        rabbitMirroring = new RabbitMirroring(mContext);
+        //rabbitMirroring = new RabbitMirroring(mContext);
         DipsVideoConfren.LogoCompany.setVisibility(View.VISIBLE);
         DipsVideoConfren.Zoom.setVisibility(View.VISIBLE);
         //getFragmentPage(new frag_conferee_agree());
@@ -798,17 +799,18 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
                 flagShowLeave = false;
                 dialogEnd.cancel();
                 dialogEnd.dismissWithAnimation();
-                OutboundServiceNew.stopServiceSocket();
+                //OutboundServiceNew.stopServiceSocket();
                 Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                 mContext.stopService(intentOutbound);
                 releaseResource();
                 int ret = ZoomVideoSDK.getInstance().leaveSession(false);
                 sessions.clearPartData();
-                RabbitMirroring.MirroringSendEndpoint(99);
+                //RabbitMirroring.MirroringSendEndpoint(99);
+                ConnectionRabbitHttp.mirroringEndpoint(99);
                 trimCache(mContext);
                 startActivity(new Intent(getApplicationContext(), RatingActivity.class));
                 finish();
-                RabbitMirroring.closeThreadConnection();
+                //RabbitMirroring.closeThreadConnection();
             }
         });
     }
@@ -842,7 +844,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                OutboundServiceNew.stopServiceSocket();
+                //OutboundServiceNew.stopServiceSocket();
                 Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                 mContext.stopService(intentOutbound);
 
@@ -850,11 +852,12 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
                 releaseResource();
                 int ret = ZoomVideoSDK.getInstance().leaveSession(false);
                 sessions.clearPartData();
-                RabbitMirroring.MirroringSendEndpoint(99);
+                //RabbitMirroring.MirroringSendEndpoint(99);
+                ConnectionRabbitHttp.mirroringEndpoint(99);
                 trimCache(mContext);
                 startActivity(new Intent(getApplicationContext(), RatingActivity.class));
                 finish();
-                RabbitMirroring.closeThreadConnection();
+                //RabbitMirroring.closeThreadConnection();
             }
         });
         btnCancelDialog.setOnClickListener(new View.OnClickListener() {
@@ -1164,7 +1167,8 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        RabbitMirroring.MirroringSendKey(idDipsObj);
+        //RabbitMirroring.MirroringSendKey(idDipsObj);
+        ConnectionRabbitHttp.mirroringKey(idDipsObj);
     }
 
     @Override
@@ -1174,7 +1178,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
                 dialogAgentLeave();
             }
         } else {
-            OutboundServiceNew.stopServiceSocket();
+            //OutboundServiceNew.stopServiceSocket();
             Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
             mContext.stopService(intentOutbound);
             sessions.clearPartData();

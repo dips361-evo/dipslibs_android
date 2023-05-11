@@ -50,6 +50,7 @@ import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterFile;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.FileModel;
@@ -116,13 +117,11 @@ public class frag_inputdata_new extends Fragment {
     private RabbitMirroring rabbitMirroring;
     private int lasLenChar;
     private boolean backSpaceChar;
-    private String custName = "";
     private String imgBase64;
     private byte[] imageBytes;
     private boolean isSessionZoom;
     private final String keys = "";
 
-    final String STATE_CUSTNAME = "custName";
     final String STATE_ELEMENTARRAY = "elementArray";
     final String STATE_ELEMENTObj = "elementObj";
     private boolean flagStuckSpin = false;
@@ -143,6 +142,7 @@ public class frag_inputdata_new extends Fragment {
         session = new SessionManager(mContext);
         isCust = session.getKEY_iSCust();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+        ConnectionRabbitHttp.init(mContext);
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(mContext);
         }*/
@@ -172,13 +172,9 @@ public class frag_inputdata_new extends Fragment {
         });
 
         if (savedInstanceState == null) {
-            if (getArguments().containsKey("CUSTNAME")) {
-                custName = getArguments().getString("CUSTNAME");
-            }
             swipe.setRefreshing(true);
             processGetForm();
         } else {
-            custName = savedInstanceState.getString(STATE_CUSTNAME);
             String getIdElement = savedInstanceState.getString(STATE_ELEMENTARRAY);
             String getElementObj = savedInstanceState.getString(STATE_ELEMENTObj);
 
@@ -371,7 +367,6 @@ public class frag_inputdata_new extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_CUSTNAME,custName);
         outState.putString(STATE_ELEMENTARRAY,idElement.toString());
         outState.putString(STATE_ELEMENTObj,objEl.toString());
     }
@@ -1223,7 +1218,8 @@ public class frag_inputdata_new extends Fragment {
                                     e.printStackTrace();
                                 }
                                 if (isSessionZoom) {
-                                    RabbitMirroring.MirroringSendKey(jsons);
+                                    //RabbitMirroring.MirroringSendKey(jsons);
+                                    ConnectionRabbitHttp.mirroringKey(jsons);
                                 }
                             }
                             isSwafoto = dataObj.getBoolean("isSwafoto");
@@ -1239,7 +1235,8 @@ public class frag_inputdata_new extends Fragment {
                                         Bundle bundle = new Bundle();
                                         fragment.setArguments(bundle);
                                         if (isSessionZoom) {
-                                            RabbitMirroring.MirroringSendEndpoint(3);
+                                            //RabbitMirroring.MirroringSendEndpoint(3);
+                                            ConnectionRabbitHttp.mirroringEndpoint(3);
                                             getFragmentPage(fragment);
                                         } else {
                                             getFragmentPageDefault(fragment);
@@ -1248,7 +1245,6 @@ public class frag_inputdata_new extends Fragment {
                                     else {
                                         //if (chkFlow == 1) {
                                             Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                                            intent.putExtra("CUSTNAME",custName);
                                             startActivity(intent);
                                             ((Activity) mContext).finishAffinity();
                                         /*} else {
@@ -1262,7 +1258,6 @@ public class frag_inputdata_new extends Fragment {
                                 else {
                                     //if (chkFlow == 1) {
                                         Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                                        intent.putExtra("CUSTNAME",custName);
                                         startActivity(intent);
                                         ((Activity) mContext).finishAffinity();
                                     /*} else {
@@ -1290,7 +1285,6 @@ public class frag_inputdata_new extends Fragment {
                 else {
                     if (response.code() == 404) {
                         Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                        intent.putExtra("CUSTNAME",custName);
                         startActivity(intent);
                         ((Activity) mContext).finishAffinity();
                     }
@@ -1353,7 +1347,8 @@ public class frag_inputdata_new extends Fragment {
                     fragment.setArguments(bundle);
 
                     if (isSessionZoom) {
-                        RabbitMirroring.MirroringSendEndpoint(3);
+                        //RabbitMirroring.MirroringSendEndpoint(3);
+                        ConnectionRabbitHttp.mirroringEndpoint(3);
                         getFragmentPage(fragment);
                     } else {
                         getFragmentPageDefault(fragment);
@@ -1587,7 +1582,8 @@ public class frag_inputdata_new extends Fragment {
             JSONObject dataImg = new JSONObject();
             try {
                 dataImg.put(keys,imgBase64);
-                RabbitMirroring.MirroringSendKey(dataImg);
+                //RabbitMirroring.MirroringSendKey(dataImg);
+                ConnectionRabbitHttp.mirroringKey(dataImg);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

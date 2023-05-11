@@ -20,6 +20,7 @@ import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Fragments.frag_open_account_product;
 import com.evo.mitzoom.Fragments.frag_service_item_new;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.ItemModel;
 import com.evo.mitzoom.R;
@@ -56,6 +57,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
         this.dataList = dataList;
         this.mContext = mContext;
         this.rabbitMirroring = rabbitMirroring;
+        ConnectionRabbitHttp.init(mContext);
         this.isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
     }
 
@@ -88,7 +90,8 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
         holder.ads.setOnClickListener(v -> {
             switch (dataList.get(position).getId()){
                 case "0" :
-                    RabbitMirroring.MirroringSendEndpoint(201);
+                    //RabbitMirroring.MirroringSendEndpoint(201);
+                    ConnectionRabbitHttp.mirroringEndpoint(201);
                     fragment = new frag_open_account_product();
                     getFragmentPage(fragment);
                     break;
@@ -178,7 +181,8 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                             @Override
                             public void run() {
                                 int intLayout = 359;
-                                RabbitMirroring.MirroringSendEndpoint(intLayout);
+                                //RabbitMirroring.MirroringSendEndpoint(intLayout);
+                                ConnectionRabbitHttp.mirroringEndpoint(intLayout);
                                 fragment = new frag_service_item_new();
                                 bundle = new Bundle();
                                 bundle.putInt("form_id",43);

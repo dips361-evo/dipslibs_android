@@ -22,6 +22,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.R;
@@ -48,6 +49,7 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
         this.mContext = mContext;
         sessions = new SessionManager(mContext);
         String valDataCIF = sessions.getCIF();
+        ConnectionRabbitHttp.init(mContext);
         try {
             objValCIF = new JSONObject(valDataCIF);
         } catch (JSONException e) {
@@ -119,7 +121,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
-                                            RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                            //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                            ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                         }
 
                                         @Override
@@ -157,7 +160,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                     dataFormCIF.put(nameForm,objEl);
                                                     objValCIF.put(nameForm,objEl);
                                                     sessions.saveCIF(objValCIF.toString());
-                                                    RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
@@ -178,7 +182,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                     dataFormCIF.put(nameForm,objEl);
                                                     objValCIF.put(nameForm,objEl);
                                                     sessions.saveCIF(objValCIF.toString());
-                                                    RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
@@ -198,7 +203,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                 dataFormCIF.put(nameForm,objEl);
                                                 objValCIF.put(nameForm,objEl);
                                                 sessions.saveCIF(objValCIF.toString());
-                                                RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -223,7 +229,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                     dataFormCIF.put(nameForm,objEl);
                                                     objValCIF.put(nameForm,objEl);
                                                     sessions.saveCIF(objValCIF.toString());
-                                                    RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                    //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                    ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
@@ -247,7 +254,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                 dataFormCIF.put(nameForm,objEl);
                                                 objValCIF.put(nameForm,objEl);
                                                 sessions.saveCIF(objValCIF.toString());
-                                                RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -262,7 +270,8 @@ public class AdapterCIF extends RecyclerView.Adapter<AdapterCIF.ViewHolder> {
                                                 dataFormCIF.put(nameForm,objEl);
                                                 objValCIF.put(nameForm,objEl);
                                                 sessions.saveCIF(objValCIF.toString());
-                                                RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                //RabbitMirroring.MirroringSendKey(dataFormCIF);
+                                                ConnectionRabbitHttp.mirroringKey(dataFormCIF);
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }

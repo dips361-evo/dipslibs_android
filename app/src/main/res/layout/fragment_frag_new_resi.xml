@@ -49,6 +49,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <ImageView
+                    android:id="@+id/imgResume"
+                    android:layout_width="350dp"
+                    android:layout_height="250dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/sedangmemuat"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    android:layout_marginBottom="@dimen/dp_10"
+                    android:paddingBottom="@dimen/dp_20"/>
+
                 <LinearLayout
                     android:id="@+id/tvllThanks"
                     android:layout_width="match_parent"
@@ -72,7 +84,6 @@
                         android:id="@+id/tvMsgNum"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/dp_10"
                         android:gravity="center|center_vertical"
                         tools:text="32100210002133"
                         android:textAlignment="center"
@@ -96,7 +107,7 @@
 
                 </LinearLayout>
 
-                <com.github.chrisbanes.photoview.PhotoView
+                <!--<com.github.chrisbanes.photoview.PhotoView
                     android:id="@+id/imgResume"
                     android:layout_width="350dp"
                     android:layout_height="250dp"
@@ -106,7 +117,7 @@
                     android:layout_marginEnd="@dimen/dp_10"
                     android:layout_marginBottom="@dimen/dp_10"
                     android:paddingBottom="@dimen/dp_20"
-                    android:src="@drawable/sedangmemuat" />
+                    android:src="@drawable/sedangmemuat" />-->
 
                 <LinearLayout
                     android:layout_width="match_parent"

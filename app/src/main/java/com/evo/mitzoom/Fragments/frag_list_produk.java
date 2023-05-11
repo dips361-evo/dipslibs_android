@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.ItemSavingAdapter;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
@@ -106,7 +107,8 @@ public class frag_list_produk extends Fragment {
                 //rabbitMirroring.MirroringSendEndpoint(0);
                 /*rabbitMirroring.MirroringSendEndpoint(361);
                 PopUpTnc();*/
-                RabbitMirroring.MirroringSendEndpoint(201);
+                //RabbitMirroring.MirroringSendEndpoint(201);
+                ConnectionRabbitHttp.mirroringEndpoint(201);
                 getFragmentPage(new frag_open_account_product());
             }
         });
@@ -235,7 +237,8 @@ public class frag_list_produk extends Fragment {
                     Log.d("CHECK","TRUE");
                     btn.setBackgroundTintList(context.getResources().getColorStateList(R.color.zm_button));
                     btn.setClickable(true);
-                    RabbitMirroring.MirroringSendEndpoint(363);
+                    //RabbitMirroring.MirroringSendEndpoint(363);
+                    ConnectionRabbitHttp.mirroringEndpoint(363);
                 }
                 else {
                     Log.d("CHECK","FALSE");
@@ -254,7 +257,8 @@ public class frag_list_produk extends Fragment {
                     sessions.saveIsSwafoto(isSwafoto);
                     sessions.saveFormCOde(4);
                     Fragment fragment = new frag_cif_new();
-                    RabbitMirroring.MirroringSendEndpoint(4);
+                    //RabbitMirroring.MirroringSendEndpoint(4);
+                    ConnectionRabbitHttp.mirroringEndpoint(4);
                     getFragmentPage(fragment);
                 }
                 else {

@@ -97,7 +97,6 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
     private DisplayMetrics displayMetrics;
     String idDips;
     boolean isCust = false;
-    String custName;
     private Button btnSchedule;
     private Button btnEndCall;
     ArrayList<String> time = new ArrayList<>();
@@ -151,7 +150,6 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
         Intent intent = getIntent();
         useFacing = intent.getIntExtra(KEY_USE_FACING, Camera.CameraInfo.CAMERA_FACING_FRONT);
 
-        custName = getIntent().getExtras().getString("CUSTNAME");
         boolean cekformCode = getIntent().hasExtra("formCode");
         int formCode = 0;
         boolean ocrKTP = false;
@@ -169,7 +167,6 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
         } else {
             fragment = new frag_inputdata_new();
             sessions.saveIsCust(isCust);
-            bundle.putString("CUSTNAME", custName);
         }
         fragment.setArguments(bundle);
         getFragmentPage(fragment);

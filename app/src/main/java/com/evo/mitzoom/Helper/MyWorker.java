@@ -26,7 +26,7 @@ public class MyWorker extends Worker {
             getApplicationContext().startForegroundService(serviceIntent);
         } else {
             getApplicationContext().stopService(serviceIntent);
-            OutboundServiceNew.stopServiceSocket();
+            //OutboundServiceNew.stopServiceSocket();
         }
         return Result.success();
     }

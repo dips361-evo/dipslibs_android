@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterPortofolioNew;
 import com.evo.mitzoom.BaseMeetingActivity;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
@@ -118,6 +119,7 @@ public class frag_portfolio_new extends Fragment {
         }
 
 //        noCif = "89916515"; //mba tari
+        ConnectionRabbitHttp.init(mContext);
 
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         if (isSessionZoom) {
@@ -128,7 +130,8 @@ public class frag_portfolio_new extends Fragment {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            RabbitMirroring.MirroringSendKey(dataCIF);
+            //RabbitMirroring.MirroringSendKey(dataCIF);
+            ConnectionRabbitHttp.mirroringKey(dataCIF);
         }
     }
 
@@ -177,7 +180,8 @@ public class frag_portfolio_new extends Fragment {
             @Override
             public void onClick(View view) {
                 if (dataNasabah.length() > 0) {
-                    RabbitMirroring.MirroringSendEndpoint(15);
+                    //RabbitMirroring.MirroringSendEndpoint(15);
+                    ConnectionRabbitHttp.mirroringEndpoint(15);
                     getFragmentPage(new frag_service_new());
                 }
             }
