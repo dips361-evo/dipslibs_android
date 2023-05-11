@@ -642,7 +642,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
                         } else {
                             intent = new Intent(mContext, DipsSwafoto.class);
                             intent.putExtra("RESULT_IMAGE_AI", bytePhoto);
-                            intent.putExtra("CUSTNAME", custName);
                         }
                         startActivity(intent);
                         finishAffinity();
@@ -749,10 +748,10 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
 
                     sessions.saveIdDips(idDips);
                     sessions.saveIsCust(isCust);
+                    sessions.saveNasabahName(custName);
 
                     Intent intent = new Intent(DipsCapture.this,DipsWaitingRoom.class);
                     sessions.saveIsCust(isCust);
-                    intent.putExtra("CUSTNAME",custName);
                     intent.putExtra("idDips", idDips);
                     intent.putExtra("SessionName", sessionName);
                     intent.putExtra("SessionPass", sessionPass);

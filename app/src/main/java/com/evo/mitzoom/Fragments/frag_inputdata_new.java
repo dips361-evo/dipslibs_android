@@ -117,13 +117,11 @@ public class frag_inputdata_new extends Fragment {
     private RabbitMirroring rabbitMirroring;
     private int lasLenChar;
     private boolean backSpaceChar;
-    private String custName = "";
     private String imgBase64;
     private byte[] imageBytes;
     private boolean isSessionZoom;
     private final String keys = "";
 
-    final String STATE_CUSTNAME = "custName";
     final String STATE_ELEMENTARRAY = "elementArray";
     final String STATE_ELEMENTObj = "elementObj";
     private boolean flagStuckSpin = false;
@@ -175,14 +173,10 @@ public class frag_inputdata_new extends Fragment {
 
         if (savedInstanceState == null) {
             Log.e("CEK","MASUK NULL SAVED INSTANACE");
-            if (getArguments().containsKey("CUSTNAME")) {
-                custName = getArguments().getString("CUSTNAME");
-            }
             swipe.setRefreshing(true);
             processGetForm();
         } else {
             Log.e("CEK","MASUK SAVED INSTANACE");
-            custName = savedInstanceState.getString(STATE_CUSTNAME);
             String getIdElement = savedInstanceState.getString(STATE_ELEMENTARRAY);
             String getElementObj = savedInstanceState.getString(STATE_ELEMENTObj);
 
@@ -452,7 +446,6 @@ public class frag_inputdata_new extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_CUSTNAME,custName);
         outState.putString(STATE_ELEMENTARRAY,idElement.toString());
         outState.putString(STATE_ELEMENTObj,objEl.toString());
     }
@@ -1382,7 +1375,6 @@ public class frag_inputdata_new extends Fragment {
                                         //if (chkFlow == 1) {
                                         Log.e("CEK_INPUT_DATA","getNoCIF : "+session.getNoCIF());
                                             Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                                            intent.putExtra("CUSTNAME",custName);
                                             startActivity(intent);
                                             ((Activity) mContext).finishAffinity();
                                         /*} else {
@@ -1397,7 +1389,6 @@ public class frag_inputdata_new extends Fragment {
                                     //if (chkFlow == 1) {
                                     Log.e("CEK_INPUT_DATA","getNoCIF : "+session.getNoCIF());
                                         Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                                        intent.putExtra("CUSTNAME",custName);
                                         startActivity(intent);
                                         ((Activity) mContext).finishAffinity();
                                     /*} else {
@@ -1425,7 +1416,6 @@ public class frag_inputdata_new extends Fragment {
                 else {
                     if (response.code() == 404) {
                         Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                        intent.putExtra("CUSTNAME",custName);
                         startActivity(intent);
                         ((Activity) mContext).finishAffinity();
                     }

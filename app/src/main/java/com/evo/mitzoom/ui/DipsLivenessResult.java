@@ -264,10 +264,8 @@ public class DipsLivenessResult extends AppCompatActivity {
                                             intent.putExtra("CUSTNAME", custName);*/
                                             if (!noCif.isEmpty()) {
                                                 intent = new Intent(mContext, DipsWaitingRoom.class);
-                                                intent.putExtra("CUSTNAME", custName);
                                             } else {
                                                 intent = new Intent(mContext, DipsSwafoto.class);
-                                                intent.putExtra("CUSTNAME", custName);
                                                 intent.putExtra("formCode", 22); //4 Upload KTP, 22 Swafoto
                                                 intent.putExtra("OCRKTP",true);
                                             }

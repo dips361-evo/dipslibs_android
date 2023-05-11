@@ -238,7 +238,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         AnimationCall();
         //setupConnectionFactory(); //RabbitMQ
 
-        custName = getIntent().getExtras().getString("CUSTNAME");
+        custName = sessions.getNasabahName();
 
         initialWaitingRoom();
 

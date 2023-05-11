@@ -55,9 +55,8 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
     private final List<JSONObject> dataProduct;
     private ImageView adsImg;
 
-    public GridProductAdapter(Context ctx, int[] gambar, List<JSONObject> newDataProd) {
+    public GridProductAdapter(Context ctx, List<JSONObject> newDataProd) {
         this.ctx = ctx;
-        this.gambar = gambar;
         this.dataProduct = newDataProd;
         this.sessions = new SessionManager(this.ctx);
     }

@@ -51,7 +51,8 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/dips361_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:extractNativeLibs="false">
         <activity
             android:name=".ui.DipsLivenessResult"
             android:exported="false"
