@@ -3,28 +3,31 @@ plugins {
     id 'maven-publish'
 }
 
-ext {
+/*ext {
     travisBuild = System.getenv("TRAVIS") == "true"
     preDexEnabled = System.getProperty("pre-dex", "true")
     abiCodes = ['armeabi-v7a': 1, 'x86': 2, 'x86_64': 3, 'arm64-v8a': 4]
-}
+}*/
 
 android {
     compileSdk 33
     defaultConfig {
         minSdk 21
         targetSdk 33
-        versionCode 92
+        versionCode 93
+        ndk {
+            abiFilters 'x86', 'x86_64' // Do not build for x86 & x86_64 CPUs
+        }
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    splits {
+    /*splits {
         abi {
             universalApk true
             enable true
         }
-    }
+    }*/
 
     buildTypes {
         release {
@@ -101,7 +104,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.dips361-evo'
                 artifactId = 'dipslibs361'
-                version = 'v.1.0.8'
+                version = '1.0.9'
             }
             /*// Creates a Maven publication called “debug”.
             debug(MavenPublication) {
