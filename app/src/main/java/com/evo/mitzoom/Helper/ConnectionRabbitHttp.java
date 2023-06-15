@@ -118,7 +118,8 @@ public class ConnectionRabbitHttp {
         });
     }
 
-    public static void listenCall(@Nullable getTicketInfoCallbacks callbacks) {
+    public static void
+    listenCall(@Nullable getTicketInfoCallbacks callbacks) {
         JSONObject dataObj = new JSONObject();
         try {
             dataObj.put("custId", idDips);
