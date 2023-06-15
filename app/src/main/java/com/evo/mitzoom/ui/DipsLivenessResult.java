@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Base64;
@@ -39,7 +40,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import ai.advance.liveness.lib.CameraType;
 import ai.advance.liveness.lib.Detector;
@@ -423,6 +429,14 @@ public class DipsLivenessResult extends AppCompatActivity {
                 Bitmap livenessBitmap = LivenessResult.getLivenessBitmap();// picture
                 String imgBase64 = imgtoBase64(livenessBitmap);
                 byte[] bytePhoto = Base64.decode(imgBase64, Base64.NO_WRAP);
+                try {
+                    File pathPhotoLiveness = createTemporaryFile(bytePhoto);
+                    String filePath = pathPhotoLiveness.getAbsolutePath();
+                    Log.e(TAG,"filePath pathPhotoLiveness : "+filePath);
+                    sessions.savePhotoLiveness(filePath);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 sessions.saveNoCIF(null);
                 Intent intent = new Intent(mContext, DipsLivenessResult.class);
                 intent.putExtra("RESULT_IMAGE_AI",bytePhoto);
@@ -438,6 +452,30 @@ public class DipsLivenessResult extends AppCompatActivity {
             }
         }
     }
+
+    private File createTemporaryFile(byte[] byteImage) throws Exception {
+        String appName = getString(R.string.app_name_dips);
+        String IMAGE_DIRECTORY_NAME = appName;
+        File mediaStorageDir = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), IMAGE_DIRECTORY_NAME);
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS",
+                Locale.getDefault()).format(new Date());
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                "IMG_" + timeStamp + ".jpg");
+
+        FileOutputStream fos = new FileOutputStream(mediaFile);
+        fos.write(byteImage);
+        fos.close();
+
+        return mediaFile;
+    }
+
     private String imgtoBase64(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,100, baos);

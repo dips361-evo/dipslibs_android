@@ -54,6 +54,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import ai.advance.liveness.lib.CameraType;
@@ -106,6 +110,7 @@ public class DipsChooseLanguage extends AppCompatActivity {
         sessions.saveSWAFOTO(null);
         sessions.saveNPWP(null);
         sessions.saveTTD(null);
+        sessions.savePhotoLiveness(null);
 
         if (idDips == null) {
             idDips = "";
@@ -444,6 +449,14 @@ public class DipsChooseLanguage extends AppCompatActivity {
                 Bitmap livenessBitmap = LivenessResult.getLivenessBitmap();// picture
                 String imgBase64 = imgtoBase64(livenessBitmap);
                 byte[] bytePhoto = Base64.decode(imgBase64, Base64.NO_WRAP);
+                try {
+                    File pathPhotoLiveness = createTemporaryFile(bytePhoto);
+                    String filePath = pathPhotoLiveness.getAbsolutePath();
+                    Log.e(TAG,"filePath pathPhotoLiveness : "+filePath);
+                    sessions.savePhotoLiveness(filePath);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 sessions.saveNoCIF(null);
                 Intent intent = new Intent(mContext, DipsLivenessResult.class);
                 intent.putExtra("RESULT_IMAGE_AI",bytePhoto);
@@ -461,6 +474,29 @@ public class DipsChooseLanguage extends AppCompatActivity {
         } else if (requestCode == REQUEST_BATTERY_OP) {
             setNeverAskForBatteryOptimizationsAgain();
         }
+    }
+
+    private File createTemporaryFile(byte[] byteImage) throws Exception {
+        String appName = getString(R.string.app_name_dips);
+        String IMAGE_DIRECTORY_NAME = appName;
+        File mediaStorageDir = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), IMAGE_DIRECTORY_NAME);
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS",
+                Locale.getDefault()).format(new Date());
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                "IMG_" + timeStamp + ".jpg");
+
+        FileOutputStream fos = new FileOutputStream(mediaFile);
+        fos.write(byteImage);
+        fos.close();
+
+        return mediaFile;
     }
 
     private void setNeverAskForBatteryOptimizationsAgain() {

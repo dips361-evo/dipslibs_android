@@ -158,7 +158,7 @@ public class frag_cif_new extends Fragment {
     private String encodedImageCrop;
     private boolean flagOCR = false;
     private String tmptLahir = "-";
-    private String provinsi,kodepos="",kota_kabupaten, nik, nama, ttl, jeniskelamin, golongan_darah, alamat, rtrw, desa_kelurahan, kecamatan, agama, status_perkawinan, kewarganegaraan, pekerjaan = "", namaIbuKandung = "";
+    private String provinsi,kodepos, kota_kabupaten, nik, nama, ttl, jeniskelamin, golongan_darah, alamat, rtrw, desa_kelurahan, kecamatan, agama, status_perkawinan, kewarganegaraan, pekerjaan = "", namaIbuKandung = "";
     private JSONObject datasReqOCR = null;
     private int lasLenChar;
     private boolean backSpaceChar;
@@ -3040,13 +3040,15 @@ public class frag_cif_new extends Fragment {
         String rt = "";
         String rw = "";
         if (rtrw != null ) {
-            if (rtrw.contains("/")) {
-                String[] pisahrtrw = rtrw.split("/");
-                rt = pisahrtrw[0];
-                rw = pisahrtrw[1];
-            } else {
-                rt = rtrw.substring(0,3);
-                rw = rtrw.substring(3,6);
+            if (!rtrw.equals("null")) {
+                if (rtrw.contains("/")) {
+                    String[] pisahrtrw = rtrw.split("/");
+                    rt = pisahrtrw[0];
+                    rw = pisahrtrw[1];
+                } else {
+                    rt = rtrw.substring(0, 3);
+                    rw = rtrw.substring(3, 6);
+                }
             }
         }
 
@@ -4104,11 +4106,11 @@ public class frag_cif_new extends Fragment {
         });
     }
 
-    private void processFormDataAttachment2(String keys, String picturePath) {
-        File file = new File(picturePath);
+    private void processFormDataAttachment2(String keys, String picturePathAttach) {
+        File file = new File(picturePathAttach);
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"),file);
         RequestBody requestidDips = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(idDips));
-        Log.e("CEK","filePath : "+ picturePath +" | requestidDips : "+requestidDips);
+        Log.e("CEK","filePath : "+ picturePathAttach +" | requestidDips : "+requestidDips);
         ApiService API = Server.getAPIService2();
         Call<JsonObject> call = null;
         MultipartBody multipartBody = null;
@@ -4155,7 +4157,11 @@ public class frag_cif_new extends Fragment {
                         String msg = dataObj.getString("message");
                         if (errCode == 200 || errCode == 202) {
                             if (keys.equals("ktp")) {
-                                processFormDataAttachment2("foto",picturePath);
+                                /*if (sessions.getPhotoLiveness() != null) {
+                                    processFormDataAttachment2("foto",sessions.getPhotoLiveness());
+                                } else {*/
+                                    processFormDataAttachment2("foto", picturePath);
+                                //}
                             } else if (keys.equals("foto")) {
                                 processFormDataAttachment2("ttd",picturePathCrop);
                             }
@@ -4187,6 +4193,22 @@ public class frag_cif_new extends Fragment {
                                             }
                                         } catch (IOException e) {
                                             e.printStackTrace();
+                                        }
+                                    }
+                                }
+
+                                if (sessions.getPhotoLiveness() != null) {
+                                    File mediaFilePhotoLiveness = new File(sessions.getPhotoLiveness());
+                                    if (mediaFilePhotoLiveness != null) {
+                                        if (mediaFilePhotoLiveness.exists()) {
+                                            try {
+                                                mediaFilePhotoLiveness.getCanonicalFile().delete();
+                                                if (mediaFilePhotoLiveness.exists()) {
+                                                    getActivity().getApplicationContext().deleteFile(mediaFilePhotoLiveness.getName());
+                                                }
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                     }
                                 }
@@ -5019,49 +5041,79 @@ public class frag_cif_new extends Fragment {
                             JSONObject dataObj = jsObj.getJSONObject("data");
                             datasReqOCR = dataObj;
                             if (dataObj.has("provinsi")) {
-                                provinsi = dataObj.getString("provinsi");
+                                if (!dataObj.isNull("provinsi")) {
+                                    provinsi = dataObj.getString("provinsi");
+                                }
                             }
                             if (dataObj.has("kota_kabupaten")) {
-                                kota_kabupaten = dataObj.getString("kota_kabupaten");
+                                if (!dataObj.isNull("kota_kabupaten")) {
+                                    kota_kabupaten = dataObj.getString("kota_kabupaten");
+                                }
                             }
                             if (dataObj.has("nik")) {
-                                nik = dataObj.getString("nik");
+                                if (!dataObj.isNull("nik")) {
+                                    nik = dataObj.getString("nik");
+                                }
                             }
                             if (dataObj.has("nama")) {
-                                nama = dataObj.getString("nama");
+                                if (!dataObj.isNull("nama")) {
+                                    nama = dataObj.getString("nama");
+                                }
                             }
                             if (dataObj.has("ttl")) {
-                                ttl = dataObj.getString("ttl");
+                                if (!dataObj.isNull("ttl")) {
+                                    ttl = dataObj.getString("ttl");
+                                }
                             }
                             if (dataObj.has("jeniskelamin")) {
-                                jeniskelamin = dataObj.getString("jeniskelamin");
+                                if (!dataObj.isNull("jeniskelamin")) {
+                                    jeniskelamin = dataObj.getString("jeniskelamin");
+                                }
                             }
                             if (dataObj.has("golongan_darah")) {
-                                golongan_darah = dataObj.getString("golongan_darah");
+                                if (!dataObj.isNull("golongan_darah")) {
+                                    golongan_darah = dataObj.getString("golongan_darah");
+                                }
                             }
                             if (dataObj.has("alamat")) {
-                                alamat = dataObj.getString("alamat");
+                                if (!dataObj.isNull("alamat")) {
+                                    alamat = dataObj.getString("alamat");
+                                }
                             }
                             if (dataObj.has("rtrw")) {
-                                rtrw = dataObj.getString("rtrw");
+                                if (!dataObj.isNull("rtrw")) {
+                                    rtrw = dataObj.getString("rtrw");
+                                }
                             }
                             if (dataObj.has("desa_kelurahan")) {
-                                desa_kelurahan = dataObj.getString("desa_kelurahan");
+                                if (!dataObj.isNull("desa_kelurahan")) {
+                                    desa_kelurahan = dataObj.getString("desa_kelurahan");
+                                }
                             }
                             if (dataObj.has("kecamatan")) {
-                                kecamatan = dataObj.getString("kecamatan");
+                                if (!dataObj.isNull("kecamatan")) {
+                                    kecamatan = dataObj.getString("kecamatan");
+                                }
                             }
                             if (dataObj.has("agama")) {
-                                agama = dataObj.getString("agama");
+                                if (!dataObj.isNull("agama")) {
+                                    agama = dataObj.getString("agama");
+                                }
                             }
                             if (dataObj.has("status_perkawinan")) {
-                                status_perkawinan = dataObj.getString("status_perkawinan");
+                                if (!dataObj.isNull("status_perkawinan")) {
+                                    status_perkawinan = dataObj.getString("status_perkawinan");
+                                }
                             }
                             if (dataObj.has("kewarganegaraan")) {
-                                kewarganegaraan = dataObj.getString("kewarganegaraan");
+                                if (!dataObj.isNull("kewarganegaraan")) {
+                                    kewarganegaraan = dataObj.getString("kewarganegaraan");
+                                }
                             }
                             if (dataObj.has("pekerjaan")) {
-                                pekerjaan = dataObj.getString("pekerjaan");
+                                if (!dataObj.isNull("pekerjaan")) {
+                                    pekerjaan = dataObj.getString("pekerjaan");
+                                }
                             }
 
                             if (ttl.indexOf(",") > 0) {
@@ -5314,7 +5366,11 @@ public class frag_cif_new extends Fragment {
     }
 
     private void processSwafotoCheck() {
-        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), mediaFilePhoto);
+        File filePhoto = mediaFilePhoto;
+        /*if (sessions.getPhotoLiveness() != null) {
+            filePhoto = new File(sessions.getPhotoLiveness());
+        }*/
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), filePhoto);
         RequestBody requestFileCrop = RequestBody.create(MediaType.parse("image/jpeg"), mediaFilePhotoCropSwafoto);
 
         ApiService API = Server.getAPIService2();
@@ -5325,7 +5381,7 @@ public class frag_cif_new extends Fragment {
         String exchangeToken = sessions.getExchangeToken();
 
         multipartBody = new MultipartBody.Builder()
-                .addPart(MultipartBody.Part.createFormData("firstImage", mediaFilePhoto.getName(), requestFile))
+                .addPart(MultipartBody.Part.createFormData("firstImage", filePhoto.getName(), requestFile))
                 .addPart(MultipartBody.Part.createFormData("secondImage", mediaFilePhotoCropSwafoto.getName(), requestFileCrop))
                 .build();
         contentType = "multipart/form-data; charset=utf-8; boundary=" + multipartBody.boundary();
