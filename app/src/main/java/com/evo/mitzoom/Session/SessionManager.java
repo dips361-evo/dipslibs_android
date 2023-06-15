@@ -53,6 +53,7 @@ public class SessionManager {
     public static final String KEY_SESSIONID_DIPS = "SESSIONID_DIPS";
     public static final String KEY_SCHEDULE_DATE = "SCHEDULE_DATE";
     public static final String KEY_SCHEDULE_TIME = "SCHEDULE_TIME";
+    public static final String KEY_PHOTOLIVENESS = "PHOTOLIVENESS";
 
     // Constructor
     public SessionManager(Context context){
@@ -209,6 +210,11 @@ public class SessionManager {
         editor.commit();
     }
 
+    public void savePhotoLiveness(String data) {
+        editor.putString(KEY_PHOTOLIVENESS,data);
+        editor.commit();
+    }
+
     public void clearPartData(){
         editor.putString(KEY_RTGS,null);
         editor.putString(KEY_CIF,null);
@@ -352,6 +358,9 @@ public class SessionManager {
     }
     public String getScheduledTime() {
         return pref.getString(KEY_SCHEDULE_TIME,null);
+    }
+    public String getPhotoLiveness() {
+        return pref.getString(KEY_PHOTOLIVENESS,null);
     }
 
 }
