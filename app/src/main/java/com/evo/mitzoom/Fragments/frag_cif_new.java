@@ -3316,8 +3316,9 @@ public class frag_cif_new extends Fragment {
                     //dialogFailedValidation("IDEM");
                     if (response.code() == 400) {
                         processDTOTT();
+                    } else {
+                        Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
                     }
-                    Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -4094,16 +4095,6 @@ public class frag_cif_new extends Fragment {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 Log.e("CEK","processFormDataAttachment response code : "+response.code());
-                ((Activity)mContext).runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isSessionZoom) {
-                            BaseMeetingActivity.showProgress(false);
-                        } else {
-                            DipsSwafoto.showProgress(false);
-                        }
-                    }
-                });
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     Log.e("CEK","processFormDataAttachment : "+dataS);
@@ -4128,6 +4119,16 @@ public class frag_cif_new extends Fragment {
                                 processFormDataAttachment2("ttd",picturePathCrop);
                             }
                             if (!isSessionZoom && formCode == 22 && keys.equals("ttd")) {
+                                ((Activity)mContext).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (isSessionZoom) {
+                                            BaseMeetingActivity.showProgress(false);
+                                        } else {
+                                            DipsSwafoto.showProgress(false);
+                                        }
+                                    }
+                                });
                                 Intent intent = new Intent(mContext, DipsWaitingRoom.class);
                                 intent.putExtra("CUSTNAME",nama);
                                 startActivity(intent);
@@ -4177,6 +4178,16 @@ public class frag_cif_new extends Fragment {
                             }
                         }
                         else {
+                            ((Activity)mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (isSessionZoom) {
+                                        BaseMeetingActivity.showProgress(false);
+                                    } else {
+                                        DipsSwafoto.showProgress(false);
+                                    }
+                                }
+                            });
                             Toast.makeText(mContext,msg,Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -4185,6 +4196,16 @@ public class frag_cif_new extends Fragment {
                     }
                 }
                 else {
+                    ((Activity)mContext).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isSessionZoom) {
+                                BaseMeetingActivity.showProgress(false);
+                            } else {
+                                DipsSwafoto.showProgress(false);
+                            }
+                        }
+                    });
                     if (response.body() != null) {
                         Log.e("CEK","response body : "+ response.body());
                     } else {
@@ -4889,6 +4910,22 @@ public class frag_cif_new extends Fragment {
                 chooseImage.setVisibility(View.GONE);
             }
         });
+        provinsi = "";
+        kota_kabupaten = "";
+        nik = "";
+        nama = "";
+        ttl = "";
+        jeniskelamin = "";
+        golongan_darah = "";
+        alamat = "";
+        rtrw = "";
+        desa_kelurahan = "";
+        kecamatan = "";
+        agama = "";
+        status_perkawinan = "";
+        kewarganegaraan = "";
+        pekerjaan = "";
+        tmptLahir = "-";
         ocrKTP();
     }
 

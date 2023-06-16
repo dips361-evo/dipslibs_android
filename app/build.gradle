@@ -17,18 +17,18 @@ android {
         ndk {
             abiFilters 'x86', 'x86_64' // Do not build for x86 & x86_64 CPUs
         }
-        versionCode 95
+        versionCode 96
         versionName "3.2.23"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    /*splits {
+    splits {
         abi {
             universalApk true
             enable true
         }
-    }*/
+    }
 
     buildTypes {
         release {
@@ -105,7 +105,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.dips361-evo'
                 artifactId = 'dipslibs361'
-                version = 'dev.1.0.1'
+                version = 'dev.1.0.2'
                 //version = '1.0.10'
             }
             /*// Creates a Maven publication called “debug”.
