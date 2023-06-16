@@ -14,10 +14,11 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 33
-        versionCode 94
         ndk {
             abiFilters 'x86', 'x86_64' // Do not build for x86 & x86_64 CPUs
         }
+        versionCode 95
+        versionName "3.2.23"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -104,7 +105,8 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.dips361-evo'
                 artifactId = 'dipslibs361'
-                version = '1.0.10'
+                version = 'dev.1.0.1'
+                //version = '1.0.10'
             }
             /*// Creates a Maven publication called “debug”.
             debug(MavenPublication) {
