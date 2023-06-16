@@ -429,6 +429,12 @@ public class DipsChooseLanguage extends AppCompatActivity {
             startActivityForResult(new Intent(this, LivenessActivity.class), REQUEST_CODE_LIVENESS);
         } else {
             Log.e("LivenessSDK", "License check failed:" + checkResult);
+            if (checkResult.contains("EXPIRE")) {
+                showProgress(true);
+                sessions.saveAuthAdvanceAI(null,0);
+                new AsyncAuth().execute();
+            }
+
         }
     }
 
