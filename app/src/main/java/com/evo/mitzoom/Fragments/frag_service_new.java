@@ -47,6 +47,7 @@ public class frag_service_new extends Fragment {
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(mContext);
         }*/
+        ConnectionRabbitHttp.init(mContext);
 
     }
 

@@ -2,11 +2,11 @@ plugins {
     id 'com.android.application'
 }
 
-/*ext {
+ext {
     travisBuild = System.getenv("TRAVIS") == "true"
     preDexEnabled = System.getProperty("pre-dex", "true")
     abiCodes = ['armeabi-v7a': 1, 'x86': 2, 'x86_64': 3, 'arm64-v8a': 4]
-}*/
+}
 
 android {
     compileSdk 33
@@ -14,9 +14,9 @@ android {
         applicationId "com.evo.mitzoom"
         minSdk 21
         targetSdk 33
-        ndk {
+        /*ndk {
             abiFilters 'x86', 'x86_64' // Do not build for x86 & x86_64 CPUs
-        }
+        }*/
         versionCode 95
         versionName "3.2.23"
         vectorDrawables.useSupportLibrary = true

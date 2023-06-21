@@ -99,6 +99,7 @@ public class frag_cif_resi extends Fragment {
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(mContext);
         }*/
+        ConnectionRabbitHttp.init(mContext);
         if (getArguments() != null) {
             formCode = getArguments().getInt("formCode");
             idForm = getArguments().getString("idForm");

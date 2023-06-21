@@ -81,6 +81,7 @@ public class frag_list_produk extends Fragment {
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(context);
         }*/
+        ConnectionRabbitHttp.init(context);
         Log.e("CEK_FRAG_LIST_PROD","getNoCIF : "+sessions.getNoCIF());
     }
     @Nullable
