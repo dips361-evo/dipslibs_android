@@ -85,6 +85,7 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
         isCust = session.getKEY_iSCust();
         isSwafoto = session.getKEY_iSSwafoto();
         //rabbitMirroring = new RabbitMirroring(context);
+        ConnectionRabbitHttp.init(context);
     }
 
     @Nullable

@@ -3008,8 +3008,13 @@ public class frag_cif_new extends Fragment {
                     rt = pisahrtrw[0];
                     rw = pisahrtrw[1];
                 } else {
-                    rt = rtrw.substring(0, 3);
-                    rw = rtrw.substring(3, 6);
+                    if (rtrw.length() == 6) {
+                        rt = rtrw.substring(0, 3);
+                        rw = rtrw.substring(3, 6);
+                    } else {
+                        rt = rtrw.substring(0, 3);
+                        rw = rtrw.substring(3);
+                    }
                 }
             }
         }

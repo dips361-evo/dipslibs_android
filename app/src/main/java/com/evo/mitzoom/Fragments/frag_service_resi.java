@@ -85,6 +85,7 @@ public class frag_service_resi extends Fragment {
         /*if (isSessionZoom) {
             rabbitMirroring = new RabbitMirroring(mContext);
         }*/
+        ConnectionRabbitHttp.init(mContext);
 
         no_Form = sessions.getNoComplaint();
         noPengaduan = sessions.getNoComplaint();

@@ -243,6 +243,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         initMeeting();
         updateSessionInfo();
         //rabbitMirroring = new RabbitMirroring(mContext);
+        ConnectionRabbitHttp.init(mContext);
         DipsVideoConfren.LogoCompany.setVisibility(View.VISIBLE);
         DipsVideoConfren.Zoom.setVisibility(View.VISIBLE);
         //getFragmentPage(new frag_conferee_agree());

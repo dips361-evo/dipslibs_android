@@ -78,6 +78,7 @@ public class frag_list_produk extends Fragment {
         isCust = sessions.getKEY_iSCust();
         isSwafoto = sessions.getKEY_iSSwafoto();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+        ConnectionRabbitHttp.init(context);
     }
     @Nullable
     @Override
