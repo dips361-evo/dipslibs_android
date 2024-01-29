@@ -105,6 +105,9 @@ public class DipsChooseLanguage extends AppCompatActivity {
 
         mContext = this;
         sessions = new SessionManager(mContext);
+        sessions.clearPartData();
+        sessions.clearCIF();
+
         idDips = sessions.getKEY_IdDips();
         sessions.saveKTP(null);
         sessions.saveSWAFOTO(null);
@@ -127,12 +130,14 @@ public class DipsChooseLanguage extends AppCompatActivity {
 
         radioGroup.clearCheck();
 
+        trimCache(mContext);
+
         onClickListener();
 
         try {
             PackageInfo info = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(),0);
             String version = info.versionName;
-            version = "V "+version;
+            version = "V 1.0.11";
             tvVersion.setText(version);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -148,7 +153,6 @@ public class DipsChooseLanguage extends AppCompatActivity {
         if (isFlagALL_FILES_ACCESS) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (!Settings.canDrawOverlays(this)) {
-
                     if ("xiaomi".equals(Build.MANUFACTURER.toLowerCase(Locale.ROOT))) {
                         final Intent intent =new Intent("miui.intent.action.APP_PERM_EDITOR");
                         intent.setClassName("com.miui.securitycenter",
@@ -174,6 +178,30 @@ public class DipsChooseLanguage extends AppCompatActivity {
             sessions.saveAuthAdvanceAI(null,0);
             new AsyncAuth().execute();
         }
+    }
+
+    private void trimCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            if (dir != null && dir.isDirectory()) {
+                deleteDir(dir);
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    private boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
     }
 
     public boolean foregroundServiceRunning(){
@@ -240,7 +268,6 @@ public class DipsChooseLanguage extends AppCompatActivity {
 
     private void startApp() {
         String licenseAI = sessions.getAuthAdvanceAI();
-
         if (licenseAI != null) {
             startLivenessDetection(licenseAI);
         } else {
@@ -288,34 +315,26 @@ public class DipsChooseLanguage extends AppCompatActivity {
                 ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(mContext, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
 
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE,Manifest.permission.CAMERA,readImagePermission,Manifest.permission.RECEIVE_SMS,
                         Manifest.permission.READ_SMS,Manifest.permission.READ_PHONE_NUMBERS,Manifest.permission.RECORD_AUDIO}, REQUEST_ALL);
             }
         } else {
-
             if (ActivityCompat.checkSelfPermission(mContext, readImagePermission) != PackageManager.PERMISSION_GRANTED) {
-
                 ActivityCompat.requestPermissions(this, new String[]{readImagePermission}, READ_EXTERNAL_STORAGE);
             } else if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS}, REQUEST_RECEIVE_SMS);
             } else if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
             } else if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, REQUEST_VIDEO_AUDIO_CODE);
             } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
                 if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE);
                 }
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-
-                if (!Environment.isExternalStorageManager() && isFlagALL_FILES_ACCESS == false){
+                if (!Environment.isExternalStorageManager() && !isFlagALL_FILES_ACCESS){
                     isFlagALL_FILES_ACCESS = true;
-
                     Intent getpermission = new Intent();
                     getpermission.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                     startActivityForResult(getpermission,ATTACHMENT_MANAGE_ALL_FILE);
@@ -324,7 +343,6 @@ public class DipsChooseLanguage extends AppCompatActivity {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (Settings.canDrawOverlays(this)) {
-
                     if (isOptimizingBattery() && getPreferences().getBoolean(getBatteryOptimizationPreferenceKey(), true)) {
                         Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
                         Uri uri = Uri.parse("package:" + getPackageName());
@@ -343,12 +361,10 @@ public class DipsChooseLanguage extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == REQUEST_ALL) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (!Environment.isExternalStorageManager() && isFlagALL_FILES_ACCESS == false){
+                    if (!Environment.isExternalStorageManager() && !isFlagALL_FILES_ACCESS){
                         isFlagALL_FILES_ACCESS = true;
                         Intent getpermission = new Intent();
                         getpermission.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
@@ -360,24 +376,17 @@ public class DipsChooseLanguage extends AppCompatActivity {
             }
         } else if (requestCode == READ_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
             }
         } else if (requestCode == REQUEST_CAMERA) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
             }
         } else if (requestCode == REQUEST_VIDEO_AUDIO_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
             }
         } else if (requestCode == WRITE_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (!Environment.isExternalStorageManager()){
-                        Intent getpermission = new Intent();
-                        getpermission.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                        startActivityForResult(getpermission,ATTACHMENT_MANAGE_ALL_FILE);
-                    }
-                }*/
+
             }
         }
     }
@@ -393,11 +402,9 @@ public class DipsChooseLanguage extends AppCompatActivity {
         GuardianLivenessDetectionSDK.setActionTimeoutMills(20000);
         GuardianLivenessDetectionSDK.isDetectOcclusion(true);
         String checkResult = GuardianLivenessDetectionSDK.setLicenseAndCheck(yourLicense);
-
         if ("SUCCESS".equals(checkResult)) {
             startActivityForResult(new Intent(this, LivenessActivity.class), REQUEST_CODE_LIVENESS);
         } else {
-            Log.e("LivenessSDK", "License check failed:" + checkResult);
             if (checkResult.contains("EXPIRE")) {
                 showProgress(true);
                 sessions.saveAuthAdvanceAI(null,0);
@@ -423,14 +430,7 @@ public class DipsChooseLanguage extends AppCompatActivity {
                 Bitmap livenessBitmap = LivenessResult.getLivenessBitmap();// picture
                 String imgBase64 = imgtoBase64(livenessBitmap);
                 byte[] bytePhoto = Base64.decode(imgBase64, Base64.NO_WRAP);
-                try {
-                    File pathPhotoLiveness = createTemporaryFile(bytePhoto);
-                    String filePath = pathPhotoLiveness.getAbsolutePath();
-                    Log.e(TAG,"filePath pathPhotoLiveness : "+filePath);
-                    sessions.savePhotoLiveness(filePath);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+
                 sessions.saveNoCIF(null);
                 Intent intent = new Intent(mContext, DipsLivenessResult.class);
                 intent.putExtra("RESULT_IMAGE_AI",bytePhoto);
@@ -438,9 +438,7 @@ public class DipsChooseLanguage extends AppCompatActivity {
                 startActivity(intent);
                 finishAffinity();
             } else {// Failure
-                //String errorCode = LivenessResult.getErrorCode();// error code
                 String errorMsg = LivenessResult.getErrorMsg();// error message
-                //String transactionId = LivenessResult.getTransactionId(); // Transaction number, which can be used to troubleshoot problems with us
                 if (errorMsg != null) {
                     Toast.makeText(mContext, errorMsg, Toast.LENGTH_LONG).show();
                 }
@@ -523,9 +521,7 @@ public class DipsChooseLanguage extends AppCompatActivity {
                         showProgress(false);
                     }
                 });
-
                 if (response.isSuccessful()) {
-
                     try {
                         JSONObject dataObj = new JSONObject(response.body().toString());
                         String dataLicense = dataObj.getJSONObject("data").getString("license");
@@ -560,14 +556,11 @@ public class DipsChooseLanguage extends AppCompatActivity {
         }
 
         String AccessKey = "9daf9d6e9dfe6cdd";
-
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
         Server.getAPIServiceAdvanceAI().AuthLicenseLiveness(requestBody,AccessKey).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
                 if (response.isSuccessful()) {
-
                     try {
                         JSONObject dataObj = new JSONObject(response.body().toString());
                         String sttcode = dataObj.getString("code");
@@ -584,7 +577,6 @@ public class DipsChooseLanguage extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-
             }
         });
     }

@@ -97,7 +97,12 @@ public class DownloadTaskHelper extends AsyncTask<String, Integer, String> {
             String filename = "FORM_CIF_"+timeStamp+".pdf";
             if (sUrl[1] != null) {
                 if (!sUrl[1].isEmpty()) {
-                    filename = sUrl[1];
+                    if (sUrl[1].contains(".")) {
+                        filename = sUrl[1];
+                    } else if (sUrl[1].contains("?")) {
+                        String[] sp2 = sUrl[1].split("\\?");
+                        filename = sp2[0].trim()+".pdf";
+                    }
                 }
             }
             File mediaFile = new File(dir.getPath() + File.separator +
@@ -165,9 +170,9 @@ public class DownloadTaskHelper extends AsyncTask<String, Integer, String> {
         mWakeLock.release();
         mProgressDialog.dismiss();
         if (result != null)
-            Toast.makeText(context,"Download error: "+result, Toast.LENGTH_LONG).show();
+            Toast.makeText(context,result, Toast.LENGTH_LONG).show();
         else
-            Toast.makeText(context,"File downloaded", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, R.string.file_downloaded, Toast.LENGTH_LONG).show();
     }
 
     private File createDir() {

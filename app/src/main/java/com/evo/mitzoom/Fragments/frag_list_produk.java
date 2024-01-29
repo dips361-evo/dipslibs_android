@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Base64;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,10 +34,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.ItemSavingAdapter;
+import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
+import com.evo.mitzoom.ui.Alternative.DipsSwafoto;
 import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
@@ -54,7 +58,7 @@ public class frag_list_produk extends Fragment {
     private Context context;
     private NestedScrollView nested;
     private ImageView btnBack;
-    private RelativeLayout rlOpenAccount;
+    private LinearLayout rlOpenAccount;
     private boolean isSessionZoom = false;
     private SweetAlertDialog sweetAlertDialogTNC = null;
     private View dialogView;
@@ -97,6 +101,12 @@ public class frag_list_produk extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         dataProduct = new JSONArray();
+
+        if (isSessionZoom) {
+            BaseMeetingActivity.showProgress(true);
+        } else {
+            DipsSwafoto.showProgress(true);
+        }
         new AsyncProcess().execute();
 
         if (isSessionZoom) {
@@ -109,7 +119,9 @@ public class frag_list_produk extends Fragment {
                 /*rabbitMirroring.MirroringSendEndpoint(361);
                 PopUpTnc();*/
                 //RabbitMirroring.MirroringSendEndpoint(201);
-                ConnectionRabbitHttp.mirroringEndpoint(201);
+                if (isSessionZoom) {
+                    ConnectionRabbitHttp.mirroringEndpoint(201);
+                }
                 getFragmentPage(new frag_open_account_product());
             }
         });
@@ -206,21 +218,23 @@ public class frag_list_produk extends Fragment {
         Button btn = dialogView.findViewById(R.id.btnnexttnc);
 
         if (!dataTnC.isEmpty()) {
-            tvBody.setText(Html.fromHtml(dataTnC, Html.FROM_HTML_MODE_LEGACY, new Html.ImageGetter() {
-                @Override
-                public Drawable getDrawable(String source) {
-                    int idx = source.indexOf(",");
-                    idx += 1;
-                    String new_source = source.substring(idx);
-                    byte[] data = Base64.decode(new_source, Base64.NO_WRAP);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    Drawable d = new BitmapDrawable(context.getResources(), bitmap);
-                    int intH = d.getIntrinsicHeight();
-                    int intW = d.getIntrinsicWidth();
-                    d.setBounds(0, 0, intW, intH);
-                    return d;
-                }
-            }, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                tvBody.setText(Html.fromHtml(dataTnC, Html.FROM_HTML_MODE_LEGACY, new Html.ImageGetter() {
+                    @Override
+                    public Drawable getDrawable(String source) {
+                        int idx = source.indexOf(",");
+                        idx += 1;
+                        String new_source = source.substring(idx);
+                        byte[] data = Base64.decode(new_source, Base64.NO_WRAP);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        Drawable d = new BitmapDrawable(context.getResources(), bitmap);
+                        int intH = d.getIntrinsicHeight();
+                        int intW = d.getIntrinsicWidth();
+                        d.setBounds(0, 0, intW, intH);
+                        return d;
+                    }
+                }, null));
+            }
         }
         btn.setClickable(false);
 
@@ -235,14 +249,12 @@ public class frag_list_produk extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkBox.isChecked()){
-                    Log.d("CHECK","TRUE");
                     btn.setBackgroundTintList(context.getResources().getColorStateList(R.color.zm_button));
                     btn.setClickable(true);
                     //RabbitMirroring.MirroringSendEndpoint(363);
                     ConnectionRabbitHttp.mirroringEndpoint(363);
                 }
                 else {
-                    Log.d("CHECK","FALSE");
                     btn.setBackgroundTintList(context.getResources().getColorStateList(R.color.btnFalse));
                     btn.setClickable(false);
                 }
@@ -256,6 +268,7 @@ public class frag_list_produk extends Fragment {
                     sweetAlertDialogTNC.cancel();
                     sessions.saveIsCust(isCust);
                     sessions.saveIsSwafoto(isSwafoto);
+                    //sessions.saveFormCOde(4);
                     sessions.saveFormCOde(4);
                     Fragment fragment = new frag_cif_new();
                     //RabbitMirroring.MirroringSendEndpoint(4);
@@ -275,6 +288,11 @@ public class frag_list_produk extends Fragment {
         Server.getAPIWAITING_PRODUCT().getNewProductPublish(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     try {
@@ -345,6 +363,11 @@ public class frag_list_produk extends Fragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
                 Toast.makeText(context,t.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
@@ -361,11 +384,19 @@ public class frag_list_produk extends Fragment {
     }
 
     private void getFragmentPage(Fragment fragment){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.layout_frame2, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (isSessionZoom) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame2, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     private void sendDataFragment(Bundle bundle, Fragment fragment){

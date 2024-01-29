@@ -336,6 +336,7 @@ public class OutboundServiceNew extends Service {
                             Thread.sleep(4000); //sleep and then try again
                             subscribeCall();
                         } catch (InterruptedException e) {
+
                         }
                     }
                 }
@@ -590,6 +591,12 @@ public class OutboundServiceNew extends Service {
         if (sessions.getIDSchedule() > 0) {
             //publishCallAccept("accept");
             publishCallAcceptHttp("accept");
+            /*if (subscribeThreadCallOutbound != null) {
+                subscribeThreadCallOutbound.interrupt();
+            }
+            if (publishCallAcceptThread != null) {
+                publishCallAcceptThread.interrupt();
+            }*/
         } else {
             Toast.makeText(mContext,"Tidak berhasil Call",Toast.LENGTH_SHORT).show();
         }

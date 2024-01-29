@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Base64;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
@@ -71,6 +73,8 @@ public class frag_open_account_product extends Fragment {
     private boolean isCust = false;
     private boolean isSwafoto = false;
     private boolean flagViewTNC = false;
+    private int idTNC = 1;
+    private TextView titleofhead;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,12 @@ public class frag_open_account_product extends Fragment {
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         ConnectionRabbitHttp.init(mContext);
 
+        if (getArguments() != null) {
+            if (getArguments().containsKey("idTNC")) {
+                idTNC = getArguments().getInt("idTNC");
+            }
+        }
+
     }
 
     @Override
@@ -91,6 +101,7 @@ public class frag_open_account_product extends Fragment {
         View views = inflater.inflate(R.layout.fragment_frag_open_account_product, container, false);
 
         btnBack = views.findViewById(R.id.btn_back);
+        titleofhead = (TextView) views.findViewById(R.id.titleofhead);
         rv_item = views.findViewById(R.id.rv_item);
         rv_item2 = views.findViewById(R.id.rv_item2);
         btnNext = views.findViewById(R.id.btnNext);
@@ -129,12 +140,14 @@ public class frag_open_account_product extends Fragment {
             @Override
             public void onClick(View v) {
                 if (sessions.getNoCIF() == null || sessions.getNoCIF().isEmpty()) {
-                    //RabbitMirroring.MirroringSendEndpoint(2);
-                    ConnectionRabbitHttp.mirroringEndpoint(2);
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringEndpoint(2);
+                    }
                     getFragmentPage(new frag_list_produk());
                 } else {
-                    //RabbitMirroring.MirroringSendEndpoint(15);
-                    ConnectionRabbitHttp.mirroringEndpoint(15);
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringEndpoint(15);
+                    }
                     getFragmentPage(new frag_service_new());
                 }
             }
@@ -147,9 +160,14 @@ public class frag_open_account_product extends Fragment {
                     Toast.makeText(mContext,getString(R.string.waiting),Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (flagViewTNC == false) {
-                    //RabbitMirroring.MirroringSendEndpoint(361);
-                    ConnectionRabbitHttp.mirroringEndpoint(361);
+                if (!flagViewTNC) {
+                    if (isSessionZoom) {
+                        if (idTNC == 1) {
+                            ConnectionRabbitHttp.mirroringEndpoint(361);
+                        } else {
+                            ConnectionRabbitHttp.mirroringEndpoint(156);
+                        }
+                    }
                     PopUpTnc();
                 }
             }
@@ -169,7 +187,7 @@ public class frag_open_account_product extends Fragment {
     private void processGetTNC() {
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
-        Server.getAPIService().getTNC(1,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+        Server.getAPIService().getTNC(idTNC,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                 if (isSessionZoom) {
@@ -264,21 +282,23 @@ public class frag_open_account_product extends Fragment {
         sweetAlertDialogTNC.setCancelable(true);
 
         if (!dataTnC.isEmpty()) {
-            tvBody.setText(Html.fromHtml(dataTnC, Html.FROM_HTML_MODE_LEGACY, new Html.ImageGetter() {
-                @Override
-                public Drawable getDrawable(String source) {
-                    int idx = source.indexOf(",");
-                    idx += 1;
-                    String new_source = source.substring(idx);
-                    byte[] data = Base64.decode(new_source, Base64.NO_WRAP);
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-                    Drawable d = new BitmapDrawable(mContext.getResources(), bitmap);
-                    int intH = d.getIntrinsicHeight();
-                    int intW = d.getIntrinsicWidth();
-                    d.setBounds(0, 0, intW, intH);
-                    return d;
-                }
-            }, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                tvBody.setText(Html.fromHtml(dataTnC, Html.FROM_HTML_MODE_LEGACY, new Html.ImageGetter() {
+                    @Override
+                    public Drawable getDrawable(String source) {
+                        int idx = source.indexOf(",");
+                        idx += 1;
+                        String new_source = source.substring(idx);
+                        byte[] data = Base64.decode(new_source, Base64.NO_WRAP);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                        Drawable d = new BitmapDrawable(mContext.getResources(), bitmap);
+                        int intH = d.getIntrinsicHeight();
+                        int intW = d.getIntrinsicWidth();
+                        d.setBounds(0, 0, intW, intH);
+                        return d;
+                    }
+                }, null));
+            }
         }
 
         sweetAlertDialogTNC.show();
@@ -289,7 +309,6 @@ public class frag_open_account_product extends Fragment {
         int newWidth = (int)(width*0.8);
         int newHeight = (int)(height*0.85);
 
-        //sweetAlertDialogTNC.getWindow().setGravity(Gravity.CENTER_HORIZONTAL);
         sweetAlertDialogTNC.getWindow().setLayout(newWidth,newHeight);
         sweetAlertDialogTNC.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
@@ -302,30 +321,40 @@ public class frag_open_account_product extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkBox.isChecked()){
-                    Log.d("CHECK","TRUE");
                     btn.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                     btn.setClickable(true);
                     JSONObject tncCheckObj = new JSONObject();
                     try {
-                        tncCheckObj.put("tnc1",true);
+                        if (idTNC == 1) {
+                            tncCheckObj.put("tnc1", true);
+                        } else {
+                            tncCheckObj.put("pembukaanakun",new JSONObject("{\n" +
+                                    "\"tnc35\":true}"));
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //RabbitMirroring.MirroringSendKey(tncCheckObj);
-                    ConnectionRabbitHttp.mirroringKey(tncCheckObj);
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringKey(tncCheckObj);
+                    }
                 }
                 else {
-                    Log.d("CHECK","FALSE");
                     btn.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.btnFalse));
                     btn.setClickable(false);
                     JSONObject tncCheckObj = new JSONObject();
                     try {
-                        tncCheckObj.put("tnc1",false);
+                        if (idTNC == 1) {
+                            tncCheckObj.put("tnc1", false);
+                        } else {
+                            tncCheckObj.put("pembukaanakun",new JSONObject("{\n" +
+                                    "\"tnc35\":true}"));
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    //RabbitMirroring.MirroringSendKey(tncCheckObj);
-                    ConnectionRabbitHttp.mirroringKey(tncCheckObj);
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringKey(tncCheckObj);
+                    }
                 }
             }
         });
@@ -336,20 +365,19 @@ public class frag_open_account_product extends Fragment {
                     sweetAlertDialogTNC.cancel();
                     sweetAlertDialogTNC.dismissWithAnimation();
                     if (sessions.getNoCIF() == null || sessions.getNoCIF().isEmpty()) {
-                        sessions.saveIsCust(isCust);
-                        sessions.saveIsSwafoto(isSwafoto);
-                        sessions.saveFormCOde(4);
-                        Fragment fragment = new frag_cif_new();
-                        //RabbitMirroring.MirroringSendEndpoint(4);
-                        ConnectionRabbitHttp.mirroringEndpoint(4);
-                        getFragmentPage(fragment);
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(true);
+                        } else {
+                            DipsSwafoto.showProgress(true);
+                        }
+                        processGetDataeKTP();
                     } else {
                         sessions.saveFormCOde(150);
                         Fragment fragment = new frag_ready_account();
-                        //RabbitMirroring.MirroringSendEndpoint(150);
-                        ConnectionRabbitHttp.mirroringEndpoint(150);
+                        if (isSessionZoom) {
+                            ConnectionRabbitHttp.mirroringEndpoint(150);
+                        }
                         getFragmentPage(fragment);
-                        //Toast.makeText(mContext,"Halaman belum tersedia",Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
@@ -359,12 +387,158 @@ public class frag_open_account_product extends Fragment {
         });
     }
 
+    private void processGetDataeKTP() {
+        String authAccess = "Bearer "+sessions.getAuthToken();
+        String exchangeToken = sessions.getExchangeToken();
+        Server.getAPIService().GetDataeKTP(sessions.getKEY_IdDips(),authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject dataBody = new JSONObject(response.body().toString());
+                        JSONObject dataObj = dataBody.getJSONObject("data");
+
+                        String getDataNasabah = sessions.getNasabah();
+                        JSONObject dataNasabahObj = new JSONObject(getDataNasabah);
+                        for(Iterator<String> iter = dataObj.keys(); iter.hasNext();) {
+                            String key = iter.next();
+                            String nameDataEl = key;
+
+                            if (nameDataEl.equals("namaLengkap")) {
+                                dataNasabahObj.put("namaCust",dataObj.getString(key));
+                            } else if (nameDataEl.equals("alamat")) {
+                                dataNasabahObj.put("address1",dataObj.getString(key));
+                            } else if (nameDataEl.equals("rt")) {
+                                dataNasabahObj.put("address2",dataObj.getString(key));
+                            } else if (nameDataEl.equals("rw")) {
+                                if (dataNasabahObj.has("address2")) {
+                                    String datRT = dataNasabahObj.getString("address2");
+                                    String datRTRW = datRT + dataObj.getString(key);
+                                    dataNasabahObj.put("address2",datRTRW);
+                                }
+                            } else if (nameDataEl.equals("kelurahan")) {
+                                dataNasabahObj.put("address3",dataObj.getString(key));
+                            } else if (nameDataEl.equals("kecamatan")) {
+                                dataNasabahObj.put("address4",dataObj.getString(key));
+                            } else if (nameDataEl.equals("kabupaten")) {
+                                dataNasabahObj.put("address5",dataObj.getString(key));
+                            } else if (nameDataEl.equals("propinsi")) {
+                                dataNasabahObj.put("propinsi",dataObj.getString(key));
+                                dataNasabahObj.put("Prov1",dataObj.getString(key));
+                            } else if (nameDataEl.equals("tempatlahir")) {
+                                dataNasabahObj.put("tempatLahir",dataObj.getString(key));
+                            } else if (nameDataEl.equals("jenisKelamin")) {
+                                dataNasabahObj.put("jenisKelamin",dataObj.getString(key));
+                            } else if (nameDataEl.equals("tglLahir")) {
+                                dataNasabahObj.put("tglLahir",dataObj.getString(key));
+                            } else if (nameDataEl.equals("nik")) {
+                                dataNasabahObj.put("nomorId",dataObj.getString(key));
+                            } else if (nameDataEl.equals("kodePos")) {
+                                dataNasabahObj.put("zipCode",dataObj.getString(key));
+                            } else if (nameDataEl.equals("namaLengkapIbu")) {
+                                dataNasabahObj.put("namaIbu",dataObj.getString(key));
+                            } else if (nameDataEl.equals("agama")) {
+                                dataNasabahObj.put("agama",dataObj.getString(key));
+                            } else if (nameDataEl.equals("statusKawin")) {
+                                dataNasabahObj.put("statusNikah",dataObj.getString(key));
+                            } else if (nameDataEl.equals("jenisPekerjaan")) {
+                                dataNasabahObj.put("jenisPekerjaan",dataObj.getString(key));
+                            }
+                        }
+                        sessions.saveNasabah(dataNasabahObj.toString());
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    sessions.saveIsCust(isCust);
+                    sessions.saveIsSwafoto(isSwafoto);
+                    //sessions.saveFormCOde(4);// KTP
+                    sessions.saveFormCOde(22);
+                    Fragment fragment = new frag_cif_new();
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("swaOCR", true);
+                    fragment.setArguments(bundle);
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringEndpoint(9);
+                    }
+                    getFragmentPage(fragment);
+                } else {
+
+                    sessions.saveIsSwafoto(isSwafoto);
+                    sessions.saveFormCOde(22);
+                    Fragment fragment = new frag_cif_new();
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("ocrKTP", true);
+                    fragment.setArguments(bundle);
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringEndpoint(9);
+                    }
+                    getFragmentPage(fragment);
+
+                    String msg = "";
+                    if (response.body() != null) {
+                        String dataS = response.body().toString();
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            msg = dataObj.getString("message");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        if (response.errorBody().toString().isEmpty()) {
+                            String dataS = response.errorBody().toString();
+                            try {
+                                JSONObject dataObj = new JSONObject(dataS);
+                                msg = dataObj.getString("message");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            String dataS = null;
+                            try {
+                                dataS = response.errorBody().string();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                msg = dataObj.getString("message");
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                    Toast.makeText(mContext,msg,Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void getFragmentPage(Fragment fragment){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.layout_frame2, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (isSessionZoom) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame2, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     private void addData(){

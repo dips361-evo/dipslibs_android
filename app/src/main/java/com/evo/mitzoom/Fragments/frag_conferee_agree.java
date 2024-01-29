@@ -74,6 +74,7 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
     protected ZoomVideoSDKSession sessionz;
     private final Boolean result = true;
     private RabbitMirroring rabbitMirroring;
+    private boolean isSessionZoom;
 
 
     @Override
@@ -94,7 +95,7 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
         View view = inflater.inflate(R.layout.frag_start_conferee, container, false);
         btn_Setuju = view.findViewById(R.id.btn_accept);
         btn_tidak = view.findViewById(R.id.btn_not);
-        sessionz = ZoomVideoSDK.getInstance().getSession();
+        isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         ZoomVideoSDK.getInstance().addListener(this);
         return view;
     }
@@ -107,7 +108,7 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
             @Override
             public void onClick(View v) {
                 boolean flagAgree = session.getFlagConfAgree();
-                if (flagAgree == false) {
+                if (!flagAgree) {
                     SweetAlertDialog dialogNotAgree = new SweetAlertDialog(context,SweetAlertDialog.WARNING_TYPE);
                     dialogNotAgree.setContentText(getString(R.string.waiting_conf));
                     dialogNotAgree.setCancelable(true);
@@ -147,20 +148,22 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
             @Override
             public void onClick(View v) {
                 boolean flagAgree = session.getFlagConfAgree();
-                if (flagAgree == false) {
+                /*if (flagAgree == false) {
                     SweetAlertDialog dialogNotAgree = new SweetAlertDialog(context,SweetAlertDialog.WARNING_TYPE);
                     dialogNotAgree.setContentText(getString(R.string.waiting_conf));
                     dialogNotAgree.setCancelable(true);
                     dialogNotAgree.setConfirmText("OK");
                     dialogNotAgree.show();
                     return;
-                }
+                }*/
                 cekData();
                 /*BaseMeetingActivity.btnFile.setBackgroundTintList(context.getResources().getColorStateList(R.color.Blue));
                 BaseMeetingActivity.btnFile.setClickable(true);*/
 
                 //BaseMeetingActivity.btnChat.setBackground(ResourcesCompat.getDrawable(getResources(),R.drawable.oval_background_10dp,null));
-                BaseMeetingActivity.btnChat.setClickable(true);
+                if (isSessionZoom) {
+                    BaseMeetingActivity.btnChat.setClickable(true);
+                }
             }
         });
     }
@@ -204,12 +207,12 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.d("MIRROR","Mirroring Sukses");
+
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.d("MIRROR","Mirroring Gagal");
+
             }
         });
     }
@@ -234,11 +237,19 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
         }
     }
     private void getFragmentPage(Fragment fragment){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.layout_frame2, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (isSessionZoom) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame2, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
     private void OutApps(){
         Intent intent = new Intent(Intent.ACTION_MAIN);

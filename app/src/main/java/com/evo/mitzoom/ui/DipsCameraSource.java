@@ -277,7 +277,7 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
             try {
                 String pathFile = mediaFile.getPath();
                 Bitmap bitmapCropShape = getResizedBitmap(realBitmap, realBitmap.getWidth(), realBitmap.getHeight());
-                //Bitmap bitmapCrop = prosesOptimalImage(realBitmap, mediaFile);
+
                 ExifInterface exif = new ExifInterface(pathFile);
                 int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                 rotationInDegree = rotation;
@@ -358,8 +358,8 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
             widthB = (int) (height / 1.9);
             heightB = (int) (width / 2.1);*/
             cx = (int) (width / 9.5);
-            cy = height / 5;
-            widthB = width / 4;
+            cy = (int) (height / 5);
+            widthB = (int) (width / 4);
             heightB = (int) (height / 1.7);
 
             matrix.postScale(1, -1); //xiaomi cx itu brarti sudut Y dan cy brarti sudut X
@@ -437,7 +437,6 @@ public class DipsCameraSource extends AppCompatActivity implements CameraSource.
         int h = bitmap.getHeight();
 
         Matrix matrix = new Matrix();
-        Log.d("CEK","useFacing : "+useFacing);
         if (useFacing == CameraSource.CAMERA_FACING_FRONT) {
             matrix.setRotate(rotationInDegree);
         } else {

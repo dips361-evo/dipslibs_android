@@ -163,7 +163,53 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
         parseGetSchedule();
         new AsyncProcess().execute();
 
+        /*btnSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (time.size() > 0) {
+                    PopUpSchedule();
+                } else {
+                    Toast.makeText(context,getString(R.string.please_wait),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        btnEndCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EndCall();
+            }
+        });*/
+
     }
+
+    /*private void processGetCheckSchedule() {
+        String authAccess = "Bearer "+sessions.getAuthToken();
+        Server.getAPIService().GetCheckSchedule(authAccess).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful()) {
+                    String dataS = response.body().toString();
+                    try {
+                        JSONObject dataObj = new JSONObject(dataS);
+                        int errCode = dataObj.getInt("code");
+                        if (errCode == 200) {
+                            tanggalPenuh = dataObj.getJSONObject("data").getJSONArray("tanggalPenuh");
+                            periodePenuh = dataObj.getJSONObject("data").getJSONArray("periodePenuh");
+
+                            l,,,,,,,,,,,,,,,,,
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+
+            }
+        });
+    }*/
 
     @Override
     public void onDateSet(com.wdullaer.materialdatetimepicker.date.DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
@@ -559,6 +605,7 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
         //System.exit(0);
     }
     private void initPager() {
+
         mPager.setAdapter(new AdapterSlide(context, dataArrSpanduk));
         mPager.setClipToPadding(false);
         mPager.setClipChildren(false);

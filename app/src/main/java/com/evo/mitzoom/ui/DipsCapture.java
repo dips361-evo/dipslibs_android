@@ -128,9 +128,7 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
 
         TelephonyManager tMgr = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Log.d("CEK","MASUK IF PERMISSION");
             return;
-            //requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE,Manifest.permission.READ_SMS,Manifest.permission.READ_PHONE_NUMBERS}, REQUEST_ALL);
         }
         String mPhoneNumber = tMgr.getLine1Number();
 
@@ -143,7 +141,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             } else {
                 Toast.makeText(DipsCapture.this,"Permission Denied", Toast.LENGTH_LONG).show();
-                return;
             }
         }
     }
@@ -291,7 +288,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
 
     private Bitmap prosesOptimalImage(Bitmap bitmap, File mediaFile) {
         int file_size = Integer.parseInt(String.valueOf(mediaFile.length()/1024));
-        Log.d("CEK", "file_size : "+file_size);
 
         int perDiff = 1;
         if (file_size > 3072) {
@@ -376,7 +372,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
             //float marginTop = (float) (cTop * 3) / diff1;
             //int margins = MarginSurf * 2;
             float rad = (float) width / 2;
-            //double cy = rad + MarginSurf;
 
             int NUM_DASHES = 20;
             float DASH_PORTION = (float) 0.75;
@@ -466,29 +461,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
                     intent.putExtra("idDips", idDips);
                     startActivity(intent);
                     finishAffinity();
-
-                    //showProgress(true);
-                    //processCaptureIdentifyAuth(imgBase64);
-
-                    /*View dialogView = getLayoutInflater().inflate(R.layout.layout_show_image, null);
-                    SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(mContext, SweetAlertDialog.NORMAL_TYPE);
-                    sweetAlertDialog.setCustomView(dialogView);
-                    sweetAlertDialog.setCancelable(false);
-
-                    ImageView imgCapture = (ImageView) dialogView.findViewById(R.id.imgCapture);
-                    imgCapture.setImageBitmap(bitmap);
-
-                    sweetAlertDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sweetAlertDialog) {
-                            sweetAlertDialog.dismissWithAnimation();
-                            showProgress(true);
-                            //processCaptureIdentify(imgBase64);
-                            //Intent intent = new Intent(mContext, DipsWaitingRoom.class);
-                            processCaptureIdentifyAuth(imgBase64);
-                        }
-                    });
-                    sweetAlertDialog.show();*/
                 }
 
             } catch (IOException e) {
@@ -538,7 +510,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
         int h = bitmap.getHeight();
 
         Matrix matrix = new Matrix();
-        Log.d("CEK","useFacing : "+useFacing);
         if (useFacing == CameraSource.CAMERA_FACING_FRONT) {
             matrix.setRotate(rotationInDegree);
         } else {
@@ -576,13 +547,6 @@ public class DipsCapture extends AppCompatActivity implements CameraSource.Pictu
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        /*String filename = "CaptureAuth_"+idDips+".txt";
-        try {
-            createTemporaryFile(jsons.toString(),filename);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
 
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
 

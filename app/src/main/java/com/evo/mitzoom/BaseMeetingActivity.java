@@ -179,6 +179,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
     private boolean flagClickEnd = false;
     private boolean flagUserLeave = false;
     public static RelativeLayout rlprogress;
+    public static TextView tvLoading;
     private String lang = "";
     private LinearLayout iconBubble;
     private boolean flagShowLeave = false;
@@ -191,6 +192,9 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
     private final List<CharSequence> list = new ArrayList<>();
     private final List<Boolean> isSelf = new ArrayList<>();
     private final List<Boolean> isHost = new ArrayList<>();
+    private boolean flagConnectResult = true;
+    private boolean flagSessionLeave = false;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -305,6 +309,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         });
         chatListView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         chatListView.setAdapter(chatMsgAdapter);
+        //updateChatLayoutParams();
         if (!bottomSheetDialog.isShowing()){
             SavedInstanceChat();
         }
@@ -581,6 +586,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         try {
             startActivity(home);
         } catch (Exception e) {
+            Log.e(TAG, e.toString());
         }
     }
 
@@ -641,9 +647,9 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         int widthDisp = displayMetrics.widthPixels;
         int dyWidth = (int) Math.ceil(widthDisp / 2);
 
-
         gifLoading = findViewById(R.id.gifLoading);
         rlprogress = findViewById(R.id.rlprogress);
+        tvLoading = (TextView) findViewById(R.id.tvLoading);
         imgBatikVic = findViewById(R.id.imgBatikVic);
         llUsersVideo = findViewById(R.id.llUsersVideo);
         cardSurf = findViewById(R.id.cardSurf);
@@ -803,15 +809,13 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
                 //OutboundServiceNew.stopServiceSocket();
                 Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                 mContext.stopService(intentOutbound);
+                ConnectionRabbitHttp.mirroringEndpoint(99);
+                trimCache(mContext);
                 releaseResource();
                 int ret = ZoomVideoSDK.getInstance().leaveSession(false);
                 sessions.clearPartData();
-                //RabbitMirroring.MirroringSendEndpoint(99);
-                ConnectionRabbitHttp.mirroringEndpoint(99);
-                trimCache(mContext);
                 startActivity(new Intent(getApplicationContext(), RatingActivity.class));
                 finish();
-                //RabbitMirroring.closeThreadConnection();
             }
         });
     }
@@ -850,15 +854,13 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
                 mContext.stopService(intentOutbound);
 
                 dialogEnd.dismissWithAnimation();
+                ConnectionRabbitHttp.mirroringEndpoint(99);
+                trimCache(mContext);
                 releaseResource();
                 int ret = ZoomVideoSDK.getInstance().leaveSession(false);
                 sessions.clearPartData();
-                //RabbitMirroring.MirroringSendEndpoint(99);
-                ConnectionRabbitHttp.mirroringEndpoint(99);
-                trimCache(mContext);
                 startActivity(new Intent(getApplicationContext(), RatingActivity.class));
                 finish();
-                //RabbitMirroring.closeThreadConnection();
             }
         });
         btnCancelDialog.setOnClickListener(new View.OnClickListener() {
@@ -906,10 +908,11 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+
             }
         });
     }
-    
+
     public void onClickChat(View view) {
         btnChat.setFocusable(true);
         iconBubble.setVisibility(View.GONE);
@@ -1026,9 +1029,6 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         if (left > margin || left <= 0) {
             userVideoList.scrollBy(left - margin, 0);
         }
-        /*if (BuildConfig.DEBUG) {
-            Log.d(TAG, "left:" + left + " view left:" + view.getLeft());
-        }*/
     }
 
     private void updateVideoListLayout() {
@@ -1174,9 +1174,14 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onSessionLeave() {
-        if (flagUserLeave == false) {
-            if (flagShowLeave == false) {
-                dialogAgentLeave();
+        flagSessionLeave = true;
+        if (!flagUserLeave) {
+            if (flagConnectResult) {
+                if (!flagShowLeave) {
+                    dialogAgentLeave();
+                }
+            } else {
+                Toast.makeText(mContext,"Session Ends Because Connection Lost...",Toast.LENGTH_LONG).show();
             }
         } else {
             //OutboundServiceNew.stopServiceSocket();
@@ -1229,9 +1234,13 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
         flagUserLeave = true;
 
-        if (userList.size() < 2 && flagClickEnd == false) {
-            if (flagShowLeave == false) {
-                dialogAgentLeave();
+        if (userList.size() < 2 && !flagClickEnd) {
+            if (flagConnectResult) {
+                if (!flagShowLeave) {
+                    dialogAgentLeave();
+                }
+            } else {
+                Toast.makeText(mContext,"Session Ends Because Connection Lost...",Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -1259,11 +1268,16 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
             sessions.saveCamera(isOn);
 
             boolean flagDoc = sessions.getFlagUpDoc();
-            if (flagDoc) {
-                startVideoHandler();
+            int valMedia = sessions.getMedia();
+
+            if (flagDoc && valMedia == 1) {
+                //startVideoHandler();
+                if (isOn == 2) {
+                    onOffVideo();
+                }
+                sessions.saveFlagUpDoc(false);
             } else {
-                int valMedia = sessions.getMedia();
-                if (valMedia == 0 && isOn == 2) {
+                if (valMedia != 1 && isOn == 2) {
                     onOffVideo();
                 }
             }
@@ -1290,6 +1304,7 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onUserShareStatusChanged(ZoomVideoSDKShareHelper zoomVideoSDKShareHelper, ZoomVideoSDKUser zoomVideoSDKUser, ZoomVideoSDKShareStatus zoomVideoSDKShareStatus) {
+
     }
 
     @Override
@@ -1299,7 +1314,6 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onChatNewMessageNotify(ZoomVideoSDKChatHelper zoomVideoSDKChatHelper, ZoomVideoSDKChatMessage messageItem) {
-
         chatMsgAdapter.onReceive(messageItem);
         if(bottomSheetDialog.isShowing()){
             iconBubble.setVisibility(View.GONE);
@@ -1331,19 +1345,30 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onUserActiveAudioChanged(ZoomVideoSDKAudioHelper zoomVideoSDKAudioHelper, List<ZoomVideoSDKUser> list) {
+        boolean flagDoc = sessions.getFlagUpDoc();
+        int valMedia = sessions.getMedia();
+        if (flagDoc && valMedia == 1) {
+            //startVideoHandler();
+            if (isOn == 2) {
+                onOffVideo();
+            }
+            sessions.saveFlagUpDoc(false);
+        } else {
+            if (valMedia != 1 && isOn == 2) {
+                onOffVideo();
+            }
+        }
 
         adapter.onUserActiveAudioChanged(list, userVideoList);
     }
 
     @Override
     public void onSessionNeedPassword(ZoomVideoSDKPasswordHandler handler) {
-
         showInputPwdDialog(handler);
     }
 
     @Override
     public void onSessionPasswordWrong(ZoomVideoSDKPasswordHandler handler) {
-
         Toast.makeText(this, "Password wrong", Toast.LENGTH_LONG).show();
         showInputPwdDialog(handler);
     }
@@ -1365,12 +1390,16 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onCommandReceived(ZoomVideoSDKUser zoomVideoSDKUser, String s) {
-
     }
 
     @Override
     public void onCommandChannelConnectResult(boolean b) {
-
+        flagConnectResult = b;
+        if (!b) {
+            if (!flagSessionLeave) {
+                Toast.makeText(mContext, "Connection Lost...", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -1445,7 +1474,6 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
-
         super.onPointerCaptureChanged(hasCapture);
     }
 

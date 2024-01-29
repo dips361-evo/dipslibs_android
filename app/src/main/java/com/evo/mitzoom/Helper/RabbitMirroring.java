@@ -98,7 +98,6 @@ public class RabbitMirroring {
                                 if (sessions.getKEY_IdDips() != null) {
                                     jsons.put("idDips", sessions.getKEY_IdDips());
                                 }
-                                //OutboundServiceNew.stopServiceSocket();
                                 Intent intentOutbound = new Intent(mContext, OutboundServiceNew.class);
                                 mContext.stopService(intentOutbound);
                             }
@@ -110,7 +109,6 @@ public class RabbitMirroring {
                         chSendEndpoint.confirmSelect();
 
                         String csID = sessions.getCSID();
-
                         JSONObject datax = dataMirroring(jsons);
                         String dataxS = datax.toString();
 

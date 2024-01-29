@@ -81,7 +81,7 @@ public class GraphicFaceTracker extends Tracker<Face> {
             PointF posF = face.getPosition();
             float posFX = posF.x;
             float posFY = posF.y;
-            if (((posFX < 90 || posFX > 220) || (posFY < 120 || posFY > 320)) && flag == false) {
+            if (((posFX < 90 || posFX > 220) || (posFY < 120 || posFY > 320)) && !flag) {
                 flag = true;
                 ((Activity)mContext).runOnUiThread(new Runnable() {
                     @Override
@@ -95,7 +95,7 @@ public class GraphicFaceTracker extends Tracker<Face> {
                     }
                 });
                 return;
-            } else if ((posFX < 120 && posFY > 220) && flag == false) {
+            } else if ((posFX < 120 && posFY > 220) && !flag) {
                 flag = true;
                 ((Activity)mContext).runOnUiThread(new Runnable() {
                     @Override

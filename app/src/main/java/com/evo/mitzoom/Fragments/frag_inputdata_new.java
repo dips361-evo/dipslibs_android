@@ -51,6 +51,7 @@ import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterFile;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.HideSoftKeyboard;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.FileModel;
@@ -161,6 +162,12 @@ public class frag_inputdata_new extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        boolean flagDoc = session.getFlagUpDoc();
+        int valMedia = session.getMedia();
+        if (!flagDoc && valMedia == 1) {
+            session.saveFlagUpDoc(true);
+        }
 
         idDips = session.getKEY_IdDips();
 
@@ -331,11 +338,10 @@ public class frag_inputdata_new extends Fragment {
                         if (validate) {
                             if (isSessionZoom) {
                                 BaseMeetingActivity.showProgress(true);
-                                keyboard(mContext);
                             } else {
-                                keyboard(mContext);
                                 DipsSwafoto.showProgress(true);
                             }
+                            HideSoftKeyboard.hideSoftKeyboard(getActivity());
                             CekDataByNIK(objEl);
                         } else {
                             Toast.makeText(mContext, R.string.doesn_match, Toast.LENGTH_SHORT).show();
@@ -345,15 +351,6 @@ public class frag_inputdata_new extends Fragment {
             }
         });
     }
-
-    private void keyboard(Context context){
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (imm.isAcceptingText()){
-            ((InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE))
-                    .toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-        }
-    }
-
 
     @Override
     public void onDestroy() {
@@ -516,6 +513,7 @@ public class frag_inputdata_new extends Fragment {
                                         AutoText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                                             @Override
                                             public void onFocusChange(View view, boolean b) {
+
                                             }
                                         });
                                     } else {
@@ -645,7 +643,12 @@ public class frag_inputdata_new extends Fragment {
                                                 try {
                                                     objEl.put(nameDataEl, results);
                                                     if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                                        valSpinProv.put(nameDataEl,idData);
+                                                        String newNameDataEl = nameDataEl;
+                                                        if (nameDataEl.contains("(")) {
+                                                            int indxProv = nameDataEl.indexOf("(");
+                                                            newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                                        }
+                                                        valSpinProv.put(newNameDataEl,idData);
                                                     } else {
                                                         valSpin.put(nameDataEl, idData);
                                                         if (nameDataEl.contains("jenis") && (nameDataEl.contains("pengaduan") || nameDataEl.contains("komplain"))) {
@@ -698,7 +701,6 @@ public class frag_inputdata_new extends Fragment {
                                             keyUpFile = nameDataEl;
                                             if (ll.getChildAt(0) instanceof LinearLayout) {
                                                 LinearLayout ll2 = (LinearLayout) ll.getChildAt(0);
-
                                                 TextView tvll = (TextView) ll2.getChildAt(1);
                                                 String txt = tvll.getText().toString();
                                                 if (txt.toLowerCase().indexOf("gambar") > 0 || txt.toLowerCase().indexOf("image") > 0 || txt.toLowerCase().indexOf("tangan") > 0) {
@@ -939,7 +941,12 @@ public class frag_inputdata_new extends Fragment {
                                 dataDropDown.add(new FormSpin(idData, labelIdn, labelIdn, labelEng));
                                 if (i == 0) {
                                     if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                        valSpinProv.put(nameDataEl,idData);
+                                        String newNameDataEl = nameDataEl;
+                                        if (nameDataEl.contains("(")) {
+                                            int indxProv = nameDataEl.indexOf("(");
+                                            newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                        }
+                                        valSpinProv.put(newNameDataEl,idData);
                                     } else {
                                         valSpin.put(nameDataEl, idData);
                                         valSpinLabel.put(nameDataEl,labelEng);
@@ -1154,6 +1161,7 @@ public class frag_inputdata_new extends Fragment {
     }
 
     private void CekDataByNIK(JSONObject jsons){
+
         String authAccess = "Bearer "+session.getAuthToken();
         String exchangeToken = session.getExchangeToken();
 
@@ -1288,7 +1296,6 @@ public class frag_inputdata_new extends Fragment {
                         startActivity(intent);
                         ((Activity) mContext).finishAffinity();
                     }
-                    Log.d("CEK","MASUK ELSE");
                 }
             }
 
@@ -1321,12 +1328,10 @@ public class frag_inputdata_new extends Fragment {
             @Override
             public void onClick(View v) {
                 if (checkBox.isChecked()){
-                    Log.d("CHECK","TRUE");
                     btn.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.Blue));
                     btn.setClickable(true);
                 }
                 else {
-                    Log.d("CHECK","FALSE");
                     btn.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.btnFalse));
                     btn.setClickable(false);
                 }
@@ -1388,7 +1393,6 @@ public class frag_inputdata_new extends Fragment {
                 }
                 imgtoBase64(bitmap);
             } else if (requestCode == 201) {
-                session.saveFlagUpDoc(true);
                 Uri selectedImage = data.getData();
                 String[] filePath = { MediaStore.Images.Media.DATA };
                 Cursor c = mContext.getContentResolver().query(selectedImage,filePath, null, null, null);
@@ -1413,9 +1417,7 @@ public class frag_inputdata_new extends Fragment {
                     }
                 }
             } else if (requestCode == REQUESTCODE_FILE) {
-                Log.e("CEK","RESULT FILE");
                 Uri uri = data.getData();
-                Log.e("CEK","uri : "+uri);
                 if (dataFiles.size() > 3) {
                     Toast.makeText(mContext, R.string.max_upfile, Toast.LENGTH_SHORT).show();
                     return;
@@ -1425,7 +1427,6 @@ public class frag_inputdata_new extends Fragment {
                     Cursor c = mContext.getContentResolver().query(uri,null, null, null, null);
                     c.moveToFirst();
                     @SuppressLint("Range") String fileName = c.getString(c.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                    Log.e("CEK","RESULT fileName : "+fileName);
                     if (tvSavedFile != null) {
                         tvSavedFile.setText(fileName);
                         if (!keyUpFile.isEmpty()) {
@@ -1460,15 +1461,12 @@ public class frag_inputdata_new extends Fragment {
                     }
                 } else if (data.getClipData().getItemCount() > 0) {
                     dataFiles = new ArrayList();
-                    Log.e("CEK","MULTI uri : "+data.getClipData().getItemCount());
 
                     for(int i = 0; i < data.getClipData().getItemCount(); i++) {
                         Uri uriFile = data.getClipData().getItemAt(i).getUri();
-                        Log.e("CEK","uriFile : "+uriFile.toString());
                         Cursor c = mContext.getContentResolver().query(uriFile,null, null, null, null);
                         c.moveToFirst();
                         @SuppressLint("Range") String fileName = c.getString(c.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                        Log.e("CEK","RESULT fileName : "+fileName);
                         if (rv_item_file != null) {
                             dataFiles.add(new FileModel("1", fileName, R.color.item_file_silver, ""));
                         }
@@ -1533,7 +1531,6 @@ public class frag_inputdata_new extends Fragment {
         File mediaFile = new File(picturePath);
         Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
         int file_size = Integer.parseInt(String.valueOf(mediaFile.length()/1024));
-        Log.d("CEK", "file_size : "+file_size);
 
         int perDiff = 1;
         if (file_size > 3072) {

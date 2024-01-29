@@ -65,7 +65,6 @@ public class frag_new_resi extends Fragment {
         mContext = getContext();
         sessions = new SessionManager(mContext);
         dataRTGS = sessions.getRTGS();
-        Log.d("CEK","dataRTGS : "+dataRTGS);
 
     }
 
@@ -179,7 +178,6 @@ public class frag_new_resi extends Fragment {
         myFiles = mediaStorageDir.list();
         if (myFiles != null) {
             for (int i = 0; i < myFiles.length; i++) {
-                Log.d("CEK","myFiles ke-"+i+" : "+myFiles[i]);
                 File myFile = new File(mediaStorageDir, myFiles[i]);
                 myFile.delete();
             }
@@ -229,12 +227,12 @@ public class frag_new_resi extends Fragment {
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.d("MIRROR","Mirroring Sukses");
+
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.d("MIRROR","Mirroring Gagal");
+
             }
         });
     }
@@ -305,10 +303,13 @@ public class frag_new_resi extends Fragment {
                             nama_penerima,alamat_penerima,sourceBank,rek_penerima,berita,"Hadi");
                     String linkResi = call.request().url().toString();
                     String URLServ = Server.BASE_URL_API;
+
                     String finalLinkResi = linkResi.replace(URLServ,"");
                     call.enqueue(new Callback<JsonObject>() {
                         @Override
                         public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                            if (response.body() != null) {
+                            }
                             if (response.isSuccessful()) {
                                 btnUnduhResi.setEnabled(true);
                                 Mirroring(false,1,1, finalLinkResi);

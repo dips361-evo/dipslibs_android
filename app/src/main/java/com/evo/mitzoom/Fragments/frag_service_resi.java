@@ -91,10 +91,10 @@ public class frag_service_resi extends Fragment {
         noPengaduan = sessions.getNoComplaint();
 
         if (getArguments() != null) {
-            newComplain = getArguments().getBoolean("newComplain");
+            if (getArguments().containsKey("newComplain")) {
+                newComplain = getArguments().getBoolean("newComplain");
+            }
         }
-
-        Log.e("CEK",this+" noPengaduan : "+noPengaduan);
 
     }
 
@@ -153,7 +153,6 @@ public class frag_service_resi extends Fragment {
         btnOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("CEK","MASUK BUTTON OK");
                 //RabbitMirroring.MirroringSendEndpoint(14);
                 ConnectionRabbitHttp.mirroringEndpoint(14);
                 sessions.clearCIF();
@@ -164,7 +163,6 @@ public class frag_service_resi extends Fragment {
         btnUnduh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.e("CEK","MASUK BUTTON UnduhResi");
                 if (bytePhoto == null) {
                     Toast.makeText(mContext,"Tidak dapat mengunduh Formulir",Toast.LENGTH_SHORT).show();
                     return;
@@ -181,7 +179,6 @@ public class frag_service_resi extends Fragment {
     }
 
     private void getResumeResi() {
-        Log.e("CEK","getResumeResi");
         ApiService API = Server.getAPIService();
         Call<JsonObject> call = null;
         String authAccess = "Bearer "+sessions.getAuthToken();
@@ -192,11 +189,9 @@ public class frag_service_resi extends Fragment {
             call = API.getResiComplaint(noPengaduan,authAccess,exchangeToken);
         }
 
-        Log.e("CEK","getResumeResi URL "+call.request());
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("CEK","getResumeResi CODE : "+response.code());
                 if (response.isSuccessful()) {
                     swipe.setRefreshing(false);
                     btnUnduh.setEnabled(true);
@@ -218,12 +213,11 @@ public class frag_service_resi extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
                         RelativeLayout.LayoutParams lpImg = new RelativeLayout.LayoutParams(250, 300);
                         lpImg.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                        lpImg.setMargins(10,120,10,10);
+                        lpImg.setMargins(10,180,10,10);
                         imgResume.setLayoutParams(lpImg);
                         imgResume.setScaleX(2.5f);
                         imgResume.setScaleY(3f);
                         imgResume.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imgResume.setImageBitmap(bitmap);
                         imgResume.setImageBitmap(bitmap);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -287,7 +281,6 @@ public class frag_service_resi extends Fragment {
         myFiles = mediaStorageDir.list();
         if (myFiles != null) {
             for (int i = 0; i < myFiles.length; i++) {
-                Log.d("CEK","myFiles ke-"+i+" : "+myFiles[i]);
                 File myFile = new File(mediaStorageDir, myFiles[i]);
                 myFile.delete();
             }
@@ -310,11 +303,20 @@ public class frag_service_resi extends Fragment {
     }
 
     private void getFragmentPage(Fragment fragment){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.layout_frame2, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (isSessionZoom) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame2, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
+
     }
 
 }

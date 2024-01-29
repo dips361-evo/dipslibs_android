@@ -64,8 +64,6 @@ public class RatingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_rating);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //getSupportActionBar().hide();
-
         rlprogress = findViewById(R.id.rlprogress);
         rating = findViewById(R.id.ratingBar);
         rating.setClickable(false);
@@ -108,8 +106,14 @@ public class RatingActivity extends AppCompatActivity {
            @Override
            public void onClick(View v) {
                if (idDips != null && idAgent != null) {
-                   showProgress(true);
-                   new AsyncRating().execute();
+                   if (!idAgent.isEmpty()) {
+                       showProgress(true);
+                       new AsyncRating().execute();
+                   } else {
+                       OutApps();
+                   }
+               } else {
+                   OutApps();
                }
            }
        });

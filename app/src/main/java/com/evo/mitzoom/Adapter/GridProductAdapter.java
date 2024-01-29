@@ -95,6 +95,7 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
     }
 
     private void PopUPData(String finalNamaProduk, String finalDataBody) {
+
         View views = LayoutInflater.from(ctx).inflate(R.layout.item_ads,null);
 
         TextView tvContent = views.findViewById(R.id.tvContents);
@@ -131,7 +132,6 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
 
         int width = ctx.getResources().getDisplayMetrics().widthPixels;
         int height = ctx.getResources().getDisplayMetrics().heightPixels;
-
         int newWidth = (int)(width*0.8);
         int newHeight = (int)(height*0.85);
 
@@ -212,12 +212,10 @@ public class GridProductAdapter extends RecyclerView.Adapter<GridProductAdapter.
                 @Override
                 public void onClick(View v) {
                     if (checkBox.isChecked()){
-                        Log.d("CHECK","TRUE");
                         btn.setBackgroundTintList(ctx.getResources().getColorStateList(R.color.Blue));
                         btn.setClickable(true);
                     }
                     else {
-                        Log.d("CHECK","FALSE");
                         btn.setBackgroundTintList(ctx.getResources().getColorStateList(R.color.btnFalse));
                         btn.setClickable(false);
                     }

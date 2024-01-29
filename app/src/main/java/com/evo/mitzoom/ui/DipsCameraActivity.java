@@ -146,7 +146,6 @@ public class DipsCameraActivity extends AppCompatActivity {
 
                                         ExifInterface exif = new ExifInterface(pathFile);
                                         rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                                        Log.d("CEK", "rotation : " + rotation);
 
                                         String imgBase64 = imageRotateBase64(bitmapCrop, rotation);
                                         byte[] bytePhoto = Base64.decode(imgBase64, Base64.NO_WRAP);
@@ -442,7 +441,6 @@ public class DipsCameraActivity extends AppCompatActivity {
             camera.setParameters(parameters);
             inPreview = true;
             if (isConfigure) {
-                Log.d("CEK","MASUK isConfigure");
                 try {
                     Thread.sleep(500);
                     optimalCamera();
@@ -620,7 +618,6 @@ public class DipsCameraActivity extends AppCompatActivity {
     {
         if (camera == null)
         {
-            Log.d("CEK","setCameraDisplayOrientation - camera null");
             return;
         }
 

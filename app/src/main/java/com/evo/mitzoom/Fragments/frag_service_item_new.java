@@ -59,6 +59,7 @@ import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterFile;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.HideSoftKeyboard;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Helper.RabbitMirroring;
 import com.evo.mitzoom.Model.FileModel;
@@ -175,9 +176,6 @@ public class frag_service_item_new extends Fragment {
         idDips = sessions.getKEY_IdDips();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         formCode = sessions.getFormCode();
-        /*if (isSessionZoom) {
-            rabbitMirroring = new RabbitMirroring(mContext);
-        }*/
 
         String dataNasabah = sessions.getNasabah();
         ConnectionRabbitHttp.init(mContext);
@@ -240,6 +238,12 @@ public class frag_service_item_new extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
+        boolean flagDoc = sessions.getFlagUpDoc();
+        int valMedia = sessions.getMedia();
+        if (!flagDoc && valMedia == 1) {
+            sessions.saveFlagUpDoc(true);
+        }
 
         smsReceiver = new BroadcastReceiver() {
 
@@ -325,9 +329,7 @@ public class frag_service_item_new extends Fragment {
             @Override
             public void onClick(View view) {
                 /* hide keyboard */
-                Log.d("CEk Button","");
-                ((InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE))
-                        .toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
+                HideSoftKeyboard.hideSoftKeyboard(getActivity());
                 int child = llFormBuild.getChildCount();
 
                 if (child > 0 && idElement.length() > 0) {
@@ -349,7 +351,7 @@ public class frag_service_item_new extends Fragment {
                                             EditText ed = (EditText) llFormBuild.getChildAt(i);
                                             String results = ed.getText().toString();
                                             if (requiredDataEl && results.isEmpty()) {
-                                                Toast.makeText(mContext, labelDataEl + " harus diisi/dipilih", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                 checkEmpty = true;
                                             }
                                             break;
@@ -360,11 +362,11 @@ public class frag_service_item_new extends Fragment {
                                                 RadioButton rb = rg.findViewById(selectedId);
                                                 String results = rb.getText().toString();
                                                 if (requiredDataEl && results.isEmpty()) {
-                                                    Toast.makeText(mContext, labelDataEl + " harus diisi/dipilih", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                     checkEmpty = true;
                                                 }
                                             } else if (requiredDataEl){
-                                                Toast.makeText(mContext, labelDataEl + " harus diisi/dipilih", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                 checkEmpty = true;
                                             }
                                             break;
@@ -382,7 +384,7 @@ public class frag_service_item_new extends Fragment {
                                             RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                             if (rl.getChildAt(0) instanceof Spinner) {
                                                 if (objEl.getString(nameDataEl).toLowerCase().contains("pilih")) {
-                                                    Toast.makeText(mContext, labelDataEl + " harus diisi/dipilih", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                     checkEmpty = true;
                                                 }
                                                 break;
@@ -391,7 +393,7 @@ public class frag_service_item_new extends Fragment {
                                             AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
                                             String results = autoText.getText().toString();
                                             if (requiredDataEl && results.isEmpty()) {
-                                                Toast.makeText(mContext, labelDataEl + " harus diisi/dipilih", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                 checkEmpty = true;
                                                 break;
                                             }
@@ -523,7 +525,6 @@ public class frag_service_item_new extends Fragment {
                         objEl.put("tanggallahir", tanggalLahir);
                         objEl.put("namaibukandung", namaIbu);
                         dataForms.put(keys,objEl);
-                        //RabbitMirroring.MirroringSendKey(dataForms);
                         ConnectionRabbitHttp.mirroringKey(dataForms);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -754,9 +755,13 @@ public class frag_service_item_new extends Fragment {
                                                     String accountNo = listRekNasabah.getJSONObject(ij).getString("accountNo");
                                                     String accountName = listRekNasabah.getJSONObject(ij).getString("accountName");
                                                     String labelGab = accountNo;
+                                                    if (listRekNasabah.getJSONObject(ij).has("prodName")) {
+                                                        String prodName = listRekNasabah.getJSONObject(i).getString("prodName").replace("R/K","").trim();
+                                                        labelGab = prodName + "\n" + accountNo + " - " + accountName;
+                                                    }
                                                     dataDropDown.add(new FormSpin(ij, accountNo, labelGab, labelGab));
                                                 }
-                                                ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
+                                                ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.dropdown_multiline, dataDropDown);
                                                 spin.setAdapter(adapter2);
                                             }
                                         }
@@ -769,9 +774,18 @@ public class frag_service_item_new extends Fragment {
                                                 String getCodeType = dataSpin.getCode();
                                                 String results = dataSpin.getName();
                                                 try {
-                                                    objEl.put(nameDataEl, results);
+                                                    if (nameDataEl.contains("nomor") && nameDataEl.contains("rekening")) {
+                                                        objEl.put(nameDataEl, getCodeType);
+                                                    } else {
+                                                        objEl.put(nameDataEl, results);
+                                                    }
                                                     if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                                        valSpinProv.put(nameDataEl,idData);
+                                                        String newNameDataEl = nameDataEl;
+                                                        if (nameDataEl.contains("(")) {
+                                                            int indxProv = nameDataEl.indexOf("(");
+                                                            newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                                        }
+                                                        valSpinProv.put(newNameDataEl,idData);
                                                     } else {
                                                         valSpin.put(nameDataEl, idData);
                                                         if (nameDataEl.contains("jenis") && (nameDataEl.contains("pengaduan") || nameDataEl.contains("komplain"))) {
@@ -1153,7 +1167,6 @@ public class frag_service_item_new extends Fragment {
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("CEK","formComplaintMedia code : "+response.code());
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -1259,10 +1272,10 @@ public class frag_service_item_new extends Fragment {
         File newFile = new File(file.getParent(), newName);
         if (!newFile.equals(file)) {
             if (newFile.exists() && newFile.delete()) {
-                Log.d("FileUtil", "Delete old " + newName + " file");
+
             }
             if (file.renameTo(newFile)) {
-                Log.d("FileUtil", "Rename file to " + newName);
+
             }
         }
         return newFile;
@@ -1306,6 +1319,18 @@ public class frag_service_item_new extends Fragment {
                         transactionId = dataObj.getJSONObject("data").getString("transactionId");
                         //RabbitMirroring.MirroringSendEndpoint(11);
                         ConnectionRabbitHttp.mirroringEndpoint(11);
+                        JSONObject dataMirr = null;
+                        try {
+                            dataMirr = new JSONObject();
+                            dataMirr.put("noponsel",no_handphone);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        ConnectionRabbitHttp.mirroringKey(dataMirr);
+
+                        getMinutes = 2;
+                        seconds = 60;
+                        running = true;
                         pageOTP();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1369,6 +1394,7 @@ public class frag_service_item_new extends Fragment {
                     fragment.setArguments(bundle);
                     getFragmentPage(fragment);
                 } else {
+                    running = true;
                     imgDialog.setImageDrawable(AppCompatResources.getDrawable(mContext,R.drawable.v_dialog_failed));
                     textTitleOTP.setText(R.string.titleWrongOTP);
                     otp.setText("");
@@ -1377,6 +1403,7 @@ public class frag_service_item_new extends Fragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                running = true;
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -1392,10 +1419,10 @@ public class frag_service_item_new extends Fragment {
         scrollOTP.setVisibility(View.VISIBLE);
         swipe.setVisibility(View.GONE);
 
-        String noHandphone = "089783434XXX";
+        String noHandphone = "089783434***";
         if (!no_handphone.isEmpty()) {
             String sub_no_handphone = no_handphone.substring(no_handphone.length() - 3);
-            noHandphone = no_handphone.replace(sub_no_handphone,"XXX");
+            noHandphone = no_handphone.replace(sub_no_handphone,"***");
         }
 
         String contentText = textTitleOTP.getText().toString();
@@ -1425,7 +1452,6 @@ public class frag_service_item_new extends Fragment {
                     JSONObject otpObj = new JSONObject();
                     try {
                         otpObj.put("otp",numberOTP);
-                        //RabbitMirroring.MirroringSendKey(otpObj);
                         ConnectionRabbitHttp.mirroringKey(otpObj);
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1443,10 +1469,15 @@ public class frag_service_item_new extends Fragment {
                 else {
                     if (!transactionId.isEmpty()) {
                         if (isSessionZoom) {
+                            BaseMeetingActivity.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
+                            BaseMeetingActivity.tvLoading.setVisibility(View.VISIBLE);
                             BaseMeetingActivity.showProgress(true);
                         } else {
+                            DipsSwafoto.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
+                            DipsSwafoto.tvLoading.setVisibility(View.VISIBLE);
                             DipsSwafoto.showProgress(true);
                         }
+                        running = false;
                         processValidateOTP();
                     }
                 }
@@ -1457,6 +1488,7 @@ public class frag_service_item_new extends Fragment {
             @Override
             public void onClick(View v) {
                 if (seconds==0){
+                    otp.setText("");
                     resendOTP();
                 }
             }
@@ -1573,7 +1605,12 @@ public class frag_service_item_new extends Fragment {
                                 dataDropDown.add(new FormSpin(idData, labelIdn, labelIdn, labelEng));
                                 if (i == 0) {
                                     if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                        valSpinProv.put(nameDataEl,idData);
+                                        String newNameDataEl = nameDataEl;
+                                        if (nameDataEl.contains("(")) {
+                                            int indxProv = nameDataEl.indexOf("(");
+                                            newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                        }
+                                        valSpinProv.put(newNameDataEl,idData);
                                     } else {
                                         valSpin.put(nameDataEl, idData);
                                         valSpinLabel.put(nameDataEl,labelEng);
@@ -1665,7 +1702,6 @@ public class frag_service_item_new extends Fragment {
                                     String idSpin = String.valueOf(idProv);
                                     String idSpin2 = String.valueOf(idKabKot);
                                     String urlNew = urlPath.replace(":id_provinsi",idSpin).replace(":id_kabupaten",idSpin2);
-
                                     if (idKabKot != 0) {
                                         RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                         if (rl.getChildAt(0) instanceof Spinner) {
@@ -1749,7 +1785,6 @@ public class frag_service_item_new extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (resultCode == RESULT_OK && data != null) {
             if (requestCode == REQUESTCODE_CAPTURE) {
                 sessions.saveFlagUpDoc(true);
@@ -1773,7 +1808,6 @@ public class frag_service_item_new extends Fragment {
                 imgtoBase64(bitmap);
 
             } else if (requestCode == REQUESTCODE_GALLERY) {
-                sessions.saveFlagUpDoc(true);
                 Uri selectedImage = data.getData();
                 String[] filePath = { MediaStore.Images.Media.DATA };
                 Cursor c = mContext.getContentResolver().query(selectedImage,filePath, null, null, null);
@@ -1794,7 +1828,6 @@ public class frag_service_item_new extends Fragment {
                     chooseImage.setVisibility(View.GONE);
                 }
             } else if (requestCode == REQUESTCODE_FILE) {
-                sessions.saveFlagUpDoc(true);
                 Uri uri = data.getData();
                 if (dataFiles.size() > 3) {
                     Toast.makeText(mContext, R.string.max_upfile, Toast.LENGTH_SHORT).show();
@@ -1803,7 +1836,6 @@ public class frag_service_item_new extends Fragment {
                 if (uri != null) {
                     dataFilesMedia = new ArrayList();
                     String paths = uri.getPath();
-                    //dataFilesMedia.add(paths);
                     dataFilesMedia.add(uri);
                     Cursor c = mContext.getContentResolver().query(uri,null, null, null, null);
                     c.moveToFirst();
@@ -1816,7 +1848,6 @@ public class frag_service_item_new extends Fragment {
                                 fileArr.put(fileName);
                                 objEl.put(keyUpFile,fileArr);
                                 dataForms.put(keys,objEl);
-                                //RabbitMirroring.MirroringSendKey(dataForms);
                                 ConnectionRabbitHttp.mirroringKey(dataForms);
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
@@ -1835,7 +1866,6 @@ public class frag_service_item_new extends Fragment {
                                 fileArr.put(fileName);
                                 objEl.put(keyUpFile,fileArr);
                                 dataForms.put(keys,objEl);
-                                //RabbitMirroring.MirroringSendKey(dataForms);
                                 ConnectionRabbitHttp.mirroringKey(dataForms);
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
@@ -1863,8 +1893,6 @@ public class frag_service_item_new extends Fragment {
                         if (rv_item_file != null) {
                             dataFilesMedia.add(uriFile);
                             String paths = uriFile.getPath();
-                            Log.e("CEK","uriFile paths : "+paths);
-                            //dataFilesMedia.add(paths);
                             dataFiles.add(new FileModel("1", fileName, R.color.item_file_silver, ""));
                         }
                         c.close();
@@ -1877,7 +1905,6 @@ public class frag_service_item_new extends Fragment {
                     try {
                         objEl.put(keyUpFile,fileArr);
                         dataForms.put(keys,objEl);
-                        //RabbitMirroring.MirroringSendKey(dataForms);
                         ConnectionRabbitHttp.mirroringKey(dataForms);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
@@ -1898,7 +1925,6 @@ public class frag_service_item_new extends Fragment {
         File mediaFile = new File(picturePath);
         Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
         int file_size = Integer.parseInt(String.valueOf(mediaFile.length()/1024));
-        Log.d("CEK", "file_size : "+file_size);
 
         int perDiff = 1;
         if (file_size > 3072) {
@@ -1995,11 +2021,19 @@ public class frag_service_item_new extends Fragment {
     }
 
     private void getFragmentPage(Fragment fragment){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.layout_frame2, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (isSessionZoom) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame2, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
 }

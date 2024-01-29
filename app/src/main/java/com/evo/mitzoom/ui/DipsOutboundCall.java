@@ -271,7 +271,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         myRunnable = new Runnable() {
             @Override
             public void run() {
-                Log.d("TIDAK DIANGKAT","");
                 OutboundServiceNew.OutConference();
                 Intent serviceIntent = new Intent(mContext, OutboundServiceNew.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -767,7 +766,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         }
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
-        Log.d("PARAMS JADWAL","idDips = "+idDips+", Tanggal = "+Savetanggal+", periodeId = "+periodeId);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
         ApiService API = Server.getAPIService();
         Call<JsonObject> call = API.saveSchedule(requestBody,authAccess,exchangeToken);
@@ -936,7 +934,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
     public void setCameraDisplayOrientation(){
         if (camera == null)
         {
-            Log.d(TAG,"setCameraDisplayOrientation - camera null");
             return;
         }
 
@@ -1046,7 +1043,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
             camera.setParameters(parameters);
             inPreview = true;
             if (isConfigure) {
-                Log.d("CEK","MASUK isConfigure");
                 try {
                     Thread.sleep(500);
                     optimalCamera();

@@ -17,6 +17,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterPortofolioNew;
@@ -81,6 +82,7 @@ public class frag_portfolio_new extends Fragment {
     private String typeProduct = "";
     private String percentProduct = "";
     public static final NumberFormat numberFormat = NumberFormat.getInstance(new Locale("id", "ID"));
+    private SwipeRefreshLayout swipe;
 
     private static int rgb(String hex) {
         int color = (int) Long.parseLong(hex.replace("#", ""), 16);
@@ -90,47 +92,27 @@ public class frag_portfolio_new extends Fragment {
         return Color.rgb(r, g, b);
     }
 
-    /*@Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.e("CEK","MASUK onAttach");
-        sessions = new SessionManager(context);
-        String lang = sessions.getLANG();
-
-        Locale locale = new Locale(lang);
-        Locale.setDefault(locale);
-        Resources resources = context.getResources();
-        Configuration config = resources.getConfiguration();
-        config.setLocale(locale);
-        resources.updateConfiguration(config, resources.getDisplayMetrics());
-    }*/
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.e("CEK","MASUK context");
         mContext = getContext();
         sessions = new SessionManager(mContext);
 
         super.onCreate(savedInstanceState);
-        Log.e("CEK","MASUK onCreate");
 
         if (sessions.getNoCIF() != null) {
             noCif = sessions.getNoCIF();
         }
 
-//        noCif = "89916515"; //mba tari
         ConnectionRabbitHttp.init(mContext);
 
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         if (isSessionZoom) {
-            //rabbitMirroring = new RabbitMirroring(mContext);
             JSONObject dataCIF = new JSONObject();
             try {
                 dataCIF.put("noCif",noCif);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            //RabbitMirroring.MirroringSendKey(dataCIF);
             ConnectionRabbitHttp.mirroringKey(dataCIF);
         }
     }
@@ -141,6 +123,7 @@ public class frag_portfolio_new extends Fragment {
         View views = inflater.inflate(R.layout.fragment_frag_portfolio_new, container, false);
 
         pieChart = views.findViewById(R.id.pieChart);
+        swipe = (SwipeRefreshLayout) views.findViewById(R.id.swipe);
         nestedScrollView = views.findViewById(R.id.nestedz);
         btnService = views.findViewById(R.id.btnPnL);
         tvtanggal = views.findViewById(R.id.date);
@@ -188,15 +171,36 @@ public class frag_portfolio_new extends Fragment {
         });
 
         getPortofolio();
+
+        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(true);
+                } else {
+                    DipsSwafoto.showProgress(true);
+                }
+                swipe.setRefreshing(false);
+                getPortofolio();
+            }
+        });
         
     }
 
     private void getFragmentPage(Fragment fragment){
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.layout_frame2, fragment)
-                .addToBackStack(null)
-                .commit();
+        if (isSessionZoom) {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame2, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.layout_frame, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
     private void getPortofolio() {
@@ -208,7 +212,6 @@ public class frag_portfolio_new extends Fragment {
             e.printStackTrace();
         }
 
-        Log.e("CEK", this+" getPortofolio PARAMS : "+ jsons);
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
@@ -216,7 +219,6 @@ public class frag_portfolio_new extends Fragment {
         Server.getAPIService().GetNewPortofolio(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("CEK","getPortofolio CODE: "+response.code());
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -224,7 +226,6 @@ public class frag_portfolio_new extends Fragment {
                 }
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
-                    Log.e("CEK","getPortofolio dataS: "+dataS);
                     try {
                         JSONObject dataObj = new JSONObject(dataS);
                         if (dataObj.has("token")) {
@@ -289,30 +290,35 @@ public class frag_portfolio_new extends Fragment {
 
             try {
                 String type = listTypeProduk.getJSONObject(i).getString("type");
-                int persentase = listTypeProduk.getJSONObject(i).getInt("persentase");
+                double persentase = listTypeProduk.getJSONObject(i).getDouble("persentase");
                 if (persentase == 0) {
                     persentase = 100;
                 }
 
                 if (type.equalsIgnoreCase("tabungan") || type.equalsIgnoreCase("saving")) {
-                    colorsProd.add(mContext.getColor(R.color.zm_tabungan));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_tabungan));
                 } else if (type.equalsIgnoreCase("deposito") || type.equalsIgnoreCase("deposit")) {
-                    colorsProd.add(mContext.getColor(R.color.zm_deposito));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_deposito));
                 } else if (type.equalsIgnoreCase("pinjaman") || type.equalsIgnoreCase("loan")) {
-                    colorsProd.add(mContext.getColor(R.color.zm_kredit));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_kredit));
                 } else if (type.equalsIgnoreCase("giro")) {
-                    colorsProd.add(mContext.getColor(R.color.zm_giro));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_giro));
                 } else if (type.toLowerCase().contains("banca")) {
-                    colorsProd.add(mContext.getColor(R.color.zm_banca));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_banca));
                 } else if (type.toLowerCase().contains("reksa")) {
-                    colorsProd.add(mContext.getColor(R.color.zm_reksa));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_reksa));
                 } else {
-                    colorsProd.add(mContext.getColor(R.color.zm_button));
+                    colorsProd.add(mContext.getResources().getColor(R.color.zm_button));
                 }
 
-                double d = (double) persentase / 10;
+                double d = 0;
+                String valS = String.valueOf(persentase);
+                if (valS.contains(".") || valS.contains(",")) {
+                    d = (double) persentase * 100;
+                } else {
+                    d = (double) persentase / 10;
+                }
                 String percent = String.format("%.1f", d);
-                Log.e("CEK","percent : "+percent);
 
                 if (i == 0) {
                     typeProduct = type;
@@ -325,7 +331,6 @@ public class frag_portfolio_new extends Fragment {
                     pieEntryList.add(new PieEntry(Float.parseFloat(percent), typeProduk));
 
                     JSONArray dataList = parseGetProduct(type);
-                    Log.e("CEK","dataList : "+ dataList);
 
                     dataValProduk.put("typeProduct",typeProduk);
                     dataValProduk.put("dataList",dataList);
@@ -349,22 +354,21 @@ public class frag_portfolio_new extends Fragment {
         pieData.setValueFormatter(new PercentFormatter(pieChart));
         pieChart.setEntryLabelTextSize(12f);
         if (listTypeProduk.length() == 1 && !typeProduct.isEmpty() && !percentProduct.isEmpty()) {
-            Log.e("CEK","MASUK IF PERCENT : "+percentProduct);
             if (percentProduct.equals("0,0") || percentProduct.equals("0.0")) {
                 if (typeProduct.equalsIgnoreCase("tabungan") || typeProduct.equalsIgnoreCase("saving")) {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_tabungan));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_tabungan));
                 } else if (typeProduct.equalsIgnoreCase("deposito") || typeProduct.equalsIgnoreCase("deposit")) {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_deposito));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_deposito));
                 } else if (typeProduct.equalsIgnoreCase("pinjaman") || typeProduct.equalsIgnoreCase("loan")) {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_kredit));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_kredit));
                 } else if (typeProduct.equalsIgnoreCase("giro")) {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_giro));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_giro));
                 } else if (typeProduct.toLowerCase().contains("banca")) {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_banca));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_banca));
                 } else if (typeProduct.toLowerCase().contains("reksa")) {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_reksa));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_reksa));
                 } else {
-                    pieChart.setTransparentCircleColor(mContext.getColor(R.color.zm_text));
+                    pieChart.setTransparentCircleColor(mContext.getResources().getColor(R.color.zm_text));
                 }
                 pieChart.setTransparentCircleRadius(70f);
             }
@@ -392,7 +396,6 @@ public class frag_portfolio_new extends Fragment {
                     rekTabungan.put(jsonObject);
                 }
             }
-            Log.e("CEK","rekTabungan : "+ rekTabungan);
             sessions.saveRekNasabah(rekTabungan.toString());
         } else if (type.equalsIgnoreCase("deposito") || type.equalsIgnoreCase("deposit")) {
             prod = dataNasabah.getJSONArray("portodeposito");
@@ -422,7 +425,7 @@ public class frag_portfolio_new extends Fragment {
             String kurs = "";
             if (type.equalsIgnoreCase("tabungan") || type.equalsIgnoreCase("saving")) {
                 noRekening = prod.getJSONObject(i).getString("accountNo");
-                String balance = prod.getJSONObject(i).getString("availBalance");
+                String balance = prod.getJSONObject(i).getString("clearBalance");
                 jumlahDana = (long) Double.parseDouble(balance);
                 kurs = prod.getJSONObject(i).getString("acctCur");
 
@@ -453,7 +456,6 @@ public class frag_portfolio_new extends Fragment {
     }
 
     private void setRecylerExpand() {
-        Log.e("CEK","MASUK setRecylerExpand");
 
         AdapterPortofolioNew dataExpand = new AdapterPortofolioNew(mContext, typeProdukListArr);
 
@@ -469,7 +471,6 @@ public class frag_portfolio_new extends Fragment {
             String currencyValue = value.replaceAll(replaceRegex, "");
             return new BigDecimal(currencyValue);
         } catch (Exception e) {
-            Log.e("MyApp", e.getMessage(), e);
         }
         return BigDecimal.ZERO;
     }
