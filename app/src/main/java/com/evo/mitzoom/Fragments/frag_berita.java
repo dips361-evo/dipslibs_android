@@ -302,8 +302,8 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
         Server.getAPIWAITING_PRODUCT().getSpandukPublish(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                DipsWaitingRoom.showProgress(false);
                 if (response.isSuccessful()) {
-                    DipsWaitingRoom.showProgress(false);
                     String dataS = response.body().toString();
                     try {
                         JSONObject dataObj = new JSONObject(dataS);
@@ -337,10 +337,15 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
                         e.printStackTrace();
                     }
                 }
+                else {
+                    Toast.makeText(context,R.string.msg_error,Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(context,R.string.msg_error,Toast.LENGTH_SHORT).show();
+                DipsWaitingRoom.showProgress(false);
             }
         });
     }
@@ -522,7 +527,7 @@ public class frag_berita extends Fragment implements com.wdullaer.materialdateti
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-
+                Toast.makeText(context,R.string.msg_error,Toast.LENGTH_SHORT).show();
             }
         });
     }

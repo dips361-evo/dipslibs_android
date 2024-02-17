@@ -2,6 +2,7 @@ package com.evo.mitzoom.Fragments;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -33,11 +34,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import us.zoom.sdk.ZoomVideoSDK;
+import us.zoom.sdk.ZoomVideoSDKAnnotationHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioRawData;
+import us.zoom.sdk.ZoomVideoSDKCRCCallStatus;
 import us.zoom.sdk.ZoomVideoSDKChatHelper;
 import us.zoom.sdk.ZoomVideoSDKChatMessage;
 import us.zoom.sdk.ZoomVideoSDKChatMessageDeleteType;
+import us.zoom.sdk.ZoomVideoSDKChatPrivilegeType;
 import us.zoom.sdk.ZoomVideoSDKDelegate;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamHelper;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamStatus;
@@ -59,6 +63,8 @@ import us.zoom.sdk.ZoomVideoSDKUser;
 import us.zoom.sdk.ZoomVideoSDKUserHelper;
 import us.zoom.sdk.ZoomVideoSDKVideoCanvas;
 import us.zoom.sdk.ZoomVideoSDKVideoHelper;
+import us.zoom.sdk.ZoomVideoSDKVideoSubscribeFailReason;
+import us.zoom.sdk.ZoomVideoSDKVideoView;
 
 public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
     private Context context;
@@ -77,9 +83,25 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        //BaseMeetingActivity.btnChat.setBackgroundTintList(context.getResources().getColorStateList(R.color.btnFalse));
-        BaseMeetingActivity.btnChat.setClickable(false);
         sessionManager = new SessionManager(context);
+        setButtonChatOff();
+    }
+
+    private void setButtonChatOff(){
+        BaseMeetingActivity.btnChat.setBackgroundTintList(context.getResources().getColorStateList(R.color.btnFalse));
+        BaseMeetingActivity.btnChat.setTextColor(context.getResources().getColorStateList(R.color.white));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            BaseMeetingActivity.btnChat.setCompoundDrawableTintList(context.getResources().getColorStateList(R.color.white));
+        }
+        BaseMeetingActivity.btnChat.setClickable(false);
+    }
+    private void setButtonChatOn(){
+        BaseMeetingActivity.btnChat.setBackgroundTintList(null);
+        BaseMeetingActivity.btnChat.setTextColor(context.getResources().getColorStateList(R.color.zm_v1_red_A100));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            BaseMeetingActivity.btnChat.setCompoundDrawableTintList(context.getResources().getColorStateList(R.color.zm_v1_red_A100));
+        }
+        BaseMeetingActivity.btnChat.setClickable(true);
     }
 
     @Nullable
@@ -101,8 +123,7 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //BaseMeetingActivity.btnChat.setBackgroundTintList(context.getResources().getColorStateList(R.color.Blue));
-                BaseMeetingActivity.btnChat.setClickable(true);
+                setButtonChatOn();
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.popBackStack();
                 SavedInstanceChat();
@@ -236,6 +257,11 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
     }
 
     @Override
+    public void onChatPrivilegeChanged(ZoomVideoSDKChatHelper chatHelper, ZoomVideoSDKChatPrivilegeType currentPrivilege) {
+
+    }
+
+    @Override
     public void onUserHostChanged(ZoomVideoSDKUserHelper zoomVideoSDKUserHelper, ZoomVideoSDKUser zoomVideoSDKUser) {
 
     }
@@ -326,6 +352,16 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
     }
 
     @Override
+    public void onOriginalLanguageMsgReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
+
+    }
+
+    @Override
+    public void onLiveTranscriptionMsgInfoReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
+
+    }
+
+    @Override
     public void onLiveTranscriptionMsgError(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionLanguage spokenLanguage, ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionLanguage transcriptLanguage) {
 
     }
@@ -352,6 +388,31 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
 
     @Override
     public void onUserRecordingConsent(ZoomVideoSDKUser user) {
+
+    }
+
+    @Override
+    public void onCallCRCDeviceStatusChanged(ZoomVideoSDKCRCCallStatus status) {
+
+    }
+
+    @Override
+    public void onVideoCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
+
+    }
+
+    @Override
+    public void onShareCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
+
+    }
+
+    @Override
+    public void onAnnotationHelperCleanUp(ZoomVideoSDKAnnotationHelper helper) {
+
+    }
+
+    @Override
+    public void onAnnotationPrivilegeChange(boolean enable, ZoomVideoSDKUser shareOwner) {
 
     }
 }

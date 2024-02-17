@@ -62,11 +62,6 @@ import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Constants.AuthConstants;
 import com.evo.mitzoom.Fragments.frag_berita;
-import com.evo.mitzoom.Fragments.frag_blokir_saldo;
-import com.evo.mitzoom.Fragments.frag_cif_new;
-import com.evo.mitzoom.Fragments.frag_ibmb;
-import com.evo.mitzoom.Fragments.frag_service_new;
-import com.evo.mitzoom.Fragments.frag_wm_transactions;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyWorker;
 import com.evo.mitzoom.Helper.OutboundServiceNew;
@@ -286,10 +281,12 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
 
         isConfigure = false;
 
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
-        } else {
-            requestPermissionWrite();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+            } else {
+                requestPermissionWrite();
+            }
         }
     }
 
@@ -350,12 +347,14 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
 
     private void requestPermissionWrite() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},  REQUEST_WRITE_PERMISSION);
-            } else {
-                if (camera == null) {
-                    camera = Camera.open(useFacing);
-                    startPreview();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},  REQUEST_WRITE_PERMISSION);
+                } else {
+                    if (camera == null) {
+                        camera = Camera.open(useFacing);
+                        startPreview();
+                    }
                 }
             }
         } else {
@@ -1604,6 +1603,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                PopUpSchedule();
                 sweetAlertDialog.dismissWithAnimation();
             }
         });

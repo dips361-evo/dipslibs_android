@@ -4834,8 +4834,17 @@ public class frag_cif_new extends Fragment {
                 sweetAlertDialog.dismissWithAnimation();
 
                 if (kasus.equals("swafotocheck")  || kasus.equals("OCR")) {
-                    sessions.saveMedia(1);
-                    chooseFromCamera();
+                    if (isSessionZoom) {
+                        sessions.saveMedia(1);
+                        chooseFromCamera();
+                    }
+                    else {
+                        sessions.saveMedia(1);
+                        Bundle bundle = new Bundle();
+                        bundle.putBoolean("swaOCR",true);
+                        sessions.saveFormCOde(4);
+                        sendDataFragment(bundle, new frag_cif_new());
+                    }
                 } else {
                     if (kasus.equals("Dukcapil")) {
                         JSONObject reqOCR = new JSONObject();
@@ -6499,7 +6508,8 @@ public class frag_cif_new extends Fragment {
                             if (isSessionZoom) {
                                 ConnectionRabbitHttp.mirroringKey(reqOCR);
                             }
-                        } else {
+                        }
+                        else {
                             Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
                         }
 

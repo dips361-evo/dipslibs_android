@@ -3,7 +3,6 @@ package com.evo.mitzoom.Fragments;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -1112,7 +1111,7 @@ public class frag_service_item extends Fragment {
                     FilePaths = uri.getPath();
                     Cursor c = mContext.getContentResolver().query(uri,null, null, null, null);
                     c.moveToFirst();
-                    @SuppressLint("Range") String fileName = c.getString(c.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    String fileName = c.getString(c.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                     tvSavedFile.setText("filename : "+fileName);
                     c.close();
                     try {

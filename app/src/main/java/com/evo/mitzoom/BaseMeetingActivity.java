@@ -87,12 +87,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import us.zoom.sdk.ZoomVideoSDK;
+import us.zoom.sdk.ZoomVideoSDKAnnotationHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioRawData;
 import us.zoom.sdk.ZoomVideoSDKAudioStatus;
+import us.zoom.sdk.ZoomVideoSDKCRCCallStatus;
 import us.zoom.sdk.ZoomVideoSDKChatHelper;
 import us.zoom.sdk.ZoomVideoSDKChatMessage;
 import us.zoom.sdk.ZoomVideoSDKChatMessageDeleteType;
+import us.zoom.sdk.ZoomVideoSDKChatPrivilegeType;
 import us.zoom.sdk.ZoomVideoSDKDelegate;
 import us.zoom.sdk.ZoomVideoSDKErrors;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamHelper;
@@ -115,6 +118,8 @@ import us.zoom.sdk.ZoomVideoSDKUser;
 import us.zoom.sdk.ZoomVideoSDKUserHelper;
 import us.zoom.sdk.ZoomVideoSDKVideoCanvas;
 import us.zoom.sdk.ZoomVideoSDKVideoHelper;
+import us.zoom.sdk.ZoomVideoSDKVideoSubscribeFailReason;
+import us.zoom.sdk.ZoomVideoSDKVideoView;
 
 public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoSDKDelegate, UserVideoAdapter.ItemTapListener, ShareToolbar.Listener {
 
@@ -1131,16 +1136,23 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
         // The directory is now empty so delete it
         return dir.delete();
     }
-
+    private void setButtonChatOff(){
+        btnChat.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.btnFalse));
+        btnChat.setTextColor(mContext.getResources().getColorStateList(R.color.white));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            btnChat.setCompoundDrawableTintList(mContext.getResources().getColorStateList(R.color.white));
+        }
+        btnChat.setClickable(false);
+    }
     @Override
     public void onSessionJoin() {
         //llUsersVideo.setVisibility(View.VISIBLE);
         cardSurf.setVisibility(View.VISIBLE);
         cardSurfOff.setVisibility(View.INVISIBLE);
         //btnFile.setBackgroundTintList(BaseMeetingActivity.this.getResources().getColorStateList(R.color.btnFalse));
-        //btnChat.setBackgroundTintList(BaseMeetingActivity.this.getResources().getColorStateList(R.color.btnFalse));
+        btnChat.setBackgroundTintList(BaseMeetingActivity.this.getResources().getColorStateList(R.color.btnFalse));
         btnFile.setClickable(false);
-        btnChat.setClickable(false);
+        setButtonChatOff();
         gifLoading.setVisibility(View.GONE);
         imgBatikVic.setVisibility(View.GONE);
         /*DipsVideoConfren.LogoCompany.setVisibility(View.VISIBLE);
@@ -1329,6 +1341,11 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
     }
 
     @Override
+    public void onChatPrivilegeChanged(ZoomVideoSDKChatHelper chatHelper, ZoomVideoSDKChatPrivilegeType currentPrivilege) {
+
+    }
+
+    @Override
     public void onUserHostChanged(ZoomVideoSDKUserHelper zoomVideoSDKUserHelper, ZoomVideoSDKUser zoomVideoSDKUser) {
 
     }
@@ -1438,6 +1455,16 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
     }
 
     @Override
+    public void onOriginalLanguageMsgReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
+
+    }
+
+    @Override
+    public void onLiveTranscriptionMsgInfoReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
+
+    }
+
+    @Override
     public void onLiveTranscriptionMsgError(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionLanguage spokenLanguage, ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionLanguage transcriptLanguage) {
 
     }
@@ -1464,6 +1491,31 @@ public class BaseMeetingActivity extends AppCompatActivity implements ZoomVideoS
 
     @Override
     public void onUserRecordingConsent(ZoomVideoSDKUser user) {
+
+    }
+
+    @Override
+    public void onCallCRCDeviceStatusChanged(ZoomVideoSDKCRCCallStatus status) {
+
+    }
+
+    @Override
+    public void onVideoCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
+
+    }
+
+    @Override
+    public void onShareCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
+
+    }
+
+    @Override
+    public void onAnnotationHelperCleanUp(ZoomVideoSDKAnnotationHelper helper) {
+
+    }
+
+    @Override
+    public void onAnnotationPrivilegeChange(boolean enable, ZoomVideoSDKUser shareOwner) {
 
     }
 
