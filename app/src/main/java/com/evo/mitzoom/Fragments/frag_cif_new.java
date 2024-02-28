@@ -6669,14 +6669,15 @@ public class frag_cif_new extends Fragment {
 
                 } else {
                     LL.setBackgroundResource(0);
-                    if (formCode != 4) {
-                        btnNext.setVisibility(View.VISIBLE);
-                        //btnNext.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
-                        btnNext.setClickable(true);
-                        imgDelete.setVisibility(View.VISIBLE);
-                        viewImage.setVisibility(View.VISIBLE);
-                        chooseImage.setVisibility(View.GONE);
-                    }
+//                    if (formCode != 4) {
+                    btnNext.setVisibility(View.VISIBLE);
+                    //btnNext.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                    btnNext.setClickable(true);
+                    imgDelete.setVisibility(View.VISIBLE);
+                    viewImage.setVisibility(View.VISIBLE);
+                    chooseImage.setVisibility(View.GONE);
+                    viewImage.setImageBitmap(thumbnail);
+//                    }
                     imgtoBase64(thumbnail);
                 }
             }

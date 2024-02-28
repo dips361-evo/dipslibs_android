@@ -302,7 +302,6 @@ public class DipsLivenessResult extends AppCompatActivity {
                                     "}";*/
                             //JSONObject dataCustomer = new JSONObject(dataHard);
                             JSONObject dataCustomer = dataObj.getJSONObject("data").getJSONObject("customer");
-                            JSONObject dataToken = dataObj.getJSONObject("data").getJSONObject("token");
 
                             String noCIF = "";
                             boolean isCust;
@@ -328,12 +327,17 @@ public class DipsLivenessResult extends AppCompatActivity {
                             boolean isSwafoto = dataCustomer.getBoolean("isSwafoto");
                             String accessToken = "";
                             String exchangeToken = "";
-                            if (dataToken.has("accessToken")) {
-                                accessToken = dataToken.getString("accessToken");
-                                exchangeToken = dataToken.getString("exchangeToken");
-                            } else {
-                                accessToken = dataToken.getString("token");
-                                exchangeToken = dataToken.getString("exchange");
+
+                            if (dataObj.getJSONObject("data").has("token")){
+                                JSONObject dataToken = dataObj.getJSONObject("data").getJSONObject("token");
+                                if (dataToken.has("accessToken") && dataToken.has("exchangeToken")) {
+                                    accessToken = dataToken.getString("accessToken");
+                                    exchangeToken = dataToken.getString("exchangeToken");
+                                }
+                                else if (dataToken.has("token") && dataToken.has("exchange")){
+                                    accessToken = dataToken.getString("token");
+                                    exchangeToken = dataToken.getString("exchange");
+                                }
                             }
 
                             /*noCIF = "";
