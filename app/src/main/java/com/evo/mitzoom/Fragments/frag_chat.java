@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.viewmodel.CreationExtras;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,14 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import us.zoom.sdk.ZoomVideoSDK;
-import us.zoom.sdk.ZoomVideoSDKAnnotationHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioRawData;
-import us.zoom.sdk.ZoomVideoSDKCRCCallStatus;
 import us.zoom.sdk.ZoomVideoSDKChatHelper;
 import us.zoom.sdk.ZoomVideoSDKChatMessage;
 import us.zoom.sdk.ZoomVideoSDKChatMessageDeleteType;
-import us.zoom.sdk.ZoomVideoSDKChatPrivilegeType;
 import us.zoom.sdk.ZoomVideoSDKDelegate;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamHelper;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamStatus;
@@ -63,7 +61,6 @@ import us.zoom.sdk.ZoomVideoSDKUser;
 import us.zoom.sdk.ZoomVideoSDKUserHelper;
 import us.zoom.sdk.ZoomVideoSDKVideoCanvas;
 import us.zoom.sdk.ZoomVideoSDKVideoHelper;
-import us.zoom.sdk.ZoomVideoSDKVideoSubscribeFailReason;
 import us.zoom.sdk.ZoomVideoSDKVideoView;
 
 public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
@@ -257,11 +254,6 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
     }
 
     @Override
-    public void onChatPrivilegeChanged(ZoomVideoSDKChatHelper chatHelper, ZoomVideoSDKChatPrivilegeType currentPrivilege) {
-
-    }
-
-    @Override
     public void onUserHostChanged(ZoomVideoSDKUserHelper zoomVideoSDKUserHelper, ZoomVideoSDKUser zoomVideoSDKUser) {
 
     }
@@ -352,11 +344,6 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
     }
 
     @Override
-    public void onOriginalLanguageMsgReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
-
-    }
-
-    @Override
     public void onLiveTranscriptionMsgInfoReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
 
     }
@@ -391,28 +378,9 @@ public class frag_chat extends Fragment  implements ZoomVideoSDKDelegate {
 
     }
 
+    @NonNull
     @Override
-    public void onCallCRCDeviceStatusChanged(ZoomVideoSDKCRCCallStatus status) {
-
-    }
-
-    @Override
-    public void onVideoCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
-
-    }
-
-    @Override
-    public void onShareCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
-
-    }
-
-    @Override
-    public void onAnnotationHelperCleanUp(ZoomVideoSDKAnnotationHelper helper) {
-
-    }
-
-    @Override
-    public void onAnnotationPrivilegeChange(boolean enable, ZoomVideoSDKUser shareOwner) {
-
+    public CreationExtras getDefaultViewModelCreationExtras() {
+        return super.getDefaultViewModelCreationExtras();
     }
 }
