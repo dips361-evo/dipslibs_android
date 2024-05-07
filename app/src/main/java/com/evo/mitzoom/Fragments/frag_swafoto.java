@@ -1536,6 +1536,8 @@ public class frag_swafoto extends Fragment {
                     }
                 } else {
                     if (chkDataCorrect.isChecked() && !flagMother) {
+                        btnOCRNext.setEnabled(false);
+                        btnOCRNext.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
                         Toast.makeText(mContext, getString(R.string.please_wait3), Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(mContext, getString(R.string.accept_mother), Toast.LENGTH_LONG).show();

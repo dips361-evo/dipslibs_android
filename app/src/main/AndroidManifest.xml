@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.evo.mitzoom"
-    android:installLocation="preferExternal">
+    android:installLocation="preferExternal" >
+
+    <uses-sdk android:minSdkVersion="21" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -48,60 +50,57 @@
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:extractNativeLibs="false"
-        android:icon="@mipmap/dips361"
-        android:label="@string/app_name_dips"
         android:preserveLegacyExternalStorage="true"
         android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/dips361_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true" >
         <activity
-            android:name=".ui.DipsConnectionForm"
+            android:name="com.evo.mitzoom.ui.DipsConnectionForm"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.DipsTransactionResult"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.MITZoom"/>
-        <activity
-            android:name=".ui.DipsTransactionsCreate"
+            android:name="com.evo.mitzoom.ui.DipsTransactionResult"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.DipsTransactions"
+            android:name="com.evo.mitzoom.ui.DipsTransactionsCreate"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.MITZoom">
+            android:theme="@style/Theme.MITZoom" />
+        <activity
+            android:name="com.evo.mitzoom.ui.DipsTransactions"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.MITZoom" >
         </activity>
         <activity
-            android:name=".ui.DipsLivenessResult"
+            android:name="com.evo.mitzoom.ui.DipsLivenessResult"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.Alternative.DipsSwafoto"
+            android:name="com.evo.mitzoom.ui.Alternative.DipsSwafoto"
             android:configChanges="screenSize|orientation|keyboardHidden|keyboard"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.DipsCameraSource"
+            android:name="com.evo.mitzoom.ui.DipsCameraSource"
             android:exported="false"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.DipsChooseLanguage"
+            android:name="com.evo.mitzoom.ui.DipsChooseLanguage"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.DipsOutboundCall"
+            android:name="com.evo.mitzoom.ui.DipsOutboundCall"
             android:autoRemoveFromRecents="true"
             android:exported="true"
             android:screenOrientation="portrait"
@@ -111,14 +110,14 @@
             android:theme="@style/Theme.MITZoom"
             android:turnScreenOn="true" />
         <activity
-            android:name=".ui.DipsCameraActivity"
+            android:name="com.evo.mitzoom.ui.DipsCameraActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.RatingActivity"
+            android:name="com.evo.mitzoom.ui.RatingActivity"
             android:configChanges="screenSize|orientation|keyboardHidden|keyboard"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -127,57 +126,44 @@
             android:theme="@style/Theme.MITZoom"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.DipsVideoConfren"
+            android:name="com.evo.mitzoom.ui.DipsVideoConfren"
             android:configChanges="screenSize|orientation|keyboardHidden|keyboard"
             android:exported="false"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
             android:theme="@style/ZMTheme.SubWindow"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.DipsWaitingRoom"
+            android:name="com.evo.mitzoom.ui.DipsWaitingRoom"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.DipsCapture"
+            android:name="com.evo.mitzoom.ui.DipsCapture"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MITZoom" />
         <activity
-            android:name=".ui.DipsSplashScreen"
+            android:name="com.evo.mitzoom.ui.DipsSplashScreen"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.MITZoom">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:theme="@style/Theme.MITZoom" >
         </activity> <!-- android:authorities="${applicationId}.provider" -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.evo.mitzoom.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_path" />
-        </provider>
 
         <service
-            android:name=".Helper.OutboundServiceNew"
+            android:name="com.evo.mitzoom.Helper.OutboundServiceNew"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />
 
         <receiver
-            android:name=".Helper.MyBroadcastReceiver"
+            android:name="com.evo.mitzoom.Helper.MyBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
@@ -185,8 +171,8 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".Helper.OtpReceiver"
-            android:exported="true">
+            android:name="com.evo.mitzoom.Helper.OtpReceiver"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>

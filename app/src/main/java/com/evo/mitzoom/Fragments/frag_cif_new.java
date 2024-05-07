@@ -222,6 +222,8 @@ public class frag_cif_new extends Fragment {
     private RelativeLayout rlContent;
     private String tglTerbit = "-";
     private Button btnOCRNext;
+    private String filePhotoTemp  = "";
+    private String fileCropPhotoTemp  = "";
 
 
     @Override
@@ -4259,6 +4261,8 @@ public class frag_cif_new extends Fragment {
                     }
                 } else {
                     if (chkDataCorrect.isChecked() && !flagMother) {
+                        btnOCRNext.setEnabled(false);
+                        btnOCRNext.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
                         Toast.makeText(mContext, getString(R.string.please_wait3), Toast.LENGTH_LONG).show();
                     } else {
                         Toast.makeText(mContext, getString(R.string.accept_mother), Toast.LENGTH_LONG).show();
@@ -5332,6 +5336,7 @@ public class frag_cif_new extends Fragment {
 
                             if (!isSessionZoom && formCode == 22) {
                                 Intent intent = new Intent(mContext, DipsWaitingRoom.class);
+                                deleteImage();
                                 intent.putExtra("CUSTNAME","Customer");
                                 startActivity(intent);
                                 ((Activity) mContext).finishAffinity();
@@ -5411,6 +5416,31 @@ public class frag_cif_new extends Fragment {
                 Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    private void deleteImage(){
+        File fileTemp = new File(filePhotoTemp);
+        File fileCropTemp = new File(fileCropPhotoTemp);
+
+        if (fileTemp.exists()) {
+            try {
+                fileTemp.getCanonicalFile().delete();
+                if (fileTemp.exists()) {
+                    getActivity().deleteFile(fileTemp.getName());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (fileCropTemp.exists()) {
+            try {
+                fileCropTemp.getCanonicalFile().delete();
+                if (fileCropTemp.exists()) {
+                    getActivity().deleteFile(fileCropTemp.getName());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void processFormDataAttachment2(String keys, String picturePathAttach) {
@@ -5601,6 +5631,7 @@ public class frag_cif_new extends Fragment {
                             });
 
                             Intent intent = new Intent(mContext, DipsWaitingRoom.class);
+                            deleteImage();
                             intent.putExtra("CUSTNAME",nama);
                             startActivity(intent);
                             ((Activity) mContext).finishAffinity();
@@ -6685,6 +6716,8 @@ public class frag_cif_new extends Fragment {
                 sessions.saveFlagUpDoc(true);
                 String filePaths = data.getStringExtra("result_camera");
                 String filePathsCrop = data.getStringExtra("result_cropImage");
+                filePhotoTemp = filePaths;
+                fileCropPhotoTemp = filePathsCrop;
                 Bitmap bitmap = BitmapFactory.decodeFile(filePaths);
                 Bitmap bitmapCrop = BitmapFactory.decodeFile(filePathsCrop);
 

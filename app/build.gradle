@@ -14,7 +14,7 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 34
-        versionName "1.0.14"
+        versionName "1.0.15"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -88,7 +88,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-perf'*/
-    implementation 'us.zoom.videosdk:ZoomVideoSDK:1.6.2'
+    implementation 'us.zoom.videosdk:ZoomVideoSDK:1.9.0'
     implementation project(':liveness')
 }
 
@@ -103,7 +103,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.dips361-evo'
                 artifactId = 'dipslibs361'
-                version = 'prod.1.0.14'
+                version = 'prod.1.0.15'
                 //version = '1.0.10'
             }
             /*// Creates a Maven publication called “debug”.
