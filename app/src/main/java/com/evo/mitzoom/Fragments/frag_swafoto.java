@@ -1950,7 +1950,8 @@ public class frag_swafoto extends Fragment {
                 viewImage.setImageBitmap(bitmap);
                 Bitmap thumbnail = prosesOptimalImage(picturePath,1);
                 imgtoBase64(thumbnail);
-            } else if (requestCode == REQUESTCODE_GALLERY){
+            }
+            else if (requestCode == REQUESTCODE_GALLERY){
                 sessions.saveMedia(0);
                 Uri selectedImage = data.getData();
                 String[] filePath = {MediaStore.Images.Media.DATA};
