@@ -2,14 +2,12 @@ package com.evo.mitzoom;
 
 import java.util.List;
 
-import us.zoom.sdk.ZoomVideoSDKAnnotationHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioHelper;
 import us.zoom.sdk.ZoomVideoSDKAudioRawData;
 import us.zoom.sdk.ZoomVideoSDKCRCCallStatus;
 import us.zoom.sdk.ZoomVideoSDKChatHelper;
 import us.zoom.sdk.ZoomVideoSDKChatMessage;
 import us.zoom.sdk.ZoomVideoSDKChatMessageDeleteType;
-import us.zoom.sdk.ZoomVideoSDKChatPrivilegeType;
 import us.zoom.sdk.ZoomVideoSDKDelegate;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamHelper;
 import us.zoom.sdk.ZoomVideoSDKLiveStreamStatus;
@@ -30,7 +28,6 @@ import us.zoom.sdk.ZoomVideoSDKUser;
 import us.zoom.sdk.ZoomVideoSDKUserHelper;
 import us.zoom.sdk.ZoomVideoSDKVideoCanvas;
 import us.zoom.sdk.ZoomVideoSDKVideoHelper;
-import us.zoom.sdk.ZoomVideoSDKVideoSubscribeFailReason;
 import us.zoom.sdk.ZoomVideoSDKVideoView;
 
 public class SimpleVideoSDKDelegate implements ZoomVideoSDKDelegate  {
@@ -91,12 +88,6 @@ public class SimpleVideoSDKDelegate implements ZoomVideoSDKDelegate  {
     public void onChatDeleteMessageNotify(ZoomVideoSDKChatHelper chatHelper, String msgID, ZoomVideoSDKChatMessageDeleteType deleteBy) {
 
     }
-
-    @Override
-    public void onChatPrivilegeChanged(ZoomVideoSDKChatHelper chatHelper, ZoomVideoSDKChatPrivilegeType currentPrivilege) {
-
-    }
-
 
     @Override
     public void onUserHostChanged(ZoomVideoSDKUserHelper userHelper, ZoomVideoSDKUser userInfo) {
@@ -189,15 +180,9 @@ public class SimpleVideoSDKDelegate implements ZoomVideoSDKDelegate  {
     }
 
     @Override
-    public void onOriginalLanguageMsgReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
-
-    }
-
-    @Override
     public void onLiveTranscriptionMsgInfoReceived(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionMessageInfo messageInfo) {
 
     }
-
 
     @Override
     public void onLiveTranscriptionMsgError(ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionLanguage spokenLanguage, ZoomVideoSDKLiveTranscriptionHelper.ILiveTranscriptionLanguage transcriptLanguage) {
@@ -233,25 +218,4 @@ public class SimpleVideoSDKDelegate implements ZoomVideoSDKDelegate  {
     public void onCallCRCDeviceStatusChanged(ZoomVideoSDKCRCCallStatus status) {
 
     }
-
-    @Override
-    public void onVideoCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
-
-    }
-
-    @Override
-    public void onShareCanvasSubscribeFail(ZoomVideoSDKVideoSubscribeFailReason fail_reason, ZoomVideoSDKUser pUser, ZoomVideoSDKVideoView view) {
-
-    }
-
-    @Override
-    public void onAnnotationHelperCleanUp(ZoomVideoSDKAnnotationHelper helper) {
-
-    }
-
-    @Override
-    public void onAnnotationPrivilegeChange(boolean enable, ZoomVideoSDKUser shareOwner) {
-
-    }
-
 }
