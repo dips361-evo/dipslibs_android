@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -202,16 +204,16 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                         getFragmentPageBackStack(fragment);
                     }
                     break;
-                case "18" :
-                    if (isSessionZoom) {
-                        ConnectionRabbitHttp.mirroringEndpoint(280);
-                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
-                        bundle.putString("subLayanan",labelserv);
-                        fragment = new frag_service_new();
-                        fragment.setArguments(bundle);
-                        getFragmentPage(fragment);
-                    }
-                    break;
+//                case "18" :
+//                    if (isSessionZoom) {
+//                        ConnectionRabbitHttp.mirroringEndpoint(280);
+//                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
+//                        bundle.putString("subLayanan",labelserv);
+//                        fragment = new frag_service_new();
+//                        fragment.setArguments(bundle);
+//                        getFragmentPage(fragment);
+//                    }
+//                    break;
                 case "19" :
                     if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(197);
@@ -222,14 +224,14 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                         getFragmentPage(fragment);
                     }
                     break;
-                case "20" :
-                    if (isSessionZoom) {
-                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
-                        fragment = new frag_assurance();
-                        fragment.setArguments(bundle);
-                        getFragmentPageBackStack(fragment);
-                    }
-                    break;
+//                case "20" :
+//                    if (isSessionZoom) {
+//                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
+//                        fragment = new frag_assurance();
+//                        fragment.setArguments(bundle);
+//                        getFragmentPageBackStack(fragment);
+//                    }
+//                    break;
                 case "33" :
                     if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(191);
@@ -284,27 +286,57 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                         getFragmentPageBackStack(fragment);
                     }
                     break;
-                case "100":
-                    //Maintenance and Administration
-                    if (isSessionZoom) {
-                        ConnectionRabbitHttp.mirroringEndpoint(1000);
-                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
-                        bundle.putString("subLayanan",labelserv);
-                        fragment = new frag_service_new();
-                        fragment.setArguments(bundle);
-                        getFragmentPage(fragment);
-                    }
+//                case "100":
+//                    //Maintenance and Administration
+//                    if (isSessionZoom) {
+//                        ConnectionRabbitHttp.mirroringEndpoint(1000);
+//                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
+//                        bundle.putString("subLayanan",labelserv);
+//                        fragment = new frag_service_new();
+//                        fragment.setArguments(bundle);
+//                        getFragmentPage(fragment);
+//                    }
+//                    break;
+//                case "101":
+//                    //Blokir Saldo
+//                    if (isSessionZoom) {
+//                        ConnectionRabbitHttp.mirroringEndpoint(1002);
+//                        bundle.putInt("idGenerateForm",78);
+//                        fragment = new frag_blokir_saldo();
+//                        fragment.setArguments(bundle);
+//                        getFragmentPageBackStack(fragment);
+//                    }
+//                    break;
+                default:
+                    PopUpMaintenance("Info",mContext.getString(R.string.wording_maintenance));
                     break;
-                case "101":
-                    //Blokir Saldo
-                    if (isSessionZoom) {
-                        ConnectionRabbitHttp.mirroringEndpoint(1002);
-                        bundle.putInt("idGenerateForm",78);
-                        fragment = new frag_blokir_saldo();
-                        fragment.setArguments(bundle);
-                        getFragmentPageBackStack(fragment);
-                    }
-                    break;
+            }
+        });
+    }
+
+    private void PopUpMaintenance(String title, String body) {
+        View dialogView = LayoutInflater.from(mContext).inflate(R.layout.layout_dialog_sweet,null);
+        ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
+        TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);
+        TextView tvBodyDialog = dialogView.findViewById(R.id.tvBodyDialog);
+        Button btnCancelDialog = dialogView.findViewById(R.id.btnCancelDialog);
+        Button btnConfirmDialog = dialogView.findViewById(R.id.btnConfirmDialog);
+
+        imgDialog.setImageDrawable(mContext.getDrawable(R.drawable.v_dialog_info));
+        tvTitleDialog.setVisibility(View.GONE);
+        tvBodyDialog.setText(body);
+        btnCancelDialog.setVisibility(View.GONE);
+
+        SweetAlertDialog sweet = new SweetAlertDialog(mContext,SweetAlertDialog.NORMAL_TYPE);
+        sweet.setCustomView(dialogView);
+        sweet.setCancelable(false);
+        sweet.hideConfirmButton();
+        sweet.show();
+
+        btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sweet.dismissWithAnimation();
             }
         });
     }

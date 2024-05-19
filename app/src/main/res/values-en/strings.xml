@@ -370,4 +370,5 @@
     <string name="maintenance_and_administration" translatable="false">Maintenance And Administration</string>
     <string name="blokir_saldo" translatable="false">Block Balance</string>
     <string name="manajemen_investasi" translatable="false">Fund Manager</string>
+    <string name="wording_maintenance" translatable="false">This feature will be ready soon in Digital Operations</string>
 </resources>

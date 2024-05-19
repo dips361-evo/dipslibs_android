@@ -369,4 +369,5 @@
     <string name="maintenance_and_administration" translatable="false">Pemeliharaan dan Administrasi</string>
     <string name="blokir_saldo" translatable="false">Blokir Saldo</string>
     <string name="manajemen_investasi" translatable="false">Manajemen Investasi</string>
+    <string name="wording_maintenance" translatable="false">Fitur Ini akan segera hadir di Digital Operations</string>
 </resources>
