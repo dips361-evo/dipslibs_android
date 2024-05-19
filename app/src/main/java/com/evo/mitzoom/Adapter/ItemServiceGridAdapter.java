@@ -204,16 +204,16 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                         getFragmentPageBackStack(fragment);
                     }
                     break;
-//                case "18" :
-//                    if (isSessionZoom) {
-//                        ConnectionRabbitHttp.mirroringEndpoint(280);
-//                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
-//                        bundle.putString("subLayanan",labelserv);
-//                        fragment = new frag_service_new();
-//                        fragment.setArguments(bundle);
-//                        getFragmentPage(fragment);
-//                    }
-//                    break;
+                case "18" :
+                    if (isSessionZoom) {
+                        ConnectionRabbitHttp.mirroringEndpoint(280);
+                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
+                        bundle.putString("subLayanan",labelserv);
+                        fragment = new frag_service_new();
+                        fragment.setArguments(bundle);
+                        getFragmentPage(fragment);
+                    }
+                    break;
                 case "19" :
                     if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(197);
@@ -308,13 +308,13 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 //                    }
 //                    break;
                 default:
-                    PopUpMaintenance("Info",mContext.getString(R.string.wording_maintenance));
+                    PopUpMaintenance(mContext.getString(R.string.wording_maintenance));
                     break;
             }
         });
     }
 
-    private void PopUpMaintenance(String title, String body) {
+    private void PopUpMaintenance(String body) {
         View dialogView = LayoutInflater.from(mContext).inflate(R.layout.layout_dialog_sweet,null);
         ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
         TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);

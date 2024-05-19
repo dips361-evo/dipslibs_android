@@ -87,8 +87,9 @@ public class frag_wm_transactions extends Fragment {
     private LinearLayout llMainMutualFund;
     private TextView tvValRiskProfile;
     private TextView title_manajemen_investasi;
-    private RelativeLayout rlPurchase;
-    private RelativeLayout rlSales;
+    private RelativeLayout rlPurchase,rlPurchaseProtect;
+    private RelativeLayout rlSales,rlSalesProtected;
+    private RelativeLayout rlSwitch;
     private RelativeLayout rlHistory;
     private TextView tvMutualFundSales;
     private RecyclerView rv_itemCatg;
@@ -239,7 +240,10 @@ public class frag_wm_transactions extends Fragment {
         llMainMutualFund = (LinearLayout) views.findViewById(R.id.llMainMutualFund);
         tvValRiskProfile = (TextView) views.findViewById(R.id.tvValRiskProfile);
         rlPurchase = (RelativeLayout) views.findViewById(R.id.rlPurchase);
+        rlPurchaseProtect = (RelativeLayout) views.findViewById(R.id.rlPurchaseProtect);
         rlSales = (RelativeLayout) views.findViewById(R.id.rlSales);
+        rlSalesProtected = (RelativeLayout) views.findViewById(R.id.rlSalesProtect);
+        rlSwitch = (RelativeLayout) views.findViewById(R.id.rlSwitch);
         rlHistory = (RelativeLayout) views.findViewById(R.id.rlHistory);
         tvMutualFundSales = (TextView) views.findViewById(R.id.tvMutualFundSales);
 
@@ -568,6 +572,27 @@ public class frag_wm_transactions extends Fragment {
             }
         });
 
+        rlPurchaseProtect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopUpMaintenance(mContext.getString(R.string.wording_maintenance));
+            }
+        });
+
+        rlSalesProtected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopUpMaintenance(mContext.getString(R.string.wording_maintenance));
+            }
+        });
+
+        rlSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopUpMaintenance(mContext.getString(R.string.wording_maintenance));
+            }
+        });
+
         rlPurchase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -581,6 +606,7 @@ public class frag_wm_transactions extends Fragment {
                 getFragmentPage(fragments);
             }
         });
+
 
         rlSales.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -608,6 +634,33 @@ public class frag_wm_transactions extends Fragment {
             }
         });
 
+    }
+
+    private void PopUpMaintenance(String body) {
+        View dialogView = LayoutInflater.from(mContext).inflate(R.layout.layout_dialog_sweet,null);
+        ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
+        TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);
+        TextView tvBodyDialog = dialogView.findViewById(R.id.tvBodyDialog);
+        Button btnCancelDialog = dialogView.findViewById(R.id.btnCancelDialog);
+        Button btnConfirmDialog = dialogView.findViewById(R.id.btnConfirmDialog);
+
+        imgDialog.setImageDrawable(mContext.getDrawable(R.drawable.v_dialog_info));
+        tvTitleDialog.setVisibility(View.GONE);
+        tvBodyDialog.setText(body);
+        btnCancelDialog.setVisibility(View.GONE);
+
+        SweetAlertDialog sweet = new SweetAlertDialog(mContext,SweetAlertDialog.NORMAL_TYPE);
+        sweet.setCustomView(dialogView);
+        sweet.setCancelable(false);
+        sweet.hideConfirmButton();
+        sweet.show();
+
+        btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sweet.dismissWithAnimation();
+            }
+        });
     }
 
     private void processFilterHistoryWM() {
