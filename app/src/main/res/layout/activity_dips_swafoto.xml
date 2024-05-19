@@ -37,12 +37,29 @@
                         android:layout_height="wrap_content"
                         android:layout_width="0dp"
                         android:layout_weight="1">
-                        <com.evo.mitzoom.view.CircularSurfaceView
-                            android:id="@+id/mySurface"
-                            android:layout_margin="5dp"
+<!--                        <com.evo.mitzoom.view.CircularSurfaceView-->
+<!--                            android:id="@+id/mySurface"-->
+<!--                            android:layout_margin="5dp"-->
+<!--                            android:layout_gravity="center"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content" />-->
+                        <com.evo.mitzoom.view.RoundedFrameLayout
+                            android:id="@+id/roundFrameLayout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+                            android:layout_margin="@dimen/dp_10"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <com.evo.mitzoom.view.AutoFitTextureView
+                                android:id="@+id/texture"
+                                android:layout_gravity="center"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                        </com.evo.mitzoom.view.RoundedFrameLayout>
                     </FrameLayout>
 
                     <FrameLayout

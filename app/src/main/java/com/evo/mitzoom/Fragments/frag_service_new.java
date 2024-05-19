@@ -140,28 +140,27 @@ public class frag_service_new extends Fragment {
         dataItems = new ArrayList<>();
         if (idTrx == 0) {
             String titleAcc = mContext.getResources().getString(R.string.tambah_rekening);
-            dataItems.add(new ItemModel("6", getResources().getString(R.string.DORMANT_ACTIVATION), R.drawable.img_aktivasi_dormant)); //Sudah
-            dataItems.add(new ItemModel("10", getResources().getString(R.string.IBMB_REGISTRATION), R.drawable.img_aktivasi_ibmb)); //Sudah
-            dataItems.add(new ItemModel("20", getString(R.string.bancassurance), R.drawable.img_blokir_rekening)); //Sudah
-            dataItems.add(new ItemModel("12", getResources().getString(R.string.block_account), R.drawable.img_blokir_rekening)); //Sudah
-            dataItems.add(new ItemModel("19", getString(R.string.deposito_online), R.drawable.deposito_online)); //Sudah
-            dataItems.add(new ItemModel("11", getResources().getString(R.string.CREDIT_FORM), R.drawable.img_formulir_kredit)); //Sudah
-            dataItems.add(new ItemModel("1", getResources().getString(R.string.Formulir_Transfer), R.drawable.img_formulir_transfer)); //Sudah
-            dataItems.add(new ItemModel("2", getResources().getString(R.string.CUSTOMER_COMPLAIN), R.drawable.img_keluhan_nasabah)); //Sudah
-            dataItems.add(new ItemModel("0", titleAcc, R.drawable.img_opening_account)); //Sudah
-            dataItems.add(new ItemModel("13", getString(R.string.account_closure), R.drawable.img_penutupan_rekening)); //Sudah
-            dataItems.add(new ItemModel("5", getResources().getString(R.string.KYC_UPDATING), R.drawable.img_perbarui_data)); //Sudah
-            dataItems.add(new ItemModel("14", getString(R.string.lbpinjaman), R.drawable.img_pinjaman)); //Sudah
-            dataItems.add(new ItemModel("9", getResources().getString(R.string.POWER_OF_ATTORNEY), R.drawable.img_surat_kuasa)); //Sudah
-            dataItems.add(new ItemModel("3", "Transfer", R.drawable.img_transaksi_antar_bank)); //Sudah
-            dataItems.add(new ItemModel("8", getString(R.string.atm_transaction), R.drawable.img_kartu_atm)); //Sudah
-            dataItems.add(new ItemModel("15", getString(R.string.ibmb_transaction), R.drawable.img_transaksi_ibmb)); //Sudah
-            dataItems.add(new ItemModel("17", getString(R.string.deposit_transactions), R.drawable.img_transaksi_titipan)); //Sudah
-            dataItems.add(new ItemModel("7", getResources().getString(R.string.FOREX), R.drawable.img_transaksi_valas)); //Sudah
-            dataItems.add(new ItemModel("18", getString(R.string.wealth_transactions), R.drawable.img_transaksi_wealth)); //Sudah
 
+            dataItems.add(new ItemModel("6", getResources().getString(R.string.DORMANT_ACTIVATION), R.drawable.img_aktivasi_dormant)); // OK
+            dataItems.add(new ItemModel("20", getString(R.string.bancassurance), R.drawable.img_blokir_rekening)); //OK
+
+            dataItems.add(new ItemModel("19", getString(R.string.deposito_online), R.drawable.deposito_online)); // OK
+//            dataItems.add(new ItemModel("11", getResources().getString(R.string.CREDIT_FORM), R.drawable.img_formulir_kredit)); //Sudah
+//            dataItems.add(new ItemModel("1", getResources().getString(R.string.Formulir_Transfer), R.drawable.img_formulir_transfer)); //Sudah
+            dataItems.add(new ItemModel("2", getResources().getString(R.string.CUSTOMER_COMPLAIN), R.drawable.img_keluhan_nasabah)); // OK
+            dataItems.add(new ItemModel("0", titleAcc, R.drawable.img_opening_account)); //OK
+
+            dataItems.add(new ItemModel("5", getResources().getString(R.string.KYC_UPDATING), R.drawable.img_perbarui_data)); // OK
+//            dataItems.add(new ItemModel("14", getString(R.string.lbpinjaman), R.drawable.img_pinjaman)); //Sudah
+//            dataItems.add(new ItemModel("9", getResources().getString(R.string.POWER_OF_ATTORNEY), R.drawable.img_surat_kuasa)); //Sudah
+            dataItems.add(new ItemModel("3", "Transfer", R.drawable.img_transaksi_antar_bank)); //OK
+            dataItems.add(new ItemModel("8", getString(R.string.atm_transaction), R.drawable.img_kartu_atm2)); // OK
+//            dataItems.add(new ItemModel("15", getString(R.string.ibmb_transaction), R.drawable.img_transaksi_ibmb)); //Sudah
+//            dataItems.add(new ItemModel("17", getString(R.string.deposit_transactions), R.drawable.transaksi_titipan)); //Sudah
+            dataItems.add(new ItemModel("7", getResources().getString(R.string.FOREX), R.drawable.img_transaksi_valas)); // OK
+            dataItems.add(new ItemModel("18", getString(R.string.wealth_transactions), R.drawable.img_transaksi_wealth)); //OK
             //Phase 3
-           // dataItems.add(new ItemModel("100", getString(R.string.maintenance_and_administration), R.drawable.bg));
+            dataItems.add(new ItemModel("100", getString(R.string.maintenance_and_administration), R.drawable.maintenance_admin)); // OK
         } else if (idTrx == 3) {
             dataItems.add(new ItemModel("33", getResources().getString(R.string.INTERBANK_TRANSACTION), R.drawable.img_transaksi_antar_bank)); //Sudah
             dataItems.add(new ItemModel("4",getString(R.string.trax_between_acc),R.drawable.img_transaksi_inter_bank)); //Sudah
@@ -175,9 +174,10 @@ public class frag_service_new extends Fragment {
             dataItems.add(new ItemModel("194", getString(R.string.e_bilyet_deposito), R.drawable.e_billyet_deposito)); //Sudah
         }
         else if (idTrx == 100){
-            dataItems.add(new ItemModel("101", getResources().getString(R.string.blokir_saldo), R.drawable.bg));
-            dataItems.add(new ItemModel("102", getResources().getString(R.string.block_account), R.drawable.img_blokir_rekening));
-            dataItems.add(new ItemModel("103", getString(R.string.account_closure), R.drawable.img_penutupan_rekening));
+            dataItems.add(new ItemModel("101", getResources().getString(R.string.blokir_saldo), R.drawable.blokir_saldo));
+            dataItems.add(new ItemModel("102", getResources().getString(R.string.block_account), R.drawable.blokir_rekening));
+            dataItems.add(new ItemModel("104", "Standing Instruction", R.drawable.standing_inst));
+            dataItems.add(new ItemModel("103", getString(R.string.account_closure), R.drawable.penutupan_rekening));
         }
     }
 
