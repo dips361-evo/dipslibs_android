@@ -220,7 +220,7 @@
     <string name="try_again" translatable="false">Coba Lagi</string>
     <string name="fail_call" translatable="false">Gagal menghubungkan panggilan</string>
     <string name="form_transation" translatable="false">Form Transaksi</string>
-    <string name="trax_between_acc" translatable="false">Transfer Antar Rekening</string>
+    <string name="trax_between_acc" translatable="false">Transfer Antar Rekening Victoria</string>
     <string name="transaction" translatable="false">Transaksi</string>
     <string name="selamat" translatable="false">SELAMAT!</string>
     <string name="contentqr" translatable="false">Formulir transaksi Anda telah tersimpan.\nFile QRCode berhasil disimpan di galeri Anda.\nSilakan unggah QRCode terlampir untuk melakukan transaksi saat bertemu dengan Agen Kami.</string>

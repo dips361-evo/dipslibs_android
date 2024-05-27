@@ -102,7 +102,7 @@
     <string name="transaksi_anda_berhasil">Your Transactions Successfully</string>
     <string name="resi">Receipt</string>
     <string name="perorangan">Personal</string>
-    <string name="INTERBANK_TRANSACTION">Interbank Transfer</string>
+    <string name="INTERBANK_TRANSACTION">Other Bank Transfer</string>
     <string name="KYC_UPDATING">Update Data</string>
     <string name="CUSTOMER_COMPLAIN">Customer Complaint</string>
     <string name="DORMANT_ACTIVATION">Dormant Activation</string>
@@ -221,7 +221,7 @@
     <string name="try_again">Try Again</string>
     <string name="fail_call">Fail to connecting call</string>
     <string name="form_transation">Transaction Form</string>
-    <string name="trax_between_acc">Transfer Between Accounts</string>
+    <string name="trax_between_acc">Other Victoria Accounts Transfer</string>
     <string name="transaction">Transaction</string>
     <string name="selamat">Congratulations</string>
     <string name="contentqr">Your transaction form has been saved.\nThe QRCode file has been successfully saved in your gallery.\nPlease upload the attached QRCode to make a transaction when you meet with our Agent.</string>
@@ -239,7 +239,7 @@
     <string name="choose_transaction_connect">Select <b>Transaction</b> Menu to return to transaction menu. Select <b>Connect</b> to connect with the Agent.</string>
     <string name="choose_favorite">Select your favorite recipient list.</string>
     <string name="second">second</string>
-    <string name="personal_account_transactions">Self Account Transfer</string>
+    <string name="personal_account_transactions">Own Account Transfer</string>
     <string name="confirm_trx_error1">There are transactions that do not match.\nYou can delete transactions or re-check.</string>
     <string name="confirm_trx_error2">Failed to connect to server.</string>
     <string name="redaksi_form">Thank you for entrusting your banking transactions to XYZ Bank. This receipt has been sent to your email address. Please check your email.</string>

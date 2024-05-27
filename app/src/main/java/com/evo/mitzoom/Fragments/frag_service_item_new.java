@@ -57,6 +57,7 @@ import com.chaos.view.PinView;
 import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterFile;
+import com.evo.mitzoom.Adapter.AdapterSourceAccount;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.HideSoftKeyboard;
@@ -83,6 +84,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -166,6 +168,7 @@ public class frag_service_item_new extends Fragment {
     private int seconds = 60;
     private boolean running = true;
     private String transactionId = "";
+    private ArrayList<FormSpin>  dataDropDownSource;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -744,7 +747,11 @@ public class frag_service_item_new extends Fragment {
                                                 flagDot = true;
                                             }
                                             if (!flagDot) {
-                                                processGetDynamicURL(spin, urlPath, nameDataEl);
+                                                if (nameDataEl.contains("sumberdana") || nameDataEl.contains("nomorrekening")) {
+                                                    processGetDynamicURLSumberDana(spin,urlPath,nameDataEl);
+                                                } else {
+                                                    processGetDynamicURL(spin, urlPath, nameDataEl);
+                                                }
                                             }
                                         } else if (sessions.getRekNasabah() != null) {
                                             if (nameDataEl.contains("nomor") && nameDataEl.contains("rekening")) {
@@ -976,7 +983,139 @@ public class frag_service_item_new extends Fragment {
             }
         }
     }
+    private void processGetDynamicURLSumberDana(Spinner spinner, String urlPath, String nameDataEl) {
+        JSONObject jsons = new JSONObject();
+        try {
+            jsons.put("noCif",sessions.getNoCIF());
+            jsons.put("bahasa",sessions.getLANG());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
+        String authAccess = "Bearer "+sessions.getAuthToken();
+        String exchangeToken = sessions.getExchangeToken();
+        Server.getAPIService().getDynamicUrlPost(urlPath,requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
 
+                if (response.isSuccessful()) {
+                    String dataS = response.body().toString();
+                    try {
+                        JSONObject dataObj = new JSONObject(dataS);
+                        if (dataObj.has("token")) {
+                            String accessToken = dataObj.getString("token");
+                            String exchangeToken = dataObj.getString("exchange");
+                            sessions.saveAuthToken(accessToken);
+                            sessions.saveExchangeToken(exchangeToken);
+                        }
+                        Log.e("dataBody",""+dataObj);
+                        JSONObject objData = dataObj.getJSONObject("data");
+                        JSONArray dataArr = objData.getJSONArray("portotabungan");
+                        dataDropDownSource = new ArrayList<>();
+                        int len = dataArr.length() + 1;
+                        String[] sourceAcc = new String[len];
+                        String textSelect = getString(R.string.choose_source_fund);
+                        sourceAcc[0] = textSelect;
+                        dataDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
+                        int loopSource = 1;
+                        for (int i = 0; i < dataArr.length(); i++) {
+                            int idData = i + 1;
+
+                            String prodName = dataArr.getJSONObject(i).getString("prodName").replace("R/K","").trim();
+                            String prodCode = dataArr.getJSONObject(i).getString("prodCode");
+                            if (prodCode.equals("T21")) {
+                                continue;
+                            }
+                            if (dataArr.getJSONObject(i).has("acctStatus")) {
+                                String acctStatus = dataArr.getJSONObject(i).getString("acctStatus");
+                                if (!acctStatus.equals("A")) {
+                                    continue;
+                                }
+                            }
+                            String accountNo = dataArr.getJSONObject(i).getString("accountNo");
+                            String accountName = dataArr.getJSONObject(i).getString("accountName");
+                            String acctCur = dataArr.getJSONObject(i).getString("acctCur");
+                            String availBalance = dataArr.getJSONObject(i).getString("availBalance");
+                            String accountType = dataArr.getJSONObject(i).getString("accountType");
+                            availBalance = availBalance.substring(0,availBalance.length() - 2);
+
+                            if (acctCur.equals("IDR")) {
+                                acctCur = "Rp.";
+                            }
+
+                            Double d = Double.valueOf(availBalance);
+                            NumberFormat formatter = null;
+                            if (sessions.getLANG().equals("id")) {
+                                formatter = NumberFormat.getInstance(new Locale("id", "ID"));
+                            } else {
+                                formatter = NumberFormat.getInstance(new Locale("en", "US"));
+                            }
+                            formatter.setMinimumFractionDigits(2);
+                            String formattedNumber = formatter.format(d);
+                            String labelIdn = "";
+                            if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                labelIdn = prodName + "\n" + accountNo + " - " + accountName;
+                            } else {
+                                labelIdn = prodName + "\n" + accountNo + " - " + accountName + "\n" + acctCur + " " + formattedNumber;
+                            }
+                            sourceAcc[loopSource] = labelIdn;
+                            loopSource++;
+
+                            dataDropDownSource.add(new FormSpin(idData,accountType,labelIdn,labelIdn));
+                        }
+                        AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext,R.layout.dropdown_multiline, dataDropDownSource);
+                        spinner.setAdapter(adapterSourceAcc);
+
+//                        SelectedPagerMatch();
+//                        ReCheckMatch();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(mContext,R.string.msg_error,Toast.LENGTH_SHORT).show();
+                    String msg = "";
+                    if (response.errorBody().toString().isEmpty()) {
+                        String dataS = response.errorBody().toString();
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("message")) {
+                                msg = dataObj.getString("message");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        String dataS = null;
+                        try {
+                            dataS = response.errorBody().string();
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("message")) {
+                                msg = dataObj.getString("message");
+                            }
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void processSendFormCompaint(JSONObject objAPI) {
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
