@@ -177,6 +177,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                         ConnectionRabbitHttp.mirroringEndpoint(250);
                         //bundle.putInt("idGenerateForm",59);
                         bundle.putInt("idGenerateForm",77);
+                        bundle.putBoolean("isCreateCIF",false);
                         fragment = new frag_update_data();
                         fragment.setArguments(bundle);
                         getFragmentPageBackStack(fragment);

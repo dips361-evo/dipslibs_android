@@ -327,7 +327,8 @@ public class frag_service_item_new extends Fragment {
         });
 
         processGetForm(form_id);
-
+        btnProses.setEnabled(false);
+        btnProses.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.btnFalse));
         btnProses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -373,7 +374,8 @@ public class frag_service_item_new extends Fragment {
                                                 checkEmpty = true;
                                             }
                                             break;
-                                        } else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                        }
+                                        else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                             CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
                                             chk.setOnClickListener(new View.OnClickListener() {
                                                 @Override
@@ -383,7 +385,8 @@ public class frag_service_item_new extends Fragment {
                                                 }
                                             });
                                             break;
-                                        } else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                        }
+                                        else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
                                             RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                             if (rl.getChildAt(0) instanceof Spinner) {
                                                 if (objEl.getString(nameDataEl).toLowerCase().contains("pilih")) {
@@ -430,13 +433,26 @@ public class frag_service_item_new extends Fragment {
                                 return;
                             }
                         }
-                        if (isSessionZoom) {
-                            BaseMeetingActivity.showProgress(true);
-                        } else {
-                            DipsSwafoto.showProgress(true);
+                        try {
+                            JSONObject objAPI = JSONReqAPI();
+                            String nomorRekening = objAPI.getJSONObject("data").getString("nomorrekening");
+                            String detailpengaduan = objAPI.getJSONObject("data").getString("detailpengaduan");
+                            Log.e("objAPI",""+objAPI);
+                            if (nomorRekening.isEmpty() || detailpengaduan.isEmpty()){
+                                Toast.makeText(mContext, getString(R.string.error_field), Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                if (isSessionZoom) {
+                                    BaseMeetingActivity.showProgress(true);
+                                } else {
+                                    DipsSwafoto.showProgress(true);
+                                }
+                                processSendFormCompaint(objAPI);
+                            }
+
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
                         }
-                        JSONObject objAPI = JSONReqAPI();
-                        processSendFormCompaint(objAPI);
                     }
                 }
             }
@@ -668,7 +684,8 @@ public class frag_service_item_new extends Fragment {
                                     });
 
                                     break;
-                                } else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                     objEl.put(nameDataEl, false);
 
                                     CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
@@ -678,12 +695,16 @@ public class frag_service_item_new extends Fragment {
                                             boolean isChk = chk.isChecked();
                                             if (isChk) {
                                                 try {
+                                                    btnProses.setEnabled(true);
+                                                    btnProses.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                                                     objEl.put(nameDataEl, isChk);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
                                                 }
                                             } else {
                                                 try {
+                                                    btnProses.setEnabled(false);
+                                                    btnProses.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.btnFalse));
                                                     objEl.put(nameDataEl, isChk);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
@@ -703,7 +724,8 @@ public class frag_service_item_new extends Fragment {
                                     });
 
                                     break;
-                                } else if (llFormBuild.getChildAt(i) instanceof Spinner) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof Spinner) {
                                     objEl.put(nameDataEl, "");
                                     Spinner spin = (Spinner) llFormBuild.getChildAt(i);
                                     spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

@@ -1526,6 +1526,7 @@ public class frag_swafoto extends Fragment {
                         } else {
                             //bundle.putInt("idGenerateForm", 59);
                             bundle.putInt("idGenerateForm", 77);
+                            bundle.putBoolean("isCreateCIF",true);
                             fragment = new frag_update_data();
                         }
                         fragment.setArguments(bundle);

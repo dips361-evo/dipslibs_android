@@ -165,6 +165,7 @@ public class frag_update_data extends Fragment {
     private boolean flagDataCore = false;
     private EditText edKodePos = null;
     private boolean actionSelected = false;
+    private boolean isCreateCIF = false;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -186,6 +187,9 @@ public class frag_update_data extends Fragment {
             }
             if (getArguments().containsKey("ocrKTP")) {
                 ocrKTP = getArguments().getBoolean("ocrKTP");
+            }
+            if (getArguments().containsKey("isCreateCIF")) {
+                isCreateCIF = getArguments().getBoolean("isCreateCIF");
             }
         }
 
@@ -1086,7 +1090,7 @@ public class frag_update_data extends Fragment {
     private void APISaveForm() {
         JSONObject dataObjCIF = new JSONObject();
         try {
-            dataObjCIF.put("formCode","KYC Update");
+            dataObjCIF.put("formCode",isCreateCIF ? "Opening Cif" : "KYC Update");
             dataObjCIF.put("idDips",idDips);
             dataObjCIF.put("payload",payloadObj.getJSONObject(labelTrx));
         } catch (JSONException e) {

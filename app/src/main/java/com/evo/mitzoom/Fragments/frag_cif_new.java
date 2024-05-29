@@ -600,14 +600,26 @@ public class frag_cif_new extends Fragment {
                             }
                             ConnectionRabbitHttp.mirroringKey(reqOCR);
                         } else {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("pathKTP",picturePath);
-                            bundle.putBoolean("swaOCR",true);
-                            sessions.saveFormCOde(22);
-                            if (isSessionZoom) {
-                                ConnectionRabbitHttp.mirroringEndpoint(7);
-                            }
-                            sendDataFragment(bundle, new frag_cif_new());
+                            ((Activity)mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (isSessionZoom) {
+                                        BaseMeetingActivity.showProgress(true);
+                                    } else {
+                                        DipsSwafoto.showProgress(true);
+                                    }
+                                }
+                            });
+                            imgPathKTP = picturePath;
+                            ocrKTP();
+//                            Bundle bundle = new Bundle();
+//                            bundle.putString("pathKTP",picturePath);
+//                            bundle.putBoolean("swaOCR",true);
+//                            sessions.saveFormCOde(22);
+//                            if (isSessionZoom) {
+//                                ConnectionRabbitHttp.mirroringEndpoint(7);
+//                            }
+//                            sendDataFragment(bundle, new frag_cif_new());
                             //Toast.makeText(mContext, "Maaf, OCR masih dalam proses...!!!", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -5749,7 +5761,7 @@ public class frag_cif_new extends Fragment {
                         }
                         running = false;
                         loopStatus = 0;
-                        HideSoftKeyboard.hideSoftKeyboard(getActivity());
+//                        HideSoftKeyboard.hideSoftKeyboard(getActivity());
                         processValidateOTP();
                     }
                 }
@@ -6350,6 +6362,7 @@ public class frag_cif_new extends Fragment {
     private void ocrKTP(){
         String baseImages = encodedImage;
         if (swaOCR) {
+            Log.e("imgPathKTP",""+imgPathKTP);
             if (!imgPathKTP.isEmpty()) {
                 Bitmap bitmapKTP = BitmapFactory.decodeFile(imgPathKTP);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -6386,143 +6399,157 @@ public class frag_cif_new extends Fragment {
                 });
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
-                    try {
-                        JSONObject jsObj = new JSONObject(dataS);
-                        int errCode = jsObj.getInt("code");
-                        String message = jsObj.getString("message");
-                        if (jsObj.has("token")) {
-                            String accessToken = jsObj.getString("token");
-                            String exchangeToken = jsObj.getString("exchange");
-                            sessions.saveAuthToken(accessToken);
-                            sessions.saveExchangeToken(exchangeToken);
+                    if (formCode != 4){
+                        try {
+                            JSONObject jsObj = new JSONObject(dataS);
+                            int errCode = jsObj.getInt("code");
+                            String message = jsObj.getString("message");
+                            if (jsObj.has("token")) {
+                                String accessToken = jsObj.getString("token");
+                                String exchangeToken = jsObj.getString("exchange");
+                                sessions.saveAuthToken(accessToken);
+                                sessions.saveExchangeToken(exchangeToken);
+                            }
+                            if (errCode == 200) {
+                                JSONObject dataObj = jsObj.getJSONObject("data");
+                                datasReqOCR = dataObj;
+                                if (dataObj.has("provinsi")) {
+                                    if (!dataObj.isNull("provinsi")) {
+                                        provinsi = dataObj.getString("provinsi");
+                                    }
+                                }
+                                if (dataObj.has("kota_kabupaten")) {
+                                    if (!dataObj.isNull("kota_kabupaten")) {
+                                        kota_kabupaten = dataObj.getString("kota_kabupaten");
+                                    }
+                                }
+                                if (dataObj.has("nik")) {
+                                    if (!dataObj.isNull("nik")) {
+                                        nik = dataObj.getString("nik");
+                                    }
+                                }
+                                if (dataObj.has("nama")) {
+                                    if (!dataObj.isNull("nama")) {
+                                        nama = dataObj.getString("nama");
+                                    }
+                                }
+                                if (dataObj.has("ttl")) {
+                                    if (!dataObj.isNull("ttl")) {
+                                        ttl = dataObj.getString("ttl");
+                                    }
+                                }
+                                if (dataObj.has("jeniskelamin")) {
+                                    if (!dataObj.isNull("jeniskelamin")) {
+                                        jeniskelamin = dataObj.getString("jeniskelamin");
+                                    }
+                                }
+                                if (dataObj.has("golongan_darah")) {
+                                    if (!dataObj.isNull("golongan_darah")) {
+                                        golongan_darah = dataObj.getString("golongan_darah");
+                                    }
+                                }
+                                if (dataObj.has("alamat")) {
+                                    if (!dataObj.isNull("alamat")) {
+                                        alamat = dataObj.getString("alamat");
+                                    }
+                                }
+                                if (dataObj.has("rtrw")) {
+                                    if (!dataObj.isNull("rtrw")) {
+                                        rtrw = dataObj.getString("rtrw");
+                                    }
+                                    if (rtrw.equals("null")) {
+                                        rtrw = "";
+                                    }
+                                }
+                                if (dataObj.has("desa_kelurahan")) {
+                                    if (!dataObj.isNull("desa_kelurahan")) {
+                                        desa_kelurahan = dataObj.getString("desa_kelurahan");
+                                    }
+                                }
+                                if (dataObj.has("kecamatan")) {
+                                    if (!dataObj.isNull("kecamatan")) {
+                                        kecamatan = dataObj.getString("kecamatan");
+                                    }
+                                }
+                                if (dataObj.has("agama")) {
+                                    if (!dataObj.isNull("agama")) {
+                                        agama = dataObj.getString("agama");
+                                    }
+                                }
+                                if (dataObj.has("status_perkawinan")) {
+                                    if (!dataObj.isNull("status_perkawinan")) {
+                                        status_perkawinan = dataObj.getString("status_perkawinan");
+                                    }
+                                }
+                                if (dataObj.has("kewarganegaraan")) {
+                                    if (!dataObj.isNull("kewarganegaraan")) {
+                                        kewarganegaraan = dataObj.getString("kewarganegaraan");
+                                    }
+                                }
+                                if (dataObj.has("pekerjaan")) {
+                                    if (!dataObj.isNull("pekerjaan")) {
+                                        pekerjaan = dataObj.getString("pekerjaan");
+                                    }
+                                }
+
+                                if (ttl.indexOf(",") > 0) {
+                                    String[] sp = ttl.split(",");
+                                    tmptLahir = sp[0].trim();
+                                }
+
+                                datasReqOCR.put("tempatlahir",tmptLahir);
+                                datasReqOCR.put("kotakabupaten",kota_kabupaten);
+                                datasReqOCR.put("golongandarah",golongan_darah);
+                                datasReqOCR.put("desakelurahan",desa_kelurahan);
+                                datasReqOCR.put("statusperkawinan",status_perkawinan);
+
+                                datasReqOCR.remove("kota_kabupaten");
+                                datasReqOCR.remove("golongan_darah");
+                                datasReqOCR.remove("kota_kabupaten");
+                                datasReqOCR.remove("desa_kelurahan");
+                                datasReqOCR.remove("status_perkawinan");
+
+                                sessions.saveOCR(datasReqOCR.toString());
+
+                                flagOCR = true;
+                                PopUpOCR();
+                                JSONObject dataReq = dataReqOCR2();
+                                JSONObject reqOCR = new JSONObject();
+                                try {
+                                    reqOCR.put("ocr",dataReq);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                if (isSessionZoom) {
+                                    ConnectionRabbitHttp.mirroringKey(reqOCR);
+                                }
+                            }
+                            else {
+                                Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        if (errCode == 200) {
-                            JSONObject dataObj = jsObj.getJSONObject("data");
-                            datasReqOCR = dataObj;
-                            if (dataObj.has("provinsi")) {
-                                if (!dataObj.isNull("provinsi")) {
-                                    provinsi = dataObj.getString("provinsi");
-                                }
-                            }
-                            if (dataObj.has("kota_kabupaten")) {
-                                if (!dataObj.isNull("kota_kabupaten")) {
-                                    kota_kabupaten = dataObj.getString("kota_kabupaten");
-                                }
-                            }
-                            if (dataObj.has("nik")) {
-                                if (!dataObj.isNull("nik")) {
-                                    nik = dataObj.getString("nik");
-                                }
-                            }
-                            if (dataObj.has("nama")) {
-                                if (!dataObj.isNull("nama")) {
-                                    nama = dataObj.getString("nama");
-                                }
-                            }
-                            if (dataObj.has("ttl")) {
-                                if (!dataObj.isNull("ttl")) {
-                                    ttl = dataObj.getString("ttl");
-                                }
-                            }
-                            if (dataObj.has("jeniskelamin")) {
-                                if (!dataObj.isNull("jeniskelamin")) {
-                                    jeniskelamin = dataObj.getString("jeniskelamin");
-                                }
-                            }
-                            if (dataObj.has("golongan_darah")) {
-                                if (!dataObj.isNull("golongan_darah")) {
-                                    golongan_darah = dataObj.getString("golongan_darah");
-                                }
-                            }
-                            if (dataObj.has("alamat")) {
-                                if (!dataObj.isNull("alamat")) {
-                                    alamat = dataObj.getString("alamat");
-                                }
-                            }
-                            if (dataObj.has("rtrw")) {
-                                if (!dataObj.isNull("rtrw")) {
-                                    rtrw = dataObj.getString("rtrw");
-                                }
-                                if (rtrw.equals("null")) {
-                                    rtrw = "";
-                                }
-                            }
-                            if (dataObj.has("desa_kelurahan")) {
-                                if (!dataObj.isNull("desa_kelurahan")) {
-                                    desa_kelurahan = dataObj.getString("desa_kelurahan");
-                                }
-                            }
-                            if (dataObj.has("kecamatan")) {
-                                if (!dataObj.isNull("kecamatan")) {
-                                    kecamatan = dataObj.getString("kecamatan");
-                                }
-                            }
-                            if (dataObj.has("agama")) {
-                                if (!dataObj.isNull("agama")) {
-                                    agama = dataObj.getString("agama");
-                                }
-                            }
-                            if (dataObj.has("status_perkawinan")) {
-                                if (!dataObj.isNull("status_perkawinan")) {
-                                    status_perkawinan = dataObj.getString("status_perkawinan");
-                                }
-                            }
-                            if (dataObj.has("kewarganegaraan")) {
-                                if (!dataObj.isNull("kewarganegaraan")) {
-                                    kewarganegaraan = dataObj.getString("kewarganegaraan");
-                                }
-                            }
-                            if (dataObj.has("pekerjaan")) {
-                                if (!dataObj.isNull("pekerjaan")) {
-                                    pekerjaan = dataObj.getString("pekerjaan");
-                                }
-                            }
-
-                            if (ttl.indexOf(",") > 0) {
-                                String[] sp = ttl.split(",");
-                                tmptLahir = sp[0].trim();
-                            }
-
-                            datasReqOCR.put("tempatlahir",tmptLahir);
-                            datasReqOCR.put("kotakabupaten",kota_kabupaten);
-                            datasReqOCR.put("golongandarah",golongan_darah);
-                            datasReqOCR.put("desakelurahan",desa_kelurahan);
-                            datasReqOCR.put("statusperkawinan",status_perkawinan);
-
-                            datasReqOCR.remove("kota_kabupaten");
-                            datasReqOCR.remove("golongan_darah");
-                            datasReqOCR.remove("kota_kabupaten");
-                            datasReqOCR.remove("desa_kelurahan");
-                            datasReqOCR.remove("status_perkawinan");
-
-                            sessions.saveOCR(datasReqOCR.toString());
-
-                            flagOCR = true;
-                            PopUpOCR();
-                            JSONObject dataReq = dataReqOCR2();
-                            JSONObject reqOCR = new JSONObject();
-                            try {
-                                reqOCR.put("ocr",dataReq);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            if (isSessionZoom) {
-                                ConnectionRabbitHttp.mirroringKey(reqOCR);
-                            }
-                        }
-                        else {
-                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
+                    else {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("pathKTP",picturePath);
+                        bundle.putBoolean("swaOCR",true);
+                        sessions.saveFormCOde(22);
+                        if (isSessionZoom) {
+                            ConnectionRabbitHttp.mirroringEndpoint(7);
+                        }
+                        sendDataFragment(bundle, new frag_cif_new());
+                    }
+
                 }
                 else {
                     flagOCR = false;
                     String msg = "";
                     if (response.errorBody().toString().isEmpty()) {
                         String dataS = response.errorBody().toString();
+                        Log.e("Data ocrKTP",""+dataS);
                         try {
                             JSONObject dataObj = new JSONObject(dataS);
                             msg = dataObj.getString("message");
@@ -6533,6 +6560,7 @@ public class frag_cif_new extends Fragment {
                         String dataS = null;
                         try {
                             dataS = response.errorBody().string();
+                            Log.e("Data ocrKTP",""+dataS);
                             JSONObject dataObj = new JSONObject(dataS);
                             if (dataObj.has("message")) {
                                 msg = dataObj.getString("message");
