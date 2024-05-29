@@ -367,6 +367,7 @@
     <string name="sort_by">Sort By :</string>
     <string name="filter_berdasarkan">Filter by :</string>
     <string name="lewati">Skip</string>
+    <string name="wording_otp" translatable="false">Please wait countdown</string>
     <string name="maintenance_and_administration" translatable="false">Maintenance And Administration</string>
     <string name="blokir_saldo" translatable="false">Block Balance</string>
     <string name="manajemen_investasi" translatable="false">Fund Manager</string>

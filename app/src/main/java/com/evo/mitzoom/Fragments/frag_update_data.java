@@ -166,6 +166,7 @@ public class frag_update_data extends Fragment {
     private EditText edKodePos = null;
     private boolean actionSelected = false;
     private boolean isCreateCIF = false;
+    private int countWrongOTP = 0;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -1206,9 +1207,16 @@ public class frag_update_data extends Fragment {
                         }
                         ConnectionRabbitHttp.mirroringKey(dataMirr);
 
-                        getMinutes = 2;
-                        seconds = 60;
-                        running = true;
+                        if (countWrongOTP >= 3){
+                            getMinutes = 10;
+                            seconds = 60;
+                            running = true;
+                        }
+                        else {
+                            getMinutes = 2;
+                            seconds = 60;
+                            running = true;
+                        }
                         pageOTP();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -1288,22 +1296,28 @@ public class frag_update_data extends Fragment {
                 }
                 else {
                     if (!transactionId.isEmpty()) {
-                        ((Activity)mContext).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (isSessionZoom) {
-                                    BaseMeetingActivity.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
-                                    BaseMeetingActivity.tvLoading.setVisibility(View.VISIBLE);
-                                    BaseMeetingActivity.showProgress(true);
-                                } else {
-                                    DipsSwafoto.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
-                                    DipsSwafoto.tvLoading.setVisibility(View.VISIBLE);
-                                    DipsSwafoto.showProgress(true);
+                        if (seconds == 0 && getMinutes == 0 && countWrongOTP < 3){
+                            ((Activity)mContext).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (isSessionZoom) {
+                                        BaseMeetingActivity.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
+                                        BaseMeetingActivity.tvLoading.setVisibility(View.VISIBLE);
+                                        BaseMeetingActivity.showProgress(true);
+                                    } else {
+                                        DipsSwafoto.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
+                                        DipsSwafoto.tvLoading.setVisibility(View.VISIBLE);
+                                        DipsSwafoto.showProgress(true);
+                                    }
                                 }
-                            }
-                        });
-                        running = false;
-                        processValidateOTP();
+                            });
+                            running = false;
+                            processValidateOTP();
+                        }
+                        else {
+                            Toast.makeText(mContext, R.string.wording_otp, Toast.LENGTH_SHORT).show();
+                        }
+
                     }
                 }
             }
@@ -1312,9 +1326,12 @@ public class frag_update_data extends Fragment {
         Resend_Otp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (seconds==0){
+                if (seconds == 0 && getMinutes == 0 && countWrongOTP < 3){
                     otp.setText("");
                     resendOTP();
+                }
+                else {
+                    Toast.makeText(mContext, R.string.wording_otp, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -1340,6 +1357,9 @@ public class frag_update_data extends Fragment {
                 }
                 if (seconds == 59) {
                     getMinutes--;
+                }
+                if (seconds == 0 && countWrongOTP >= 3 && minutes == 0){
+                    countWrongOTP = 0;
                 }
                 handlerTimer.postDelayed(this,1000);
             }
@@ -1391,6 +1411,7 @@ public class frag_update_data extends Fragment {
                     }
                     APISaveForm();
                 } else {
+                    countWrongOTP = countWrongOTP+1;
                     running = true;
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
