@@ -805,7 +805,7 @@ public class frag_service_confirm_antarbank extends Fragment {
                 }
                 else {
                     if (!transactionId.isEmpty()) {
-                        if (seconds == 0 && getMinutes == 0 && countWrongOTP < 3){
+                        if (countWrongOTP < 3){
                             ((Activity)mContext).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {

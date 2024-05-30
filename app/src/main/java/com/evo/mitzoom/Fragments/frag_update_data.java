@@ -1296,7 +1296,7 @@ public class frag_update_data extends Fragment {
                 }
                 else {
                     if (!transactionId.isEmpty()) {
-                        if (seconds == 0 && getMinutes == 0 && countWrongOTP < 3){
+                        if (countWrongOTP < 3){
                             ((Activity)mContext).runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
