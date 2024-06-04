@@ -19,7 +19,7 @@
         android:id="@+id/tvLoading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Permintan Anda sedang diproses."
+        android:text="@string/permintaan_anda_sedang_diproses"
         android:layout_below="@id/gifLoading"
         android:gravity="center"
         android:textColor="@color/zm_text"

@@ -277,7 +277,7 @@ public class SessionManager {
         return pref.getString(KEY_RTGS,null);
     }
     public String getCIF() {
-        return pref.getString(KEY_CIF,null);
+        return pref.getString(KEY_CIF,null); ///"80704972"
     }
     public String getNasabah() {
         return pref.getString(KEY_NASABAH,null);
@@ -286,7 +286,7 @@ public class SessionManager {
         return pref.getString(KEY_REKTABUNGAN,null);
     }
     public String getKEY_IdDips (){
-        return pref.getString(KEY_IdDips,null);
+        return pref.getString(KEY_IdDips,null); ///NEsNem0nV15apqeO
     }
     public String getSessionIdDips (){
         return pref.getString(KEY_SESSIONID_DIPS,null);
@@ -353,7 +353,7 @@ public class SessionManager {
         return pref.getString(KEY_FORMREQMIRRORING,null);
     }
     public String getNoCIF() {
-        return pref.getString(KEY_NOCIF,null);
+        return pref.getString(KEY_NOCIF,null); ///80704972
     }
     public String getNoComplaint() {
         return pref.getString(KEY_noComplaint,null);

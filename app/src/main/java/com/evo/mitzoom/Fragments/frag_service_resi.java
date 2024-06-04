@@ -213,7 +213,7 @@ public class frag_service_resi extends Fragment {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
                         RelativeLayout.LayoutParams lpImg = new RelativeLayout.LayoutParams(250, 300);
                         lpImg.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                        lpImg.setMargins(10,180,10,10);
+                        lpImg.setMargins(10,350,10,10);
                         imgResume.setLayoutParams(lpImg);
                         imgResume.setScaleX(2.5f);
                         imgResume.setScaleY(3f);

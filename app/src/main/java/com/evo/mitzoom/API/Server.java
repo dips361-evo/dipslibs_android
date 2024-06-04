@@ -6,10 +6,9 @@ public class Server {
     public static final String BASE_URL_RABBITMQ = "amqp://dips361:dips2022@103.140.90.42:6004"; //rabbit mq*/
 
     ///========== DEV ========= ////
-//    public static final String BASE_URL_API = "https://dips.grit.id:3080/api/"; //ip development
-//    public static final String BASE_URL_API2 = "https://dips.grit.id:3080/"; //ip development
-//    public static final String BASE_URL_API_RABBITHTTP = "http://202.157.186.65:3030/";
-
+//    public static final String BASE_URL_API = "https://app.dips361.co.id/gwnode/api/"; //ip development
+//    public static final String BASE_URL_API2 = "https://app.dips361.co.id/gwnode/"; //ip development
+//    public static final String BASE_URL_API_RABBITHTTP = "https://app.dips361.co.id/client-rabbit/";
 
     ///========== PROD ========= ////
     public static final String BASE_URL_API = "https://diops.victoriabank.co.id/gwnode/api/"; //ip bank victoria

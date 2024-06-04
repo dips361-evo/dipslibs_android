@@ -29,18 +29,10 @@ public class Client {
     private static Retrofit retrofit = null;
 
     public static Retrofit getClients(String baseUrl) {
-        /*HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);*/
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3, TimeUnit.MINUTES)
                 .readTimeout(3, TimeUnit.SECONDS)
-                .writeTimeout(3, TimeUnit.SECONDS)
-                .build();
-
-        /*OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
-                .connectTimeout(1, TimeUnit.MINUTES)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
@@ -49,8 +41,9 @@ public class Client {
                         return chain.proceed(newRequest);
                     }
                 })
-                .addInterceptor(interceptor)
-                .build();*/
+                .writeTimeout(3, TimeUnit.SECONDS)
+                .build();
+
 
         Gson gson = new GsonBuilder()
                 .setLenient()
@@ -101,11 +94,10 @@ public class Client {
             // Create an ssl socket factory with our all-trusting manager
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-            /*HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);*/
+
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
-//            builder.addInterceptor(interceptor);
+
             builder.connectTimeout(3, TimeUnit.MINUTES);
             builder.readTimeout(3, TimeUnit.MINUTES);
             builder.writeTimeout(3, TimeUnit.MINUTES);

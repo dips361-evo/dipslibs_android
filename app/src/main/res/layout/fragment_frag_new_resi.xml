@@ -44,9 +44,9 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
+        android:layout_below="@+id/llTop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/llTop">
+        android:layout_height="match_parent">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -60,8 +60,8 @@
                 <ImageView
                     android:id="@+id/imgResume"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxHeight="500dp"
+                    android:layout_height="match_parent"
+                    android:maxHeight="300dp"
                     android:layout_centerHorizontal="true"
                     android:src="@drawable/sedangmemuat"
                     android:layout_marginStart="@dimen/dp_10"

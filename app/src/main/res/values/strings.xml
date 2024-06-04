@@ -369,6 +369,8 @@
     <string name="maintenance_and_administration" translatable="false">Pemeliharaan dan Administrasi</string>
     <string name="blokir_saldo" translatable="false">Blokir Saldo</string>
     <string name="wording_otp" translatable="false">Silakan menunggu waktu tunggu</string>
+    <string name="permintaan_anda_sedang_diproses" translatable="false">Permintaan Anda sedang diproses.</string>
     <string name="manajemen_investasi" translatable="false">Manajemen Investasi</string>
+    <string name="foto_diri_ektp" translatable="false">*Foto Diri dengan eKTP untuk memperbarui data</string>
     <string name="wording_maintenance" translatable="false">Fitur Ini akan segera hadir di Digital Operations</string>
 </resources>
