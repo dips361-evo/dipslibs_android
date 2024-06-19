@@ -1577,10 +1577,10 @@ public class frag_deposito_online extends Fragment {
                             }
                         } else if (nameDataEl.contains("jangka") && nameDataEl.contains("waktu")) {
                             for (int ch = 0; ch < spin.getCount(); ch++) {
-                                if (spin.getItemAtPosition(ch).toString().trim().equals("1 Bulan") || spin.getItemAtPosition(ch).toString().trim().equals("1 bulan") || spin.getItemAtPosition(ch).toString().trim().equals("1 month") || spin.getItemAtPosition(ch).toString().trim().equals("1 Month")) {
-                                    spin.setSelection(ch);
-                                    break;
-                                }
+//                                if (spin.getItemAtPosition(ch).toString().trim().equals("1 Bulan") || spin.getItemAtPosition(ch).toString().trim().equals("1 bulan") || spin.getItemAtPosition(ch).toString().trim().equals("1 month") || spin.getItemAtPosition(ch).toString().trim().equals("1 Month")) {
+//                                    spin.setSelection(ch);
+//                                    break;
+//                                }
                             }
                         }
                     } catch (JSONException e) {

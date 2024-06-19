@@ -442,12 +442,18 @@ public class frag_service_item_new extends Fragment {
                                 Toast.makeText(mContext, getString(R.string.error_field), Toast.LENGTH_SHORT).show();
                             }
                             else {
-                                if (isSessionZoom) {
-                                    BaseMeetingActivity.showProgress(true);
-                                } else {
-                                    DipsSwafoto.showProgress(true);
+                                if (dataFiles.size() > 3) {
+                                    Toast.makeText(mContext, getString(R.string.max_upfile), Toast.LENGTH_SHORT).show();
                                 }
-                                processSendFormCompaint(objAPI);
+                                else {
+                                    if (isSessionZoom) {
+                                        BaseMeetingActivity.showProgress(true);
+                                    } else {
+                                        DipsSwafoto.showProgress(true);
+                                    }
+                                    processSendFormCompaint(objAPI);
+                                }
+
                             }
 
                         } catch (JSONException e) {

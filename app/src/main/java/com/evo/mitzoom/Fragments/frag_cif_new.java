@@ -222,6 +222,8 @@ public class frag_cif_new extends Fragment {
     private RelativeLayout rlContent;
     private String tglTerbit = "-";
     private Button btnOCRNext;
+    private String filePhotoTemp  = "";
+    private String fileCropPhotoTemp  = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -438,7 +440,7 @@ public class frag_cif_new extends Fragment {
 
         }
         else {
-            if (formCode == 22) {
+            if (formCode == 22 || formCode == 4 || formCode == 6) {
                 llOR.setVisibility(View.GONE);
                 btnGallery.setVisibility(View.GONE);
             }
@@ -851,25 +853,25 @@ public class frag_cif_new extends Fragment {
             sessions.saveFlagUpDoc(true);
         }
 
-        smsReceiver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                numberOTP = "";
-                String dataSMS = intent.getExtras().getString("smsMessage");
-                String[] sp = dataSMS.split(" ");
-                for (int i = 0; i < sp.length; i++) {
-                    String word = sp[i];
-                    if(word.matches("\\d+(?:\\.\\d+)?")) {
-                        numberOTP = word.replaceAll("[^0-9]", "");
-                        if (numberOTP.length() == 6) {
-                            otp.setText(numberOTP);
-                        }
-                    }
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
+//        smsReceiver = new BroadcastReceiver() {
+//
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                numberOTP = "";
+//                String dataSMS = intent.getExtras().getString("smsMessage");
+//                String[] sp = dataSMS.split(" ");
+//                for (int i = 0; i < sp.length; i++) {
+//                    String word = sp[i];
+//                    if(word.matches("\\d+(?:\\.\\d+)?")) {
+//                        numberOTP = word.replaceAll("[^0-9]", "");
+//                        if (numberOTP.length() == 6) {
+//                            otp.setText(numberOTP);
+//                        }
+//                    }
+//                }
+//            }
+//        };
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
     }
 
     @Override
@@ -4325,6 +4327,31 @@ public class frag_cif_new extends Fragment {
         sweetAlertDialog.getWindow().setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
     }
+    private void deleteImage(){
+        File fileTemp = new File(filePhotoTemp);
+        File fileCropTemp = new File(fileCropPhotoTemp);
+
+        if (fileTemp.exists()) {
+            try {
+                fileTemp.getCanonicalFile().delete();
+                if (fileTemp.exists()) {
+                    getActivity().deleteFile(fileTemp.getName());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (fileCropTemp.exists()) {
+            try {
+                fileCropTemp.getCanonicalFile().delete();
+                if (fileCropTemp.exists()) {
+                    getActivity().deleteFile(fileCropTemp.getName());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private JSONObject dataReqOCR2() {
         String rt = "";
@@ -5345,6 +5372,7 @@ public class frag_cif_new extends Fragment {
 
                             if (!isSessionZoom && formCode == 22) {
                                 Intent intent = new Intent(mContext, DipsWaitingRoom.class);
+                                deleteImage();
                                 intent.putExtra("CUSTNAME","Customer");
                                 startActivity(intent);
                                 ((Activity) mContext).finishAffinity();
@@ -5614,6 +5642,7 @@ public class frag_cif_new extends Fragment {
                             });
 
                             Intent intent = new Intent(mContext, DipsWaitingRoom.class);
+                            deleteImage();
                             intent.putExtra("CUSTNAME",nama);
                             startActivity(intent);
                             ((Activity) mContext).finishAffinity();
@@ -6714,6 +6743,8 @@ public class frag_cif_new extends Fragment {
                 sessions.saveFlagUpDoc(true);
                 String filePaths = data.getStringExtra("result_camera");
                 String filePathsCrop = data.getStringExtra("result_cropImage");
+                filePhotoTemp = filePaths;
+                fileCropPhotoTemp = filePathsCrop;
                 Bitmap bitmap = BitmapFactory.decodeFile(filePaths);
                 Bitmap bitmapCrop = BitmapFactory.decodeFile(filePathsCrop);
 

@@ -2,6 +2,7 @@ package com.evo.mitzoom.Session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 public class SessionManager {
 
@@ -271,13 +272,13 @@ public class SessionManager {
     }
 
     public String getLANG() {
-        return pref.getString(KEY_LANG,null);
+        return pref.getString(KEY_LANG,null); // id
     }
     public String getRTGS() {
         return pref.getString(KEY_RTGS,null);
     }
     public String getCIF() {
-        return pref.getString(KEY_CIF,null); ///"80704972"
+        return pref.getString(KEY_CIF,null); ///"39922534"
     }
     public String getNasabah() {
         return pref.getString(KEY_NASABAH,null);
@@ -353,7 +354,7 @@ public class SessionManager {
         return pref.getString(KEY_FORMREQMIRRORING,null);
     }
     public String getNoCIF() {
-        return pref.getString(KEY_NOCIF,null); ///80704972
+        return pref.getString(KEY_NOCIF,null); ///39922534
     }
     public String getNoComplaint() {
         return pref.getString(KEY_noComplaint,null);

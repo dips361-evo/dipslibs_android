@@ -107,7 +107,7 @@ public class OutboundServiceNew extends Service {
                         csId = bodyObj.getString("csId");
                         String password = bodyObj.getString("password");
                         String agentImage = "";
-                        String namaAgen = "Fulan";
+                        String namaAgen = "";
                         if (bodyObj.has("agentImage")) {
                             agentImage = bodyObj.getString("agentImage");
                         }
@@ -226,122 +226,6 @@ public class OutboundServiceNew extends Service {
             e.printStackTrace();
         } catch (IOException | TimeoutException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    void subscribeCall()
-    {
-        if (connection != null) {
-            subscribeThreadCallOutbound = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        channelCall = connection.createChannel();
-                        channelCall.basicQos(1);
-                        AMQP.Queue.DeclareOk q = channelCall.queueDeclare();
-                        channelCall.exchangeDeclare("dips361-cust-call", "direct", true);
-                        channelCall.queueBind(q.getQueue(), "dips361-cust-call", "dips.direct.cust." + idDips + ".call");
-                        channelCall.basicConsume(q.getQueue(), true, new DeliverCallback() {
-                            @Override
-                            public void handle(String consumerTag, Delivery message) throws IOException {
-                                String getMessage = new String(message.getBody());
-                                try {
-                                    JSONObject dataObj = new JSONObject(getMessage);
-                                    String actionCall = "";
-                                    if (dataObj.getJSONObject("transaction").has("action")) {
-                                        actionCall = dataObj.getJSONObject("transaction").getString("action");
-                                    }
-
-                                    if (actionCall.equals("info")) {
-                                        String csId = dataObj.getJSONObject("transaction").getString("csId");
-                                        sessions.saveCSID(csId);
-                                    } else {
-                                        int getTicket = dataObj.getJSONObject("transaction").getInt("ticket");
-                                        if (dataObj.getJSONObject("transaction").has("sessionId")) {
-                                            sessionId = dataObj.getJSONObject("transaction").getString("sessionId");
-                                            sessions.saveSessionIdDips(sessionId);
-                                        }
-                                        csId = dataObj.getJSONObject("transaction").getString("csId");
-                                        String password = dataObj.getJSONObject("transaction").getString("password");
-                                        String getQueue = String.format("%03d", getTicket);
-
-                                        String agentImage = "";
-                                        String namaAgen = "Fulan";
-                                        if (dataObj.getJSONObject("transaction").has("agentImage")) {
-                                            agentImage = dataObj.getJSONObject("transaction").getString("agentImage");
-                                        }
-                                        if (dataObj.getJSONObject("transaction").has("namaAgen")) {
-                                            namaAgen = dataObj.getJSONObject("transaction").getString("namaAgen");
-                                        }
-
-                                        password_session = password;
-                                        customerName = sessions.getNasabahName();
-                                        imagesAgent = agentImage;
-                                        nameAgent = namaAgen;
-                                        sessions.saveCSID(csId);
-
-                                        //showIncomingCallNotification();
-
-                                        Intent intent = new Intent(getApplicationContext(), MyBroadcastReceiver.class);
-                                        intent.setAction("calloutbound");
-
-                                        PendingIntent pendingIntent = null;
-                                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                                            pendingIntent = PendingIntent.getBroadcast
-                                                    (mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-                                        } else {
-                                            pendingIntent = PendingIntent.getBroadcast
-                                                    (mContext, 0, intent, 0);
-                                        }
-
-                                        long addTimes = System.currentTimeMillis() + 1000;
-
-                                        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                                        alarmManager.set(AlarmManager.RTC_WAKEUP, addTimes, pendingIntent);
-
-                                        new Handler().postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                //setelah loading maka akan langsung berpindah ke home activity
-                                                ((Activity) mContext).runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        showNotificationOutbound();
-                                                    }
-                                                });
-                                            }
-                                        }, 2000);
-                                    }
-
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }, new CancelCallback() {
-                            @Override
-                            public void handle(String consumerTag) throws IOException {
-
-                            }
-                        });
-
-                    } catch (ShutdownSignalException e) {
-                        try {
-                            Thread.sleep(4000); //sleep and then try again
-                            subscribeCall();
-                        } catch (InterruptedException ex) {
-                            ex.printStackTrace();
-                        }
-                    } catch (IOException e1) {
-                        try {
-                            Thread.sleep(4000); //sleep and then try again
-                            subscribeCall();
-                        } catch (InterruptedException e) {
-
-                        }
-                    }
-                }
-            });
-            subscribeThreadCallOutbound.start();
         }
     }
 

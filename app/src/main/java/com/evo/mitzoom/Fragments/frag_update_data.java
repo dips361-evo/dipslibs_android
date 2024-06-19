@@ -361,7 +361,7 @@ public class frag_update_data extends Fragment {
 
                                 if (pernyataan) {
                                     ConnectionRabbitHttp.mirroringEndpoint(801);
-                                    formId = 9;
+                                    formId = 109;
                                     keyData = "datatidaksesuai";
                                     objEl = new JSONObject();
                                     checkBox.setChecked(false);
@@ -374,6 +374,7 @@ public class frag_update_data extends Fragment {
                                     iconFinance.getBackground().setTint(getContext().getResources().getColor(R.color.btnFalse));
                                     tvPrevious.setVisibility(View.GONE);
                                     capture_eKTP.setVisibility(View.GONE);
+
                                 } else {
                                     ConnectionRabbitHttp.mirroringEndpoint(251);
                                     formId = 75; //menuju data pekerjaan
@@ -392,7 +393,8 @@ public class frag_update_data extends Fragment {
                                     capture_eKTP.setVisibility(View.GONE);
                                 }
                                 processGetForm();
-                            } else if (session == 2) {
+                            }
+                            else if (session == 2) {
                                 ConnectionRabbitHttp.mirroringEndpoint(252);
                                 formId = 76; //menuju data keuangan
                                 session = 3;
@@ -411,7 +413,8 @@ public class frag_update_data extends Fragment {
                                 tvPrevious.setVisibility(View.VISIBLE);
                                 capture_eKTP.setVisibility(View.GONE);
                                 processGetForm();
-                            } else if (session == 3) {
+                            }
+                            else if (session == 3) {
                                 ((Activity)mContext).runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -434,7 +437,6 @@ public class frag_update_data extends Fragment {
                         }
                     }
                 }
-
             }
         });
 
@@ -534,7 +536,7 @@ public class frag_update_data extends Fragment {
 
                             if (pernyataan) {
                                 ConnectionRabbitHttp.mirroringEndpoint(801);
-                                formId = 9;
+                                formId = 109;
                                 keyData = "datatidaksesuai";
                                 objEl = new JSONObject();
                                 checkBox.setChecked(false);
@@ -673,25 +675,25 @@ public class frag_update_data extends Fragment {
             sessions.saveFlagUpDoc(true);
         }
 
-        smsReceiver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                numberOTP = "";
-                String dataSMS = intent.getExtras().getString("smsMessage");
-                String[] sp = dataSMS.split(" ");
-                for (int i = 0; i < sp.length; i++) {
-                    String word = sp[i];
-                    if(word.matches("\\d+(?:\\.\\d+)?")) {
-                        numberOTP = word.replaceAll("[^0-9]", "");
-                        if (numberOTP.length() == 6) {
-                            otp.setText(numberOTP);
-                        }
-                    }
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
+//        smsReceiver = new BroadcastReceiver() {
+//
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                numberOTP = "";
+//                String dataSMS = intent.getExtras().getString("smsMessage");
+//                String[] sp = dataSMS.split(" ");
+//                for (int i = 0; i < sp.length; i++) {
+//                    String word = sp[i];
+//                    if(word.matches("\\d+(?:\\.\\d+)?")) {
+//                        numberOTP = word.replaceAll("[^0-9]", "");
+//                        if (numberOTP.length() == 6) {
+//                            otp.setText(numberOTP);
+//                        }
+//                    }
+//                }
+//            }
+//        };
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
     }
 
     @Override
@@ -917,22 +919,25 @@ public class frag_update_data extends Fragment {
         JSONObject dataReq = new JSONObject();
         try {
             dataReq.put("idDips",idDips);
-            dataReq.put("noCif",sessions.getNoCIF()); //cif mba tari 21525677
+            dataReq.put("noCif",sessions.getNoCIF());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
+        Log.e("authAccess",""+authAccess);
+        Log.e("exchangeToken",""+exchangeToken);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataReq.toString());
         Server.getAPIService().CustGetDataCore(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.e("dataObj","processCustGetDataCore = "+response);
                 if (response.isSuccessful()) {
                     flagDataCore = true;
                     try {
                         JSONObject dataBody = new JSONObject(response.body().toString());
                         JSONObject dataObj = dataBody.getJSONObject("data");
-
+                        Log.e("dataObj","processCustGetDataCore = "+dataObj);
                         for(Iterator<String> iter = dataObj.keys(); iter.hasNext();) {
                             if (iter.hasNext()) {
                                 String key = iter.next();
@@ -1008,11 +1013,18 @@ public class frag_update_data extends Fragment {
     }
 
     private void processGetForm() {
+        Log.e("resp","masuk processGetForm ");
+        if (isSessionZoom) {
+            BaseMeetingActivity.showProgress(true);
+        } else {
+            DipsSwafoto.showProgress(true);
+        }
         String authAccess = "Bearer " + sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIWAITING_PRODUCT().getFormBuilder(formId, authAccess, exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.e("resp","processGetForm = "+response);
                 swipe.setRefreshing(false);
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
@@ -1040,7 +1052,7 @@ public class frag_update_data extends Fragment {
 
                         if (payloadObj != null) {
                             JSONObject dataPayloadObj = payloadObj.getJSONObject(labelTrx);
-                            if (formId == 9) {
+                            if (formId == 109) {
                                 if (dataPayloadObj.has("datadiri")) {
                                     if (dataPayloadObj.getJSONObject("datadiri").has(keyData)) {
                                         processMatchDataFromeSession();
@@ -1078,6 +1090,8 @@ public class frag_update_data extends Fragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("resp","processGetForm = "+t.getMessage());
                 swipe.setRefreshing(false);
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
@@ -1494,11 +1508,11 @@ public class frag_update_data extends Fragment {
                                 String status = dataObj.getJSONObject("data").getString("status");
                                 if (status.equalsIgnoreCase("rejected")) {
                                     dialogFailedApproval();
-                                    return;
+                                }
+                                else {
+                                    dialogSuccessApproval();
                                 }
                             }
-
-                            dialogSuccessApproval();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -2005,7 +2019,6 @@ public class frag_update_data extends Fragment {
         try {
             dataNasabah = new JSONObject(getNasabah);
             int child = llFormBuild.getChildCount();
-
             if (child > 0 && idElement.length() > 0) {
                 for (int i = 0; i < child; i++) {
                     int idEl = llFormBuild.getChildAt(i).getId();
@@ -2048,13 +2061,15 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if ((newNameDataEl.contains("no") || newNameDataEl.contains("nomor")) && nameDataEl.contains("identitas")) {
+                                        }
+                                        else if ((newNameDataEl.contains("no") || newNameDataEl.contains("nomor")) && nameDataEl.contains("identitas")) {
                                             if(dataNasabah.has("nomorId")) {
                                                 String valEl = dataNasabah.getString("nomorId");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if ((newNameDataEl.contains("no") || newNameDataEl.contains("nomor")) && (newNameDataEl.contains("ponsel") || newNameDataEl.contains("handphone"))) {
+                                        }
+                                        else if ((newNameDataEl.contains("no") || newNameDataEl.contains("nomor")) && (newNameDataEl.contains("ponsel") || newNameDataEl.contains("handphone"))) {
                                             if(dataNasabah.has("noHandphone")) {
                                                 String valEl = dataNasabah.getString("noHandphone");
                                                 if (valEl.equals("null") || valEl == null) {
@@ -2168,10 +2183,12 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.equals("rt")) {
+                                        }
+                                        else if (newNameDataEl.equals("rt")) {
+                                            Log.e("newNameDataEl","newNameDataEl RT = "+newNameDataEl);
                                             String valEl = "";
                                             String keyGetRT = "address2";
-                                            if (formId == 9) {
+                                            if (formId == 109) {
                                                 keyGetRT = "domisili2";
                                             }
                                             if(dataNasabah.has("rt")) {
@@ -2200,10 +2217,11 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.equals("rw")) {
+                                        }
+                                        else if (newNameDataEl.equals("rw")) {
                                             String valEl = "";
                                             String keyGetRW = "address2";
-                                            if (formId == 9) {
+                                            if (formId == 109) {
                                                 keyGetRW = "domisili2";
                                             }
                                             if(dataNasabah.has("rw")) {
@@ -2222,7 +2240,8 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("kelurahan")) {
+                                        }
+                                        else if (newNameDataEl.contains("kelurahan")) {
                                             String valEl = "";
                                             if(dataNasabah.has("kelurahan")) {
                                                 valEl = dataNasabah.getString("kelurahan");
@@ -2231,7 +2250,8 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("kecamatan")) {
+                                        }
+                                        else if (newNameDataEl.contains("kecamatan")) {
                                             String valEl = "";
                                             if(dataNasabah.has("kecamatan")) {
                                                 valEl = dataNasabah.getString("kecamatan");
@@ -2240,7 +2260,8 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("kabupaten")) {
+                                        }
+                                        else if (newNameDataEl.contains("kabupaten")) {
                                             String valEl = "";
                                             if(dataNasabah.has("kabupaten")) {
                                                 valEl = dataNasabah.getString("kabupaten");
@@ -2249,14 +2270,16 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("provinsi")) {
+                                        }
+                                        else if (newNameDataEl.contains("provinsi")) {
                                             String valEl = "";
                                             if(dataNasabah.has("propinsi")) {
                                                 valEl = dataNasabah.getString("propinsi");
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("kodepos")) {
+                                        }
+                                        else if (newNameDataEl.contains("kodepos")) {
                                             String valEl = "";
                                             if(dataNasabah.has("kodePos")) {
                                                 valEl = dataNasabah.getString("kodePos");
@@ -2268,7 +2291,8 @@ public class frag_update_data extends Fragment {
                                                 ed.setText(String.valueOf(intZipCode));
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("jumlah") && newNameDataEl.contains("anak")) {
+                                        }
+                                        else if (newNameDataEl.contains("jumlah") && newNameDataEl.contains("anak")) {
                                             if(dataNasabah.has("jumAnak")) {
                                                 String valEl = dataNasabah.getString("jumAnak");
                                                 if (!valEl.isEmpty()) {
@@ -2277,7 +2301,8 @@ public class frag_update_data extends Fragment {
                                                     objEl.put(nameDataEl, valEl);
                                                 }
                                             }
-                                        } else if (newNameDataEl.contains("jumlah") && newNameDataEl.contains("istri")) {
+                                        }
+                                        else if (newNameDataEl.contains("jumlah") && newNameDataEl.contains("istri")) {
                                             if(dataNasabah.has("jumIstri")) {
                                                 String valEl = dataNasabah.getString("jumIstri");
                                                 if (!valEl.isEmpty()) {
@@ -2286,7 +2311,8 @@ public class frag_update_data extends Fragment {
                                                     objEl.put(nameDataEl, valEl);
                                                 }
                                             }
-                                        } else if (newNameDataEl.contains("jumlah") && newNameDataEl.contains("tanggung")) {
+                                        }
+                                        else if (newNameDataEl.contains("jumlah") && newNameDataEl.contains("tanggung")) {
                                             if(dataNasabah.has("jumTanggung")) {
                                                 String valEl = dataNasabah.getString("jumTanggung");
                                                 if (!valEl.isEmpty()) {
@@ -2295,50 +2321,59 @@ public class frag_update_data extends Fragment {
                                                     objEl.put(nameDataEl, valEl);
                                                 }
                                             }
-                                        } else if (newNameDataEl.contains("kelamin")) {
+                                        }
+                                        else if (newNameDataEl.contains("kelamin")) {
                                             String valEl = "";
                                             if(dataNasabah.has("jenisKelamin")) {
                                                 valEl = dataNasabah.getString("jenisKelamin");
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("agama")) {
+                                        }
+                                        else if (newNameDataEl.contains("agama")) {
                                             if (dataNasabah.has("agama")) {
                                                 String valEl = dataNasabah.getString("agama");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("kawin")) {
+                                        }
+                                        else if (newNameDataEl.contains("kawin")) {
                                             if (dataNasabah.has("statusKawin")) {
                                                 String valEl = dataNasabah.getString("statusKawin");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("npwp")) {
+                                        }
+                                        else if (newNameDataEl.contains("npwp")) {
                                             if (dataNasabah.has("npwp")) {
                                                 String valEl = dataNasabah.getString("npwp");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("nama") && newNameDataEl.contains("ibu")) {
+                                        }
+                                        else if (newNameDataEl.contains("nama") && newNameDataEl.contains("ibu")) {
                                             if (dataNasabah.has("namaIbu")) {
                                                 String valEl = dataNasabah.getString("namaIbu");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("nomor") && newNameDataEl.contains("identitas")) {
+                                        }
+                                        else if (newNameDataEl.contains("nomor") && newNameDataEl.contains("identitas")) {
                                             if (dataNasabah.has("nik")) {
                                                 String valEl = dataNasabah.getString("nik");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("jenis") && newNameDataEl.contains("identitas")) {
+                                        }
+                                        else if (newNameDataEl.contains("jenis") && newNameDataEl.contains("identitas")) {
                                             ed.setText("KTP");
                                             objEl.put(nameDataEl, "KTP");
-                                        } else if (newNameDataEl.contains("tanggal") && newNameDataEl.contains("berakhir")) {
+                                        }
+                                        else if (newNameDataEl.contains("tanggal") && newNameDataEl.contains("berakhir")) {
                                             ed.setText("Seumur Hidup");
                                             objEl.put(nameDataEl, "Seumur Hidup");
-                                        } else if (newNameDataEl.contains("warganegara")) {
+                                        }
+                                        else if (newNameDataEl.contains("warganegara")) {
                                             if (dataNasabah.has("negaraAsal")) {
                                                 String negaraAsal = dataNasabah.getString("negaraAsal").replace("+","");
                                                 String warganegara = "WNI";
@@ -2348,7 +2383,8 @@ public class frag_update_data extends Fragment {
                                                 ed.setText(warganegara);
                                                 objEl.put(nameDataEl, warganegara);
                                             }
-                                        } else if (newNameDataEl.contains("negara")) {
+                                        }
+                                        else if (newNameDataEl.contains("negara")) {
                                             if (dataNasabah.has("negaraAsal")) {
                                                 String negaraAsal = dataNasabah.getString("negaraAsal").replace("+","");
                                                 String negara = "";
@@ -2364,7 +2400,8 @@ public class frag_update_data extends Fragment {
                                                 ed.setText(negara);
                                                 objEl.put(nameDataEl, negara);
                                             }
-                                        } else if (newNameDataEl.contains("tanggalterbit")) {
+                                        }
+                                        else if (newNameDataEl.contains("tanggalterbit")) {
                                             String valEl = dataNasabah.getString("tanggalTerbit");
                                             String getTgl = valEl;
                                             if (getTgl.contains("-")) {
@@ -2390,7 +2427,8 @@ public class frag_update_data extends Fragment {
                                             }
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
-                                        } else if (newNameDataEl.contains("nama") && newNameDataEl.contains("perusahaan")) {
+                                        }
+                                        else if (newNameDataEl.contains("nama") && newNameDataEl.contains("perusahaan")) {
                                             if (dataNasabah.has("namaUsaha")) {
                                                 String valEl = dataNasabah.getString("namaUsaha");
                                                 ed.setText(valEl);
@@ -2407,8 +2445,8 @@ public class frag_update_data extends Fragment {
                                         JSONObject reqFormMirroring = dataReqFormMirroring();
                                         mirrObj.put(labelTrx, reqFormMirroring);
                                         ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                    } else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
-                                    } else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                         if (newNameDataEl.contains("alamatdomisili")) {
                                             if (dataNasabah.has("domisili1")) {
                                                 if (!dataNasabah.isNull("domisili1")) {
@@ -2428,36 +2466,47 @@ public class frag_update_data extends Fragment {
                                                 }
                                             }
                                         }
-                                    } else if (llFormBuild.getChildAt(i) instanceof Spinner) {
-                                    } else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
                                         RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                         if (rl.getChildAt(0) instanceof Spinner) {
                                             Spinner spin = (Spinner) rl.getChildAt(0);
-
+                                            Log.e("newNameDataEl",""+newNameDataEl);
                                             String valEl = "";
                                             if (dataNasabah.has(newNameDataEl)) {
                                                 valEl = dataNasabah.getString(newNameDataEl);
-                                            } else if (newNameDataEl.contains("kelamin")) {
+                                            }
+                                            else if (newNameDataEl.contains("kelamin")) {
                                                 valEl = dataNasabah.getString("jenisKelamin");
-                                            } else if (newNameDataEl.contains("status") && newNameDataEl.contains("menikah")) {
+                                            }
+                                            else if (newNameDataEl.contains("status") && newNameDataEl.contains("menikah")) {
                                                 valEl = dataNasabah.getString("statusNikah");
-                                            } else if (newNameDataEl.contains("pendidikan")) {
+                                            }
+                                            else if (newNameDataEl.contains("pendidikan")) {
                                                 valEl = dataNasabah.getString("pendAkhir");
-                                            } else if (newNameDataEl.contains("cabang")) {
+                                            }
+                                            else if (newNameDataEl.contains("cabang")) {
                                                 valEl = dataNasabah.getString("branchCode");
-                                            } else if (newNameDataEl.contains("kerja")) {
+                                            }
+                                            else if (newNameDataEl.contains("pekerjaan")) {
                                                 valEl = dataNasabah.getString("jenisKerja");
-                                            } else if (newNameDataEl.contains("bidang") && newNameDataEl.contains("usaha")) {
+                                            }
+                                            else if (newNameDataEl.contains("bidang") && newNameDataEl.contains("usaha")) {
                                                 valEl = dataNasabah.getString("badanUsaha");
-                                            } else if (newNameDataEl.contains("jabatan")) {
+                                            }
+                                            else if (newNameDataEl.contains("jabatan")) {
                                                 valEl = dataNasabah.getString("jobPosition");
-                                            } else if (newNameDataEl.equals("sumberdana")) {
+                                            }
+                                            else if (newNameDataEl.equals("sumberdana")) {
                                                 valEl = dataNasabah.getString("sourceIncome");
-                                            } else if (newNameDataEl.contains("tujuan") && newNameDataEl.contains("pengguna")) {
+                                            }
+                                            else if (newNameDataEl.contains("tujuanpenggunaan")) {
                                                 valEl = dataNasabah.getString("sourceFund");
-                                            } else if (newNameDataEl.contains("penghasilan")) {
+                                            }
+                                            else if (newNameDataEl.contains("penghasilan")) {
                                                 valEl = dataNasabah.getString("hasilBulan");
-                                            } else if (newNameDataEl.contains("matauang")) {
+                                            }
+                                            else if (newNameDataEl.contains("matauang")) {
                                                 valEl = "IDR";
                                             }
 
@@ -2468,6 +2517,9 @@ public class frag_update_data extends Fragment {
                                                             FormSpin dataSpin = (FormSpin) spin.getItemAtPosition(ch);
                                                             String valueCode = dataSpin.getCode();
                                                             String results = dataSpin.getName();
+                                                            Log.e("valueCode",""+valueCode);
+                                                            Log.e("valEl",""+valEl);
+                                                            Log.e("results",""+results);
                                                             if (valueCode.equals(valEl)) {
                                                                 spin.setSelection(ch);
 
@@ -2583,7 +2635,8 @@ public class frag_update_data extends Fragment {
 
                                             }
                                         }
-                                    } else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
                                     } else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
                                         LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
                                         if (ll.findViewById(R.id.llCurrency) != null) {
@@ -2603,13 +2656,12 @@ public class frag_update_data extends Fragment {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void processMatchDataFromeSession() {
         try {
             JSONObject objDataSession = null;
-            if (formId == 9) {
+            if (formId == 109) {
                 objDataSession = payloadObj.getJSONObject(labelTrx).getJSONObject("datadiri").getJSONObject(keyData);
             } else {
                 objDataSession = payloadObj.getJSONObject(labelTrx).getJSONObject(keyData);
@@ -3194,7 +3246,7 @@ public class frag_update_data extends Fragment {
         try {
             JSONObject dataFormObj2 = new JSONObject(objEl.toString());
             dataFormObj2.put("datasudahbenar",flagCheck);
-            if (formId == 9) {
+            if (formId == 109) {
                 if (payloadObj != null) {
                     JSONObject dataPayloadObj = payloadObj.getJSONObject(labelTrx);
                     if (dataPayloadObj.has("datadiri")) {
@@ -3355,7 +3407,7 @@ public class frag_update_data extends Fragment {
                         if (!actionSelected) {
                             if (payloadObj != null) {
                                 JSONObject dataPayloadObj = payloadObj.getJSONObject(labelTrx);
-                                if (formId == 9) {
+                                if (formId == 109) {
                                     if (dataPayloadObj.has("datadiri")) {
                                         if (dataPayloadObj.getJSONObject("datadiri").has(keyData)) {
                                             processMatchDataFromeSession();

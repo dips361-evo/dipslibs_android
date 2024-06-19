@@ -176,25 +176,25 @@ public class frag_ibmb extends Fragment {
     public void onResume() {
         super.onResume();
 
-        smsReceiver = new BroadcastReceiver() {
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                numberOTP = "";
-                String dataSMS = intent.getExtras().getString("smsMessage");
-                String[] sp = dataSMS.split(" ");
-                for (int i = 0; i < sp.length; i++) {
-                    String word = sp[i];
-                    if(word.matches("\\d+(?:\\.\\d+)?")) {
-                        numberOTP = word.replaceAll("[^0-9]", "");
-                        if (numberOTP.length() == 6) {
-                            otp.setText(numberOTP);
-                        }
-                    }
-                }
-            }
-        };
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
+//        smsReceiver = new BroadcastReceiver() {
+//
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                numberOTP = "";
+//                String dataSMS = intent.getExtras().getString("smsMessage");
+//                String[] sp = dataSMS.split(" ");
+//                for (int i = 0; i < sp.length; i++) {
+//                    String word = sp[i];
+//                    if(word.matches("\\d+(?:\\.\\d+)?")) {
+//                        numberOTP = word.replaceAll("[^0-9]", "");
+//                        if (numberOTP.length() == 6) {
+//                            otp.setText(numberOTP);
+//                        }
+//                    }
+//                }
+//            }
+//        };
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
 
     }
 

@@ -302,7 +302,7 @@ public class DipsLivenessResult extends AppCompatActivity {
                                     "}";*/
                             //JSONObject dataCustomer = new JSONObject(dataHard);
                             JSONObject dataCustomer = dataObj.getJSONObject("data").getJSONObject("customer");
-
+                            Log.e("Cust Auth",""+dataObj);
                             String noCIF = "";
                             boolean isCust;
                             if (dataCustomer.isNull("noCif")) {
