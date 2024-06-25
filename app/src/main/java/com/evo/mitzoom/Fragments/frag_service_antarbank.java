@@ -1311,6 +1311,13 @@ public class frag_service_antarbank extends Fragment {
 
                                 edNamePenerima.setText(destCustomerName);
 
+                                JSONObject dataTrx = dataTrxArr.getJSONObject(loopInq).getJSONObject("data");
+                                dataTrx.put("namapenerima",destCustomerName);
+                                JSONObject getObjTrx = dataTrxArr.getJSONObject(loopInq);
+                                getObjTrx.put("data", dataTrx);
+                                dataTrxArr.put(selected_position, getObjTrx);
+
+
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }
