@@ -1295,6 +1295,7 @@ public class frag_service_antarbank extends Fragment {
                     APIRequest = Server.getAPIService().InquiryOverbook(requestBody, authAccess, exchangeToken);
                 }
 
+                String noRekBaru = rekPenerima;
                 APIRequest.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
@@ -1313,6 +1314,7 @@ public class frag_service_antarbank extends Fragment {
 
                                 JSONObject dataTrx = dataTrxArr.getJSONObject(loopInq).getJSONObject("data");
                                 dataTrx.put("namapenerima",destCustomerName);
+                                dataTrx.put("rekeningpenerima", noRekBaru);
                                 JSONObject getObjTrx = dataTrxArr.getJSONObject(loopInq);
                                 getObjTrx.put("data", dataTrx);
                                 dataTrxArr.put(selected_position, getObjTrx);
