@@ -301,6 +301,7 @@
     <string name="account_receive_not_found">Recipient\'s account not found</string>
     <string name="alert_norek_notmatch">*Recipient\'s account cannot be the same as the source of funds</string>
     <string name="choose_source_fund">Select a Source of Funds</string>
+    <string name="choose_source_fund_receive" translatable="false">Select a receiver account</string>
     <string name="alert_nominal">*The nominal value exceeds the balance of the source of funds</string>
     <string name="balance_insufficient">Your balance is insufficient</string>
     <string name="konfirmasi">Confirmation</string>

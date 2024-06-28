@@ -1369,7 +1369,7 @@ public class MyParserFormBuilder {
                         ArrayList<FormSpin> dataDropDownSource = new ArrayList<>();
                         int len = dataArr.length() + 1;
                         String[] sourceAcc = new String[len];
-                        String textSelect = mContext.getString(R.string.choose_source_fund);
+                        String textSelect = mContext.getString(R.string.choose_source_fund_receive);
                         sourceAcc[0] = textSelect;
                         dataDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
                         int loopSource = 1;
@@ -1381,11 +1381,14 @@ public class MyParserFormBuilder {
                             if (prodCode.equals("T21")) {
                                 continue;
                             }
+                            if (prodCode.equals("T10")) {
+                                continue;
+                            }
                             if (dataArr.getJSONObject(i).has("acctStatus")) {
                                 String acctStatus = dataArr.getJSONObject(i).getString("acctStatus");
-                                if (!acctStatus.equals("A")) {
-                                    continue;
-                                }
+//                                if (!acctStatus.equals("A")) {
+//                                    continue;
+//                                }
                             }
                             String accountNo = dataArr.getJSONObject(i).getString("accountNo");
                             String accountName = dataArr.getJSONObject(i).getString("accountName");

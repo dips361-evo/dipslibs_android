@@ -300,6 +300,7 @@
     <string name="account_receive_not_found" translatable="false">Rekening penerima tidak ditemukan</string>
     <string name="alert_norek_notmatch" translatable="false">*Rekening penerima tidak boleh sama dengan sumber dana</string>
     <string name="choose_source_fund" translatable="false">Pilih Sumber Dana</string>
+    <string name="choose_source_fund_receive" translatable="false">Pilih Rekening Penerima</string>
     <string name="alert_nominal" translatable="false">*Nominal melebihi saldo sumber dana</string>
     <string name="balance_insufficient" translatable="false">Saldo Anda tidak mencukupi</string>
     <string name="konfirmasi" translatable="false">Konfirmasi</string>

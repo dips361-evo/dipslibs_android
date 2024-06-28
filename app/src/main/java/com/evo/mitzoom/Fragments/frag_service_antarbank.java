@@ -905,6 +905,11 @@ public class frag_service_antarbank extends Fragment {
             JSONObject dataParse = dataTrx.getJSONObject("data");
 
             if (!dataTrx.has("accountType")) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
                 Toast.makeText(mContext,mContext.getResources().getString(R.string.source_account)+" "+mContext.getResources().getString(R.string.alertRTGS),Toast.LENGTH_LONG).show();
                 return;
             }
