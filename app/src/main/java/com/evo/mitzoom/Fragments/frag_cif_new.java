@@ -6391,7 +6391,7 @@ public class frag_cif_new extends Fragment {
     private void ocrKTP(){
         String baseImages = encodedImage;
         if (swaOCR) {
-            Log.e("imgPathKTP",""+imgPathKTP);
+
             if (!imgPathKTP.isEmpty()) {
                 Bitmap bitmapKTP = BitmapFactory.decodeFile(imgPathKTP);
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -6578,7 +6578,6 @@ public class frag_cif_new extends Fragment {
                     String msg = "";
                     if (response.errorBody().toString().isEmpty()) {
                         String dataS = response.errorBody().toString();
-                        Log.e("Data ocrKTP",""+dataS);
                         try {
                             JSONObject dataObj = new JSONObject(dataS);
                             msg = dataObj.getString("message");
@@ -6589,7 +6588,7 @@ public class frag_cif_new extends Fragment {
                         String dataS = null;
                         try {
                             dataS = response.errorBody().string();
-                            Log.e("Data ocrKTP",""+dataS);
+
                             JSONObject dataObj = new JSONObject(dataS);
                             if (dataObj.has("message")) {
                                 msg = dataObj.getString("message");

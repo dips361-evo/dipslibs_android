@@ -102,7 +102,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 
         holder.ads.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            Log.e("id","dataList = "+dataList.get(position).getId());
             switch (dataList.get(position).getId()){
                 case "0" :
                     ConnectionRabbitHttp.mirroringEndpoint(201);
@@ -398,7 +397,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
         try {
             dataObj.put("nik",NIK);
             dataObj.put("noCif",sessions.getNoCIF());
-
             String authAccess = "Bearer "+sessions.getAuthToken();
             String exchangeToken = sessions.getExchangeToken();
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataObj.toString());
@@ -487,7 +485,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 
                 }
             });
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

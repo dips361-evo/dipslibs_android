@@ -377,7 +377,6 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                     @Override
                     public void onSuccess(@NonNull String myticketContent) {
                         myTicketNumber = myticketContent;
-                        Log.d("MY Ticket = ","initialWaitingRoom : "+myTicketNumber);
                         myTicket.setText(myticketContent);
                         ConnectionHttpListenCall();
                     }
@@ -690,7 +689,6 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Log.d("MY Ticket = ","subscribe : "+myticketContent);
                                             myTicket.setText(myticketContent);
                                         }
                                     });
@@ -1029,7 +1027,6 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                 camera.setPreviewDisplay(holder);
                 CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                 if (manager == null) {
-                    Log.i(TAG, "camera manager is null");
                     return;
                 }
                 try {
@@ -1096,7 +1093,6 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                     //camera.setDisplayOrientation(90);
                     CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                     if (manager == null) {
-                        Log.i(TAG, "camera manager is null");
                         return;
                     }
                     try {

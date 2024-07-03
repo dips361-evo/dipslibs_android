@@ -195,7 +195,6 @@ public class frag_wm_transactions extends Fragment {
                     }
 
                     dataCatgProdArr = new JSONArray(arrayBaru);
-                    Log.e("productCode",""+arrayBaru);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -278,7 +277,6 @@ public class frag_wm_transactions extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e("catg",""+catg);
         labelTrx = "reksadana";
         mirrObj = new JSONObject();
 
@@ -1293,7 +1291,7 @@ public class frag_wm_transactions extends Fragment {
                             }
 
                             dataItems.put(loop,dataItemObj);
-                            Log.e("dataItems",""+dataItems.toString());
+
                             if (catg == 2) {
                                 ConnectionRabbitHttp.mirroringEndpoint(287);
                                 if (!sort.isEmpty()) {

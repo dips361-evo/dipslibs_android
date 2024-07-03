@@ -288,12 +288,12 @@ public class frag_conferee_agree extends Fragment implements ZoomVideoSDKDelegat
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.d("MIRROR","Mirroring Sukses");
+
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.d("MIRROR","Mirroring Gagal");
+
             }
         });
     }

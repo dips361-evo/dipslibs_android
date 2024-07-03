@@ -281,13 +281,32 @@ public class SessionManager {
         return pref.getString(KEY_CIF,null); ///"39922534"
     }
     public String getNasabah() {
+//        return "{\n" +
+//                "\"id\":249,\n" +
+//                "\"namaLengkap\":\"WIDHO FAISAL HAKIM\",\n" +
+//                "\"gelar\":null,\n" +
+//                "\"alamat\":\"KARANGGENENG\",\n" +
+//                "\"noHp\":\"088232571983\",\n" +
+//                "\"idDips\":\"hKb0hLGc9rPzq784\",\n" +
+//                "\"noCif\":\"39922534\",\n" +
+//                "\"email\":\"WIDHOFAISAL26@GMAIL.COM\",\n" +
+//                "\"nik\":\"3374121408020001\",\n" +
+//                "\"jenisKelamin\":\"LAKI-LAKI\",\n" +
+//                "\"foto\":\"\\/home\\/administrator\\/dips\\/customer\\/faceData\\/foto-hKb0hLGc9rPzq784.png\",\n" +
+//                "\"isSwafoto\":true,\n" +
+//                "\"meta\":\"{\\\"filename\\\":\\\"foto-hKb0hLGc9rPzq784.png\\\"}\",\n" +
+//                "\"blacklist\":false,\n" +
+//                "\"branchCode\":\"710\",\n" +
+//                "\"createdAt\":\"2024-05-29T13:56:38.014Z\",\n" +
+//                "\"updatedAt\":\"2024-06-05T04:14:55.609Z\"\n" +
+//                "}";
         return pref.getString(KEY_NASABAH,null);
     }
     public String getRekNasabah() {
         return pref.getString(KEY_REKTABUNGAN,null);
     }
     public String getKEY_IdDips (){
-        return pref.getString(KEY_IdDips,null); ///NEsNem0nV15apqeO
+        return pref.getString(KEY_IdDips,null); ///hKb0hLGc9rPzq784
     }
     public String getSessionIdDips (){
         return pref.getString(KEY_SESSIONID_DIPS,null);

@@ -372,6 +372,7 @@
     <string name="wording_otp" translatable="false">Silakan menunggu waktu tunggu</string>
     <string name="permintaan_anda_sedang_diproses" translatable="false">Permintaan Anda sedang diproses.</string>
     <string name="manajemen_investasi" translatable="false">Manajemen Investasi</string>
+    <string name="qrcode_expired" translatable="false">QRCode Sudah Tidak Berlaku</string>
     <string name="foto_diri_ektp" translatable="false">*Foto Diri dengan eKTP untuk memperbarui data</string>
     <string name="wording_maintenance" translatable="false">Fitur Ini akan segera hadir di Digital Operations</string>
 </resources>

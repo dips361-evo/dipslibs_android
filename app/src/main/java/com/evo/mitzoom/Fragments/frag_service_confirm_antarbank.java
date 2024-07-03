@@ -449,15 +449,15 @@ public class frag_service_confirm_antarbank extends Fragment {
                     if (nameDataEl.toLowerCase().contains("rekening") && nameDataEl.toLowerCase().contains("penerima") && !messageError.isEmpty()) {
                         holder.tvContentElement.setText(valEl);
 //                        if (dataTrx.has("alertRekening")) {
-////                            String alertRekening = dataTrx.getString("alertRekening");
-////                            if (alertRekening.isEmpty()){
-////                                holder.tvContentElement.setTextColor(ColorStateList.valueOf(mContext.getResources().getColor(R.color.zm_button)));
-////                                holder.tvContentElement.setText(valEl);
-////                            }
-////                            else{
-////                                holder.tvContentElement.setTextColor(ColorStateList.valueOf(mContext.getResources().getColor(R.color.zm_button)));
-////                                holder.tvContentElement.setText(alertRekening);
-////                            }
+//                            String alertRekening = dataTrx.getString("alertRekening");
+//                            if (alertRekening.isEmpty()){
+//                                holder.tvContentElement.setTextColor(ColorStateList.valueOf(mContext.getResources().getColor(R.color.zm_button)));
+//                                holder.tvContentElement.setText(valEl);
+//                            }
+//                            else{
+//                                holder.tvContentElement.setTextColor(ColorStateList.valueOf(mContext.getResources().getColor(R.color.zm_button)));
+//                                holder.tvContentElement.setText(alertRekening);
+//                            }
 //
 //                        }
                     } else {

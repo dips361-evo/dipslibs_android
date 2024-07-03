@@ -925,19 +925,15 @@ public class frag_update_data extends Fragment {
         }
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
-        Log.e("authAccess",""+authAccess);
-        Log.e("exchangeToken",""+exchangeToken);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataReq.toString());
         Server.getAPIService().CustGetDataCore(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("dataObj","processCustGetDataCore = "+response);
                 if (response.isSuccessful()) {
                     flagDataCore = true;
                     try {
                         JSONObject dataBody = new JSONObject(response.body().toString());
                         JSONObject dataObj = dataBody.getJSONObject("data");
-                        Log.e("dataObj","processCustGetDataCore = "+dataObj);
                         for(Iterator<String> iter = dataObj.keys(); iter.hasNext();) {
                             if (iter.hasNext()) {
                                 String key = iter.next();
@@ -1013,7 +1009,6 @@ public class frag_update_data extends Fragment {
     }
 
     private void processGetForm() {
-        Log.e("resp","masuk processGetForm ");
         if (isSessionZoom) {
             BaseMeetingActivity.showProgress(true);
         } else {
@@ -1024,7 +1019,6 @@ public class frag_update_data extends Fragment {
         Server.getAPIWAITING_PRODUCT().getFormBuilder(formId, authAccess, exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("resp","processGetForm = "+response);
                 swipe.setRefreshing(false);
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
@@ -1046,8 +1040,10 @@ public class frag_update_data extends Fragment {
                         }
                         JSONObject dataObjForm = dataObj.getJSONObject("data");
                         String dataForm = dataObjForm.getString("data");
+
                         new MyParserFormBuilder(mContext, dataForm, llFormBuild);
                         idElement = MyParserFormBuilder.getForm();
+
                         processValidationActionForm();
 
                         if (payloadObj != null) {
@@ -1091,7 +1087,6 @@ public class frag_update_data extends Fragment {
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
                 Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("resp","processGetForm = "+t.getMessage());
                 swipe.setRefreshing(false);
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
@@ -2087,8 +2082,8 @@ public class frag_update_data extends Fragment {
                                             }
                                         }
                                         else if ((newNameDataEl.contains("no") || newNameDataEl.contains("nomor")) && newNameDataEl.contains("telepon")) {
-                                            if(dataNasabah.has("noTelp")) {
-                                                String valEl = dataNasabah.getString("noTelp");
+                                            if(dataNasabah.has("noPhone1")) {
+                                                String valEl = dataNasabah.getString("noPhone1");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
@@ -2147,15 +2142,17 @@ public class frag_update_data extends Fragment {
                                             }
 
                                             if(dataNasabah.has("domisili2")) {
-                                                String domisili2 = dataNasabah.getString("domisili2");
-                                                if (!domisili2.substring(0,2).equalsIgnoreCase("rt")) {
-                                                    int indxRT = domisili2.toLowerCase().indexOf("rt");
-                                                    if (indxRT > -1) {
-                                                        String subdomisili2 = domisili2.substring(0, indxRT).trim();
-                                                        valEl += " " + subdomisili2;
-                                                    }
-                                                }
+                                                valEl = dataNasabah.getString("domisili2");
                                             }
+
+                                            if(dataNasabah.has("domisili3")) {
+                                                valEl = dataNasabah.getString("domisili3");
+                                            }
+
+                                            if(dataNasabah.has("domisili4")) {
+                                                valEl = dataNasabah.getString("domisili4");
+                                            }
+
                                             ed.setText(valEl);
                                             objEl.put(nameDataEl, valEl);
                                         }
@@ -2185,7 +2182,6 @@ public class frag_update_data extends Fragment {
                                             objEl.put(nameDataEl, valEl);
                                         }
                                         else if (newNameDataEl.equals("rt")) {
-                                            Log.e("newNameDataEl","newNameDataEl RT = "+newNameDataEl);
                                             String valEl = "";
                                             String keyGetRT = "address2";
                                             if (formId == 109) {
@@ -2281,11 +2277,23 @@ public class frag_update_data extends Fragment {
                                         }
                                         else if (newNameDataEl.contains("kodepos")) {
                                             String valEl = "";
-                                            if(dataNasabah.has("kodePos")) {
-                                                valEl = dataNasabah.getString("kodePos");
-                                            } else if (dataNasabah.has("zipCode")) {
-                                                valEl = dataNasabah.getString("zipCode");
+
+                                            if (formId == 75){
+                                                if (dataNasabah.has("zipCode1")) {
+                                                    valEl = dataNasabah.getString("zipCode1");
+                                                }
                                             }
+                                            else {
+                                                if (dataNasabah.has("zipCode")) {
+                                                    valEl = dataNasabah.getString("zipCode");
+                                                }
+                                            }
+//                                            if(dataNasabah.has("kodePos")) {
+//                                                valEl = dataNasabah.getString("kodePos");
+//                                            } else if (dataNasabah.has("zipCode")) {
+//                                                valEl = dataNasabah.getString("zipCode");
+//                                            }
+
                                             if (!valEl.isEmpty()) {
                                                 int intZipCode = Integer.parseInt(valEl);
                                                 ed.setText(String.valueOf(intZipCode));
@@ -2434,9 +2442,10 @@ public class frag_update_data extends Fragment {
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
-                                        } else if (newNameDataEl.contains("kode") && (newNameDataEl.contains("telepon") || newNameDataEl.contains("telp"))) {
-                                            if (dataNasabah.has("kodeTelp")) {
-                                                String valEl = dataNasabah.getString("kodeTelp");
+                                        }
+                                        else if (newNameDataEl.contains("kode") && (newNameDataEl.contains("telepon") || newNameDataEl.contains("telp"))) {
+                                            if (dataNasabah.has("areaPhone1")) {
+                                                String valEl = dataNasabah.getString("areaPhone1");
                                                 ed.setText(valEl);
                                                 objEl.put(nameDataEl, valEl);
                                             }
@@ -2444,7 +2453,7 @@ public class frag_update_data extends Fragment {
 
                                         JSONObject reqFormMirroring = dataReqFormMirroring();
                                         mirrObj.put(labelTrx, reqFormMirroring);
-                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                     }
                                     else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                         if (newNameDataEl.contains("alamatdomisili")) {
@@ -2458,7 +2467,7 @@ public class frag_update_data extends Fragment {
                                                             objEl.put(nameDataEl, true);
                                                             JSONObject reqFormMirroring = dataReqFormMirroring();
                                                             mirrObj.put(labelTrx, reqFormMirroring);
-                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
                                                         }
@@ -2471,7 +2480,6 @@ public class frag_update_data extends Fragment {
                                         RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                         if (rl.getChildAt(0) instanceof Spinner) {
                                             Spinner spin = (Spinner) rl.getChildAt(0);
-                                            Log.e("newNameDataEl",""+newNameDataEl);
                                             String valEl = "";
                                             if (dataNasabah.has(newNameDataEl)) {
                                                 valEl = dataNasabah.getString(newNameDataEl);
@@ -2517,16 +2525,12 @@ public class frag_update_data extends Fragment {
                                                             FormSpin dataSpin = (FormSpin) spin.getItemAtPosition(ch);
                                                             String valueCode = dataSpin.getCode();
                                                             String results = dataSpin.getName();
-                                                            Log.e("valueCode",""+valueCode);
-                                                            Log.e("valEl",""+valEl);
-                                                            Log.e("results",""+results);
                                                             if (valueCode.equals(valEl)) {
                                                                 spin.setSelection(ch);
 
                                                                 objEl.put(nameDataEl, results);
                                                                 JSONObject reqFormMirroring = dataReqFormMirroring();
                                                                 mirrObj.put(labelTrx, reqFormMirroring);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
                                                                 break;
                                                             }
                                                         } else {
@@ -2539,7 +2543,6 @@ public class frag_update_data extends Fragment {
                                                                 objEl.put(nameDataEl, results);
                                                                 JSONObject reqFormMirroring = dataReqFormMirroring();
                                                                 mirrObj.put(labelTrx, reqFormMirroring);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
                                                                 break;
                                                             } else if (valEl.equalsIgnoreCase("laki-laki") && spin.getItemAtPosition(ch).toString().equalsIgnoreCase("male")) {
                                                                 spin.setSelection(ch);
@@ -2547,7 +2550,7 @@ public class frag_update_data extends Fragment {
                                                                 objEl.put(nameDataEl, results);
                                                                 JSONObject reqFormMirroring = dataReqFormMirroring();
                                                                 mirrObj.put(labelTrx, reqFormMirroring);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                                                 break;
                                                             } else if ((valEl.equalsIgnoreCase("perempuan") || valEl.equalsIgnoreCase("wanita")) && spin.getItemAtPosition(ch).toString().equalsIgnoreCase("female")) {
                                                                 spin.setSelection(ch);
@@ -2555,7 +2558,7 @@ public class frag_update_data extends Fragment {
                                                                 objEl.put(nameDataEl, results);
                                                                 JSONObject reqFormMirroring = dataReqFormMirroring();
                                                                 mirrObj.put(labelTrx, reqFormMirroring);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                                                 break;
                                                             }
                                                         }
@@ -2569,7 +2572,7 @@ public class frag_update_data extends Fragment {
                                                             objEl.put(nameDataEl, results);
                                                             JSONObject reqFormMirroring = dataReqFormMirroring();
                                                             mirrObj.put(labelTrx, reqFormMirroring);
-                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                                             break;
                                                         } else if (valEl.equalsIgnoreCase("laki-laki") && spin.getItemAtPosition(ch).toString().equalsIgnoreCase("male")) {
                                                             spin.setSelection(ch);
@@ -2577,7 +2580,7 @@ public class frag_update_data extends Fragment {
                                                             objEl.put(nameDataEl, results);
                                                             JSONObject reqFormMirroring = dataReqFormMirroring();
                                                             mirrObj.put(labelTrx, reqFormMirroring);
-                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                                             break;
                                                         } else if ((valEl.equalsIgnoreCase("perempuan") || valEl.equalsIgnoreCase("wanita")) && spin.getItemAtPosition(ch).toString().equalsIgnoreCase("female")) {
                                                             spin.setSelection(ch);
@@ -2585,7 +2588,7 @@ public class frag_update_data extends Fragment {
                                                             objEl.put(nameDataEl, results);
                                                             JSONObject reqFormMirroring = dataReqFormMirroring();
                                                             mirrObj.put(labelTrx, reqFormMirroring);
-                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                                             break;
                                                         }
                                                     }
@@ -2624,7 +2627,6 @@ public class frag_update_data extends Fragment {
                                                                     objEl.put(nameDataEl, nameInd);
                                                                     JSONObject reqFormMirroring = dataReqFormMirroring();
                                                                     mirrObj.put(labelTrx, reqFormMirroring);
-                                                                    ConnectionRabbitHttp.mirroringKey(mirrObj);
                                                                 }
                                                             }
 
@@ -2648,6 +2650,7 @@ public class frag_update_data extends Fragment {
                                 e.printStackTrace();
                             }
                         }
+                        ConnectionRabbitHttp.mirroringKey(mirrObj);
                     }
                 }
             }
@@ -2896,7 +2899,8 @@ public class frag_update_data extends Fragment {
                                         }
                                     });
                                     objEl.put(nameDataEl, "");
-                                } else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
                                     objEl.put(nameDataEl, "");
 
                                     RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
@@ -3392,7 +3396,8 @@ public class frag_update_data extends Fragment {
                                         newNameDataEl = nameDataEl.substring(0,indxProv).trim();
                                     }
                                     valSpinProv.put(newNameDataEl, idData);
-                                } else {
+                                }
+                                else {
                                     valSpin.put(nameDataEl, idData);
                                 }
                                 processGetSpinChild(nameDataEl);
@@ -3404,24 +3409,37 @@ public class frag_update_data extends Fragment {
                         ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
                         spin.setAdapter(adapter2);
 
-                        if (!actionSelected) {
-                            if (payloadObj != null) {
-                                JSONObject dataPayloadObj = payloadObj.getJSONObject(labelTrx);
-                                if (formId == 109) {
-                                    if (dataPayloadObj.has("datadiri")) {
-                                        if (dataPayloadObj.getJSONObject("datadiri").has(keyData)) {
-                                            processMatchDataFromeSession();
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    if (!actionSelected) {
+                                    if (payloadObj != null) {
+                                        JSONObject dataPayloadObj = payloadObj.getJSONObject(labelTrx);
+                                        if (formId == 109) {
+                                            if (dataPayloadObj.has("datadiri")) {
+                                                if (dataPayloadObj.getJSONObject("datadiri").has(keyData)) {
+                                                    processMatchDataFromeSession();
+                                                } else {
+                                                    processMatchDataFromeKTP();
+                                                    if (ocrKTP) {
+                                                        processMatchData();
+                                                        processDataFromOCR();
+                                                    }
+                                                }
+                                            }
                                         } else {
-                                            processMatchDataFromeKTP();
-                                            if (ocrKTP) {
-                                                processMatchData();
-                                                processDataFromOCR();
+                                            if (dataPayloadObj.has(keyData)) {
+                                                processMatchDataFromeSession();
+                                            } else {
+                                                processMatchDataFromeKTP();
+                                                if (ocrKTP) {
+                                                    processMatchData();
+                                                    processDataFromOCR();
+                                                }
                                             }
                                         }
-                                    }
-                                } else {
-                                    if (dataPayloadObj.has(keyData)) {
-                                        processMatchDataFromeSession();
                                     } else {
                                         processMatchDataFromeKTP();
                                         if (ocrKTP) {
@@ -3430,14 +3448,15 @@ public class frag_update_data extends Fragment {
                                         }
                                     }
                                 }
-                            } else {
-                                processMatchDataFromeKTP();
-                                if (ocrKTP) {
-                                    processMatchData();
-                                    processDataFromOCR();
                                 }
+                                catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
                             }
-                        }
+                        },3000);
+
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

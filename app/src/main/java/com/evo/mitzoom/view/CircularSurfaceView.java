@@ -57,8 +57,6 @@ public class CircularSurfaceView extends SurfaceView {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        Log.d("view", "canvas");
-
         canvasSize = canvas.getWidth();
         if (canvas.getHeight() < canvasSize)
             canvasSize = canvas.getHeight();

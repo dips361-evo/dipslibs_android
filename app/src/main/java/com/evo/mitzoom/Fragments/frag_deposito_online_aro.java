@@ -464,7 +464,7 @@ public class frag_deposito_online_aro extends Fragment {
                 } else {
                     DipsSwafoto.showProgress(false);
                 }
-                Log.e("processActiveDeposit","processActiveDeposit "+response);
+
                 if (response.isSuccessful()) {
                     try {
                         JSONObject dataBody = new JSONObject(response.body().toString());

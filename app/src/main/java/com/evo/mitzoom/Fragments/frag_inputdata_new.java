@@ -1591,7 +1591,7 @@ public class frag_inputdata_new extends Fragment {
         LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getContext());
         rv_item_file.setLayoutManager(recylerViewLayoutManager);
 
-        AdapterFile recyclerViewAdapter = new AdapterFile(getContext(), dataFiles);
+        AdapterFile recyclerViewAdapter = new AdapterFile(getContext(), dataFiles,null);
         rv_item_file.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
 

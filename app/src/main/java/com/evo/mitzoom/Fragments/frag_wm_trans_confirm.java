@@ -914,7 +914,6 @@ public class frag_wm_trans_confirm extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.e("payload","processInquiryWMRegister = "+jsons);
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());

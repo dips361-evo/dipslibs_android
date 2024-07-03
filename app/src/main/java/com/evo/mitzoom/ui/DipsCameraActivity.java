@@ -217,7 +217,6 @@ public class DipsCameraActivity extends AppCompatActivity {
                         camera.setPreviewDisplay(previewHolder);
                         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                         if (manager == null) {
-                            Log.i("CEK", "camera manager is null");
                             return;
                         }
                         try {
@@ -400,7 +399,6 @@ public class DipsCameraActivity extends AppCompatActivity {
                 //camera.setDisplayOrientation(90);
                 CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                 if (manager == null) {
-                    Log.i("CEK", "camera manager is null");
                     return;
                 }
                 try {
@@ -474,7 +472,6 @@ public class DipsCameraActivity extends AppCompatActivity {
                     //camera.setDisplayOrientation(90);
                     CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                     if (manager == null) {
-                        Log.i("CEK", "camera manager is null");
                         return;
                     }
                     try {

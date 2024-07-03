@@ -121,7 +121,7 @@ public class frag_blokir_saldo extends Fragment {
     }
 
     private void processGetForm(int formId) {
-        Log.e("LOG","formId "+formId);
+
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIWAITING_PRODUCT().getFormBuilder(formId,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {

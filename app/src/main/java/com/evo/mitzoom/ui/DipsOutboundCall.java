@@ -167,9 +167,7 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
     private final Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            Log.i(TAG,"MASUK Run Timeout");
             while (startTimeOut) {
-                Log.i(TAG,"startTimeOut "+loop+" : "+startTimeOut);
                 if (loop == 30) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -247,20 +245,10 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
 
         setupConnectionFactory(); //RabbitMQ
 
-        Log.i(TAG,"sessionId Zoom  : "+sessionId);
-        Log.i(TAG,"passSession  : "+passSession);
-        Log.i(TAG,"imageAgent  : "+imageAgent);
-        Log.i(TAG,"startTimeOut  : "+startTimeOut);
-
         previewHolder();
 
         if (!imageAgent.isEmpty()) {
             String imageAgentnew = imageAgent.replace("https://dips.grit.id:6503/", Server.BASE_URL_API);
-            Log.i("CEK GAMBAR", "" + imageAgentnew);
-            /*Glide.with(mContext)
-                    .load(imageAgentnew)
-                    .placeholder(R.drawable.agen_profile)
-                    .into(imgCS);*/
             new DownloadImageTask().execute(imageAgentnew);
         } else {
             imgCS.setImageDrawable(getDrawable(R.drawable.agen_profile));
@@ -309,7 +297,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         });
 
         if (getIntent().getAction() != null) {
-            Log.i(TAG,"MASUK ACTION : "+getAction);
             if (getAction.equals("endcall")) {
                 startTimeOut = false;
                 PopUpSchedule();
@@ -387,7 +374,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG,"MASUK Destroy");
         startTimeOut = false;
         Thread.interrupted();
         finish();
@@ -458,13 +444,11 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Log.i(TAG,"MASUK BACKGROUND AsynTimeout");
             new Thread(runnable).start();
             /*new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (startTimeOut) {
-                        Log.i(TAG,"startTimeOut "+loop+" : "+startTimeOut);
                         if (loop == 30) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -495,7 +479,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
             //String ringtones = MyApplication.getInstance().getApplicationContext().getPackageName() + paths;
             //Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + ":/" + ringtones);
             Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-            Log.i(TAG,"alarmSound : "+alarmSound.getPath());
             mRingtone = RingtoneManager.getRingtone(getApplicationContext(), alarmSound);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 mRingtone.setLooping(true);
@@ -1002,7 +985,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
                 camera.setPreviewDisplay(previewHolder);
                 CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                 if (manager == null) {
-                    Log.i(TAG, "camera manager is null");
                     return;
                 }
                 try {
@@ -1076,7 +1058,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
                     //camera.setDisplayOrientation(90);
                     CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                     if (manager == null) {
-                        Log.i("CEK", "camera manager is null");
                         return;
                     }
                     try {
@@ -1229,7 +1210,6 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         });
     }
     private void processCreateVideo(String signatures) {
-        Log.i(TAG,"masuk processCreateVideo");
         JWT jwt = new JWT(signatures);
         Map<String, Claim> allClaims = jwt.getClaims();
         String name = allClaims.get("user_identity").asString();
@@ -1252,24 +1232,11 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         sessionContext.token = signatures;
         //Optional
         sessionContext.sessionPassword = sessionPass;
-
-        Log.i(TAG,"masuk processCreateVideo sessionName : "+sessionName+" | userName : "+name);
-        Log.i(TAG,"masuk processCreateVideo signatures : "+signatures);
-
         ZoomVideoSDKSession session = ZoomVideoSDK.getInstance().joinSession(sessionContext);
 
         if(null==session){
-            Log.i(TAG,"SESSION NULL");
             return;
         }
-
-        Log.i(TAG,"masuk processCreateVideo getSessionID : "+session.getSessionID());
-        Log.i(TAG,"masuk processCreateVideo getSessionPassword : "+session.getSessionPassword());
-        Log.i(TAG,"masuk processCreateVideo getSessionName : "+session.getSessionName());
-        Log.i(TAG,"masuk processCreateVideo getSessionHostName : "+session.getSessionHostName());
-
-        Log.i(TAG,"LANJUUTT");
-
         Intent intent = new Intent(this, DipsVideoConfren.class);
         intent.putExtra("name", name);
         intent.putExtra("password", sessionPass);

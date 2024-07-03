@@ -437,7 +437,6 @@ public class frag_service_item_new extends Fragment {
                             JSONObject objAPI = JSONReqAPI();
                             String nomorRekening = objAPI.getJSONObject("data").getString("nomorrekening");
                             String detailpengaduan = objAPI.getJSONObject("data").getString("detailpengaduan");
-                            Log.e("objAPI",""+objAPI);
                             if (nomorRekening.isEmpty() || detailpengaduan.isEmpty()){
                                 Toast.makeText(mContext, getString(R.string.error_field), Toast.LENGTH_SHORT).show();
                             }
@@ -778,7 +777,6 @@ public class frag_service_item_new extends Fragment {
                                                 flagDot = true;
                                             }
                                             if (!flagDot) {
-                                                Log.e("nameData",""+nameDataEl);
                                                 if (nameDataEl.contains("sumberdana") || nameDataEl.contains("nomorrekening")) {
                                                     processGetDynamicURLSumberDana(spin,urlPath,nameDataEl);
                                                 } else {
@@ -1049,7 +1047,6 @@ public class frag_service_item_new extends Fragment {
                             sessions.saveAuthToken(accessToken);
                             sessions.saveExchangeToken(exchangeToken);
                         }
-                        Log.e("dataBody",""+dataObj);
                         JSONObject objData = dataObj.getJSONObject("data");
                         JSONArray dataArr = objData.getJSONArray("portotabungan");
                         dataDropDownSource = new ArrayList<>();
@@ -1178,29 +1175,29 @@ public class frag_service_item_new extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
-                    Log.e("response error"," ");
                     if (isSessionZoom) {
                         BaseMeetingActivity.showProgress(false);
                     } else {
                         DipsSwafoto.showProgress(false);
                     }
-                    Log.e("response error","body = "+response);
                     String msg = "";
                     if (response.body() != null) {
                         String dataS = response.body().toString();
-
                         try {
                             JSONObject dataObj = new JSONObject(dataS);
                             msg = dataObj.getString("message");
+                            Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                    } else {
+                    }
+                    else {
                         if (response.errorBody().toString().isEmpty()) {
                             String dataS = response.errorBody().toString();
                             try {
                                 JSONObject dataObj = new JSONObject(dataS);
                                 msg = dataObj.getString("message");
+                                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -1210,6 +1207,7 @@ public class frag_service_item_new extends Fragment {
                                 dataS = response.errorBody().string();
                                 JSONObject dataObj = new JSONObject(dataS);
                                 msg = dataObj.getString("message");
+                                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
                             } catch (IOException | JSONException e) {
                                 e.printStackTrace();
                             }
@@ -1220,7 +1218,7 @@ public class frag_service_item_new extends Fragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("error"," "+t.getMessage());
+                Toast.makeText(mContext, ""+t.getMessage(), Toast.LENGTH_SHORT).show();
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -1239,6 +1237,7 @@ public class frag_service_item_new extends Fragment {
         int lenMedia = dataFilesMedia.size();
 
         MultipartBody multipartBody = null;
+
         if (lenMedia == 1) {
             Uri uri = (Uri) dataFilesMedia.get(0);
             File fileMedia = null;
@@ -1257,7 +1256,8 @@ public class frag_service_item_new extends Fragment {
                     .addPart(MultipartBody.Part.createFormData("noPengaduan", null, requestnoComplaint))
                     .addPart(MultipartBody.Part.createFormData("buktiPendukung1", fileMedia.getName(), requestFileMedia))
                     .build();
-        } else if (lenMedia == 2) {
+        }
+        else if (lenMedia == 2) {
             Uri uri = (Uri) dataFilesMedia.get(0);
             File fileMedia = null;
             try {
@@ -1288,7 +1288,8 @@ public class frag_service_item_new extends Fragment {
                     .addPart(MultipartBody.Part.createFormData("buktiPendukung1", fileMedia.getName(), requestFileMedia))
                     .addPart(MultipartBody.Part.createFormData("buktiPendukung2", fileMedia2.getName(), requestFileMedia2))
                     .build();
-        } else if (lenMedia == 3) {
+        }
+        else if (lenMedia == 3) {
             Uri uri = (Uri) dataFilesMedia.get(0);
             File fileMedia = null;
             try {
@@ -1350,7 +1351,6 @@ public class frag_service_item_new extends Fragment {
                     DipsSwafoto.showProgress(false);
                 }
                 if (response.isSuccessful()) {
-                    Log.e("response"," "+response);
                     JSONObject dataMirr = null;
                     try {
                         dataMirr = new JSONObject(objEl.toString());
@@ -1380,14 +1380,11 @@ public class frag_service_item_new extends Fragment {
                     },1000);
                     //processSendOTP();
                 }
-                else{
-                    Log.e("response"," "+response);
-                }
+
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("response"," "+t.getMessage());
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -2015,7 +2012,7 @@ public class frag_service_item_new extends Fragment {
                     return;
                 }
                 if (uri != null) {
-                    dataFilesMedia = new ArrayList();
+
                     String paths = uri.getPath();
                     dataFilesMedia.add(uri);
                     Cursor c = mContext.getContentResolver().query(uri,null, null, null, null);
@@ -2037,8 +2034,7 @@ public class frag_service_item_new extends Fragment {
                     }
 
                     if (rv_item_file != null) {
-                        dataFiles = new ArrayList();
-                        dataFiles.add(new FileModel("1", fileName, R.color.item_file_silver, ""));
+                        dataFiles.add(new FileModel(Integer.toString(dataFiles.size()+1), fileName, R.color.item_file_silver, ""));
                         rv_item_file.setVisibility(View.VISIBLE);
                         setRecyler();
                         if (!keyUpFile.isEmpty()) {
@@ -2061,9 +2057,13 @@ public class frag_service_item_new extends Fragment {
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                } else if (data.getClipData().getItemCount() > 0) {
-                    dataFiles = new ArrayList();
-                    dataFilesMedia = new ArrayList();
+                }
+                else if (data.getClipData().getItemCount() > 0) {
+                    if (data.getClipData().getItemCount() > 3 || (data.getClipData().getItemCount()+dataFiles.size()) > 3) {
+                        Toast.makeText(mContext, R.string.max_upfile, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
 
                     JSONArray fileArr = new JSONArray();
                     for(int i = 0; i < data.getClipData().getItemCount(); i++) {
@@ -2075,6 +2075,7 @@ public class frag_service_item_new extends Fragment {
                             dataFilesMedia.add(uriFile);
                             String paths = uriFile.getPath();
                             dataFiles.add(new FileModel("1", fileName, R.color.item_file_silver, ""));
+
                         }
                         c.close();
 
@@ -2195,7 +2196,7 @@ public class frag_service_item_new extends Fragment {
         LinearLayoutManager recylerViewLayoutManager = new LinearLayoutManager(getContext());
         rv_item_file.setLayoutManager(recylerViewLayoutManager);
 
-        AdapterFile recyclerViewAdapter = new AdapterFile(getContext(), dataFiles);
+        AdapterFile recyclerViewAdapter = new AdapterFile(getContext(), dataFiles,dataFilesMedia);
         rv_item_file.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
 

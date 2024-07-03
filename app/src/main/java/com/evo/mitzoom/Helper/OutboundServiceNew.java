@@ -77,9 +77,6 @@ public class OutboundServiceNew extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        Log.i(TAG,"MASUK onCreate");
-
         mContext = this;
         sessions = new SessionManager(mContext);
         idDips = sessions.getKEY_IdDips();

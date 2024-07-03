@@ -12,7 +12,6 @@ import com.evo.mitzoom.ui.DipsOutboundCall;
 public class MyBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i("CEK","MyBroadcastReceiver getAction : "+intent.getAction());
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()) || Intent.ACTION_SHUTDOWN.equals(intent.getAction())
                 || Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
             Intent serviceIntent = new Intent(context,OutboundServiceNew.class);

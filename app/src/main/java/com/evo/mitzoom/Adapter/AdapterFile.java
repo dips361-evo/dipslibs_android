@@ -18,10 +18,12 @@ import java.util.ArrayList;
 
 public class AdapterFile extends RecyclerView.Adapter<AdapterFile.ItemHolder> {
     private final ArrayList<FileModel> dataList;
+    private final ArrayList<FileModel> dataList2;
     private final Context ctx;
 
-    public AdapterFile(Context ctx, ArrayList<FileModel> dataList){
+    public AdapterFile(Context ctx, ArrayList<FileModel> dataList,ArrayList<FileModel> dataList2){
         this.dataList = dataList;
+        this.dataList2 = dataList2;
         this.ctx = ctx;
     }
 
@@ -46,6 +48,9 @@ public class AdapterFile extends RecyclerView.Adapter<AdapterFile.ItemHolder> {
             @Override
             public void onClick(View v) {
                 dataList.remove(pos);
+                if (dataList2 != null){
+                    dataList2.remove(pos);
+                }
                 notifyItemRemoved(pos);
                 notifyItemRangeChanged(pos, dataList.size());
                 notifyDataSetChanged();

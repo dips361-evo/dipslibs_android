@@ -60,7 +60,7 @@ public class frag_daftar_file extends Fragment {
         recylerViewLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(recylerViewLayoutManager);
 
-        recyclerViewAdapter = new AdapterFile(getContext(), data);
+        recyclerViewAdapter = new AdapterFile(getContext(), data,null);
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerViewAdapter.notifyDataSetChanged();
 

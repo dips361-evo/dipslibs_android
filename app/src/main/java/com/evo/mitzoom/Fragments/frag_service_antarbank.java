@@ -317,7 +317,7 @@ public class frag_service_antarbank extends Fragment {
         btnAddForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HideSoftKeyboard.hideSoftKeyboard(getActivity());
+//                HideSoftKeyboard.hideSoftKeyboard(getActivity());
                 formId = formIdAwal;
                 longNumCurrent = 0;
                 minNominal = "0";
@@ -465,7 +465,6 @@ public class frag_service_antarbank extends Fragment {
     }
 
     private void setRecylerPager() {
-        Log.e("masuk setRecylerPager","");
         recylerViewLayoutManagerPager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rv_itemPage.setLayoutManager(recylerViewLayoutManagerPager);
 
@@ -538,6 +537,7 @@ public class frag_service_antarbank extends Fragment {
                         btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                         processNihilDataForm();
                         processMatchDataForm(dataParse);
+
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -570,260 +570,280 @@ public class frag_service_antarbank extends Fragment {
 
             @Override
             public void onClick(View v) {
-                if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
-                // Updating old as well as new positions
                 notifyItemChanged(selected_position);
-                selected_position = getAdapterPosition();
+                selected_position = getBindingAdapterPosition();
                 notifyItemChanged(selected_position);
+                try {
+                    JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
+                    Log.e("dataTrx","dataTrx = "+dataTrx);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
 
     private void processMatchDataForm(JSONObject dataParse) {
+        if (isSessionZoom) {
+            BaseMeetingActivity.showProgress(true);
+        } else {
+            DipsSwafoto.showProgress(true);
+        }
         flagData = 1;
         int child = llFormBuild.getChildCount();
         if (child > 0 && idElement.length() > 0) {
-            for (int i = 0; i < child; i++) {
-                int idEl = llFormBuild.getChildAt(i).getId();
-                if (idEl > 0 || idEl < -1) {
-                    for (int j = 0; j < idElement.length(); j++) {
-                        try {
-                            int idDataEl = idElement.getJSONObject(j).getInt("id");
-                            String nameDataEl = idElement.getJSONObject(j).getString("name");
-                            if (idEl == idDataEl) {
-                                if (llFormBuild.getChildAt(i) instanceof EditText) {
-                                    EditText ed = (EditText) llFormBuild.getChildAt(i);
-                                    if (dataParse.has(nameDataEl)) {
-                                        String valEl = dataParse.getString(nameDataEl);
-                                        ed.setText(valEl);
-                                    }
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
-                                    RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
-                                    for(int ch = 0; ch < rg.getChildCount(); ch++) {
-                                        int idRad = rg.getChildAt(ch).getId();
-                                        RadioButton rb = rg.findViewById(idRad);
-                                        String labelRad = rb.getText().toString();
-                                        if (dataParse.has(nameDataEl)) {
-                                            String valEl = dataParse.getString(nameDataEl);
-                                            String valRad = valEl.toLowerCase();
-
-                                            String valKurung = "";
-                                            int indx = valEl.indexOf("(");
-                                            if (indx >= 0) {
-                                                valKurung = valEl.substring(indx);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    for (int i = 0; i < child; i++) {
+                        int idEl = llFormBuild.getChildAt(i).getId();
+                        if (idEl > 0 || idEl < -1) {
+                            for (int j = 0; j < idElement.length(); j++) {
+                                try {
+                                    int idDataEl = idElement.getJSONObject(j).getInt("id");
+                                    String nameDataEl = idElement.getJSONObject(j).getString("name");
+                                    if (idEl == idDataEl) {
+                                        if (llFormBuild.getChildAt(i) instanceof EditText) {
+                                            EditText ed = (EditText) llFormBuild.getChildAt(i);
+                                            if (dataParse.has(nameDataEl)) {
+                                                String valEl = dataParse.getString(nameDataEl);
+                                                ed.setText(valEl);
                                             }
+                                        }
+                                        else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
+                                            RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
+                                            for(int ch = 0; ch < rg.getChildCount(); ch++) {
+                                                int idRad = rg.getChildAt(ch).getId();
+                                                RadioButton rb = rg.findViewById(idRad);
+                                                String labelRad = rb.getText().toString();
+                                                if (dataParse.has(nameDataEl)) {
+                                                    String valEl = dataParse.getString(nameDataEl);
+                                                    String valRad = valEl.toLowerCase();
 
-                                            if (valEl.toLowerCase().equals("kawin" + valKurung)) {
-                                                valRad = "menikah";
-                                            }
-                                            if (labelRad.toLowerCase().equals(valRad)) {
-                                                rb.setChecked(true);
-                                                break;
-                                            } else {
-                                                if (valRad.contains("laki") && valRad.contains("-")) {
-                                                    String[] sp = valRad.split("-");
-                                                    valRad = sp[0] + " - " + sp[1];
+                                                    String valKurung = "";
+                                                    int indx = valEl.indexOf("(");
+                                                    if (indx >= 0) {
+                                                        valKurung = valEl.substring(indx);
+                                                    }
+
+                                                    if (valEl.toLowerCase().equals("kawin" + valKurung)) {
+                                                        valRad = "menikah";
+                                                    }
                                                     if (labelRad.toLowerCase().equals(valRad)) {
                                                         rb.setChecked(true);
                                                         break;
+                                                    } else {
+                                                        if (valRad.contains("laki") && valRad.contains("-")) {
+                                                            String[] sp = valRad.split("-");
+                                                            valRad = sp[0] + " - " + sp[1];
+                                                            if (labelRad.toLowerCase().equals(valRad)) {
+                                                                rb.setChecked(true);
+                                                                break;
+                                                            }
+                                                        }
+                                                        else if ((valRad.contains("man") || valRad.contains("woman")) && (labelRad.toLowerCase().contains("kelamin") || labelRad.toLowerCase().contains("gender"))) {
+                                                            rb.setChecked(true);
+                                                        }
                                                     }
                                                 }
-                                                else if ((valRad.contains("man") || valRad.contains("woman")) && (labelRad.toLowerCase().contains("kelamin") || labelRad.toLowerCase().contains("gender"))) {
-                                                    rb.setChecked(true);
-                                                }
                                             }
-                                        }
-                                    }
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
-                                    CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
-                                    String labelCheck = chk.getText().toString();
-                                    if (dataParse.has(nameDataEl)) {
-                                        boolean valEl = dataParse.getBoolean(nameDataEl);
-                                        chk.setChecked(valEl);
-                                    } else if (dataParse.has(labelCheck)) {
-                                        boolean valEl = dataParse.getBoolean(labelCheck);
-                                        chk.setChecked(valEl);
-                                    }
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof Spinner) {
-                                    Spinner spin = (Spinner) llFormBuild.getChildAt(i);
-                                    if (dataParse.has(nameDataEl)) {
-                                        String valEl = dataParse.getString(nameDataEl);
-                                        for (int ch = 0; ch < spin.getCount(); ch++) {
-                                            if (spin.getItemAtPosition(ch).toString().equals(valEl)) {
-                                                spin.setSelection(ch);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
-                                    RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                    if (rl.getChildAt(0) instanceof Spinner) {
-                                        Spinner spin = (Spinner) rl.getChildAt(0);
-                                        if (spin.getCount() == 0) {
                                             break;
                                         }
-                                        if (dataParse.has(nameDataEl)) {
-                                            String valEl = dataParse.getString(nameDataEl);
-                                            if (nameDataEl.contains("sumber") && nameDataEl.contains("dana")) {
-                                                String noRekSelected = "";
-                                                if (valEl.contains("/")) {
-                                                    String[] sp = valEl.split(" / ");
-                                                    String no_nama_Rek = sp[1].trim();
-                                                    if (no_nama_Rek.indexOf("-") > 0) {
-                                                        String[] sp2 = no_nama_Rek.split("-");
-                                                        noRekSelected = sp2[0].trim();
-                                                    }
-                                                }
+                                        else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                            CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
+                                            String labelCheck = chk.getText().toString();
+                                            if (dataParse.has(nameDataEl)) {
+                                                boolean valEl = dataParse.getBoolean(nameDataEl);
+                                                chk.setChecked(valEl);
+                                            } else if (dataParse.has(labelCheck)) {
+                                                boolean valEl = dataParse.getBoolean(labelCheck);
+                                                chk.setChecked(valEl);
+                                            }
+                                            break;
+                                        }
+                                        else if (llFormBuild.getChildAt(i) instanceof Spinner) {
+                                            Spinner spin = (Spinner) llFormBuild.getChildAt(i);
+                                            if (dataParse.has(nameDataEl)) {
+                                                String valEl = dataParse.getString(nameDataEl);
                                                 for (int ch = 0; ch < spin.getCount(); ch++) {
-                                                    String dataAcc = spin.getItemAtPosition(ch).toString();
-                                                    String noRek = "";
-                                                    if (dataAcc.contains("\n")) {
-                                                        String[] sp = dataAcc.split("\n");
-                                                        String no_nama_Rek = sp[1].trim();
-                                                        if (no_nama_Rek.indexOf("-") > 0) {
-                                                            String[] sp2 = no_nama_Rek.split("-");
-                                                            noRek = sp2[0].trim();
-                                                        }
-                                                    }
-                                                    if (!noRek.isEmpty()) {
-                                                        if (noRek.equals(noRekSelected)) {
-                                                            spin.setSelection(ch);
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                for (int ch = 0; ch < spin.getCount(); ch++) {
-                                                    String dataSpin = spin.getItemAtPosition(ch).toString();
-                                                    if (dataSpin.equals(valEl)) {
+                                                    if (spin.getItemAtPosition(ch).toString().equals(valEl)) {
                                                         spin.setSelection(ch);
                                                         break;
                                                     }
                                                 }
                                             }
-
+                                            break;
                                         }
-                                        break;
-                                    } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
-                                        AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
-                                        if (dataParse.has(nameDataEl)) {
-                                            String valEl = dataParse.getString(nameDataEl);
-
-                                            ListAdapter listA = autoText.getAdapter();
-                                            if (listA == null) {
-                                                break;
-                                            }
-                                            if (listA.getCount() == 0) {
-                                                break;
-                                            }
-                                            ArrayList<FormSpin> dataDropDown = new ArrayList<>();
-                                            for (int ch = 0; ch < listA.getCount(); ch++) {
-                                                String getItem = listA.getItem(ch).toString();
-                                                if (listA.getCount() > 1) {
-                                                    Object item = listA.getItem(ch);
-                                                    if (item instanceof FormSpin) {
-                                                        FormSpin dataSpin = (FormSpin) item;
-                                                        int idData = dataSpin.getId();
-                                                        String nameInd = dataSpin.getName();
-                                                        String valCode = dataSpin.getCode();
-                                                        String nameEng = dataSpin.getNameEng();
-                                                        dataDropDown.add(new FormSpin(idData, valCode, nameInd, nameEng));
-                                                    }
+                                        else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                            RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                            if (rl.getChildAt(0) instanceof Spinner) {
+                                                Spinner spin = (Spinner) rl.getChildAt(0);
+                                                if (spin.getCount() == 0) {
+                                                    break;
                                                 }
-                                                if (!valEl.isEmpty()) {
-                                                    if (valEl.equals(getItem) || getItem.contains(valEl)) {
-                                                        int beneficiaryCode = 0;
-                                                        String swiftCode = "";
-                                                        String cityCode = "";
-
-                                                        Object item = listA.getItem(ch);
-                                                        if (item instanceof FormSpin) {
-                                                            FormSpin dataSpin = (FormSpin) item;
-                                                            int idData = dataSpin.getId();
-                                                            String results = dataSpin.getName();
-                                                            String valCode = dataSpin.getCode();
-                                                            autoText.setText(results);
-
-                                                            objEl.put(nameDataEl, results);
-
-                                                            if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                beneficiaryCode = idData;
-                                                                if (valCode.contains("|")) {
-                                                                    String[] sp = valCode.split("\\|");
-                                                                    swiftCode = sp[0].trim();
-                                                                    cityCode = sp[1].trim();
+                                                if (dataParse.has(nameDataEl)) {
+                                                    String valEl = dataParse.getString(nameDataEl);
+                                                    if (nameDataEl.contains("sumber") && nameDataEl.contains("dana")) {
+                                                        String noRekSelected = "";
+                                                        Log.e("CEK","Komponen = "+nameDataEl+" | value = "+valEl);
+                                                        if (valEl.contains("/")) {
+                                                            String[] sp = valEl.split(" / ");
+                                                            String no_nama_Rek = sp[1].trim();
+                                                            if (no_nama_Rek.indexOf("-") > 0) {
+                                                                String[] sp2 = no_nama_Rek.split("-");
+                                                                noRekSelected = sp2[0].trim();
+                                                            }
+                                                        }
+                                                        for (int ch = 0; ch < spin.getCount(); ch++) {
+                                                            String dataAcc = spin.getItemAtPosition(ch).toString();
+                                                            String noRek = "";
+                                                            if (dataAcc.contains("\n")) {
+                                                                String[] sp = dataAcc.split("\n");
+                                                                String no_nama_Rek = sp[1].trim();
+                                                                if (no_nama_Rek.indexOf("-") > 0) {
+                                                                    String[] sp2 = no_nama_Rek.split("-");
+                                                                    noRek = sp2[0].trim();
                                                                 }
-                                                            } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                                                if (results.contains("\n")) {
-                                                                    String[] sp = results.split("\n");
-                                                                    String noRek = sp[1].trim();
-                                                                    objEl.put(nameDataEl, noRek);
-                                                                    destAccount = noRek;
+                                                            }
+                                                            if (!noRek.isEmpty()) {
+                                                                if (noRek.equals(noRekSelected)) {
+                                                                    spin.setSelection(ch);
+                                                                    break;
                                                                 }
                                                             }
                                                         }
-
-                                                        if (!flagHitAPIForm) {
-                                                            JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                            JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                            getObjTrx.put("data", reqFormMirroring);
-
-                                                            if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                getObjTrx.put("beneficiaryCode", beneficiaryCode);
-                                                                getObjTrx.put("swiftCode", swiftCode);
-                                                                getObjTrx.put("cityCode", cityCode);
-                                                            }
-                                                            dataTrxArr.put(selected_position, getObjTrx);
-                                                            if (isSessionZoom) {
-                                                                dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                                mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                                mirrObj.put("activeIndex", selected_position);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                    } else {
+                                                        for (int ch = 0; ch < spin.getCount(); ch++) {
+                                                            String dataSpin = spin.getItemAtPosition(ch).toString();
+                                                            if (dataSpin.equals(valEl)) {
+                                                                spin.setSelection(ch);
+                                                                break;
                                                             }
                                                         }
                                                     }
+
+                                                }
+                                                break;
+                                            } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                                AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
+                                                if (dataParse.has(nameDataEl)) {
+                                                    String valEl = dataParse.getString(nameDataEl);
+
+                                                    ListAdapter listA = autoText.getAdapter();
+                                                    if (listA == null) {
+                                                        break;
+                                                    }
+                                                    if (listA.getCount() == 0) {
+                                                        break;
+                                                    }
+                                                    ArrayList<FormSpin> dataDropDown = new ArrayList<>();
+                                                    for (int ch = 0; ch < listA.getCount(); ch++) {
+                                                        String getItem = listA.getItem(ch).toString();
+                                                        if (listA.getCount() > 1) {
+                                                            Object item = listA.getItem(ch);
+                                                            if (item instanceof FormSpin) {
+                                                                FormSpin dataSpin = (FormSpin) item;
+                                                                int idData = dataSpin.getId();
+                                                                String nameInd = dataSpin.getName();
+                                                                String valCode = dataSpin.getCode();
+                                                                String nameEng = dataSpin.getNameEng();
+                                                                dataDropDown.add(new FormSpin(idData, valCode, nameInd, nameEng));
+                                                            }
+                                                        }
+                                                        if (!valEl.isEmpty()) {
+                                                            if (valEl.equals(getItem) || getItem.contains(valEl)) {
+                                                                int beneficiaryCode = 0;
+                                                                String swiftCode = "";
+                                                                String cityCode = "";
+
+                                                                Object item = listA.getItem(ch);
+                                                                if (item instanceof FormSpin) {
+                                                                    FormSpin dataSpin = (FormSpin) item;
+                                                                    int idData = dataSpin.getId();
+                                                                    String results = dataSpin.getName();
+                                                                    String valCode = dataSpin.getCode();
+                                                                    autoText.setText(results);
+
+                                                                    objEl.put(nameDataEl, results);
+
+                                                                    if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                        beneficiaryCode = idData;
+                                                                        if (valCode.contains("|")) {
+                                                                            String[] sp = valCode.split("\\|");
+                                                                            swiftCode = sp[0].trim();
+                                                                            cityCode = sp[1].trim();
+                                                                        }
+                                                                    } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                                                        if (results.contains("\n")) {
+                                                                            String[] sp = results.split("\n");
+                                                                            String noRek = sp[1].trim();
+                                                                            objEl.put(nameDataEl, noRek);
+                                                                            destAccount = noRek;
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                                if (!flagHitAPIForm) {
+                                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                                    getObjTrx.put("data", reqFormMirroring);
+
+                                                                    if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                        getObjTrx.put("beneficiaryCode", beneficiaryCode);
+                                                                        getObjTrx.put("swiftCode", swiftCode);
+                                                                        getObjTrx.put("cityCode", cityCode);
+                                                                    }
+                                                                    dataTrxArr.put(selected_position, getObjTrx);
+                                                                    if (isSessionZoom) {
+                                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                                        mirrObj.put("activeIndex", selected_position);
+                                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (listA.getCount() > 1) {
+                                                        ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
+                                                        autoText.setAdapter(adapter2);
+                                                    }
                                                 }
                                             }
-
-                                            if (listA.getCount() > 1) {
-                                                ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
-                                                autoText.setAdapter(adapter2);
+                                        }
+                                        else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
+                                            LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
+                                            if (ll.findViewById(R.id.llCurrency) != null) {
+                                                EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
+                                                if (dataParse.has(nameDataEl)) {
+                                                    String valEl = dataParse.getString(nameDataEl);
+                                                    tvContentCurr.setText(valEl);
+                                                }
                                             }
                                         }
                                     }
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
-                                    LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
-                                    if (ll.findViewById(R.id.llCurrency) != null) {
-                                        EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
-                                        if (dataParse.has(nameDataEl)) {
-                                            String valEl = dataParse.getString(nameDataEl);
-                                            tvContentCurr.setText(valEl);
-                                        }
-                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
                     }
+                    flagHitAPIForm = false;
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
                 }
-            }
-            flagHitAPIForm = false;
+            },10000);
         }
+
     }
 
     private void processNihilDataForm() {
         flagData = 2;
         int child = llFormBuild.getChildCount();
-
         if (child > 0 && idElement.length() > 0) {
             for (int i = 0; i < child; i++) {
                 int idEl = llFormBuild.getChildAt(i).getId();
@@ -855,6 +875,7 @@ public class frag_service_antarbank extends Fragment {
                                 else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
                                     RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                     if (rl.getChildAt(0) instanceof Spinner) {
+
                                         Spinner spin = (Spinner) rl.getChildAt(0);
                                         if (nameDataEl.contains("sumberdana")) {
                                             if (dataSelectedSource.length() > 0) {
@@ -864,8 +885,14 @@ public class frag_service_antarbank extends Fragment {
                                             }
                                         }
                                         spin.setSelection(0);
-                                    } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                        spin.setSelection(0);
+                                    }
+                                    else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                        Log.e("nameDataEl","AutoCompleteTextView | Spinner = "+nameDataEl);
                                         AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
+                                        Log.e("nameDataEl","AutoCompleteTextView value = "+autoText.getText().toString());
+                                        autoText.setText("");
+                                        autoText.setText("");
                                         autoText.setText("");
                                     }
                                 }
@@ -896,7 +923,6 @@ public class frag_service_antarbank extends Fragment {
         int dataInt = random.nextInt(99999999);
         return dataInt;
     }
-
 
     private void processGetFeeCharge(int loopInq) {
         JSONObject objReq = new JSONObject();
@@ -1008,12 +1034,46 @@ public class frag_service_antarbank extends Fragment {
                             } else {
                                 DipsSwafoto.showProgress(false);
                             }
+                            String msg = "";
+                            if (response.body() != null) {
+                                String dataS = response.body().toString();
+                                try {
+                                    JSONObject dataObj = new JSONObject(dataS);
+                                    msg = dataObj.getString("message");
+                                    Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            else {
+                                if (response.errorBody().toString().isEmpty()) {
+                                    String dataS = response.errorBody().toString();
+                                    try {
+                                        JSONObject dataObj = new JSONObject(dataS);
+                                        msg = dataObj.getString("message");
+                                        Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    String dataS = null;
+                                    try {
+                                        dataS = response.errorBody().string();
+                                        JSONObject dataObj = new JSONObject(dataS);
+                                        msg = dataObj.getString("message");
+                                        Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                                    } catch (IOException | JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
                     if (isSessionZoom) {
                         BaseMeetingActivity.showProgress(false);
                     } else {
@@ -1155,8 +1215,10 @@ public class frag_service_antarbank extends Fragment {
         JSONObject jsons = null;
         JSONObject dataTrx = null;
         JSONObject dataParse = null;
+
         try {
             dataTrx = dataTrxArr.getJSONObject(loopInq);
+
             if (idElementMulti.get(loopInq) != null) {
                 String label = dataTrx.getString("label");
                 String noForm = dataTrx.getString("noForm");
@@ -1316,14 +1378,15 @@ public class frag_service_antarbank extends Fragment {
                                 btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
 
                                 edNamePenerima.setText(destCustomerName);
-
+                                messageError = "";
+                                ///fixing nama penerima & nomor penerima
                                 JSONObject dataTrx = dataTrxArr.getJSONObject(loopInq).getJSONObject("data");
                                 dataTrx.put("namapenerima",destCustomerName);
                                 dataTrx.put("rekeningpenerima", noRekBaru);
                                 JSONObject getObjTrx = dataTrxArr.getJSONObject(loopInq);
                                 getObjTrx.put("data", dataTrx);
                                 dataTrxArr.put(selected_position, getObjTrx);
-
+                                ///
 
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
@@ -1332,7 +1395,6 @@ public class frag_service_antarbank extends Fragment {
                         } else {
                             messageError = getString(R.string.confirm_trx_error1);
                             try {
-
                                 tvAlertRek.setText(getString(R.string.account_receive_not_found));
                                 tvAlertRek.setVisibility(View.VISIBLE);
                                 edNamePenerima.setText("");
@@ -1373,6 +1435,7 @@ public class frag_service_antarbank extends Fragment {
 
                     @Override
                     public void onFailure(Call<JsonObject> call, Throwable t) {
+                        Toast.makeText(mContext, ""+t.getMessage(), Toast.LENGTH_SHORT).show();
                         messageError = getString(R.string.confirm_trx_error2);
                         if (isSessionZoom) {
                             BaseMeetingActivity.showProgress(false);
@@ -1544,6 +1607,7 @@ public class frag_service_antarbank extends Fragment {
         Server.getAPIWAITING_PRODUCT().getFormBuilder(formId,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.e("response",""+response);
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     llFormBuild.removeAllViewsInLayout();
@@ -1568,15 +1632,55 @@ public class frag_service_antarbank extends Fragment {
                         processValidationActionForm();
                         SelectedPagerMatch();
                         ReCheckMatch();
-
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    }
+                }
+                else {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    String msg = "";
+                    if (response.body() != null) {
+                        String dataS = response.body().toString();
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            msg = dataObj.getString("message");
+                            Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        if (response.errorBody().toString().isEmpty()) {
+                            String dataS = response.errorBody().toString();
+                            try {
+                                JSONObject dataObj = new JSONObject(dataS);
+                                msg = dataObj.getString("message");
+                                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            String dataS = null;
+                            try {
+                                dataS = response.errorBody().string();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                msg = dataObj.getString("message");
+                                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -1604,7 +1708,6 @@ public class frag_service_antarbank extends Fragment {
                             } else {
                                 DipsSwafoto.showProgress(false);
                             }
-
                             setRecylerPager();
                             if (llLayout.getVisibility() != View.VISIBLE) {
                                 llLayout.setVisibility(View.VISIBLE);
@@ -1685,6 +1788,7 @@ public class frag_service_antarbank extends Fragment {
                             String CompoName = idElement.getJSONObject(j).getString("CompoName");
                             String CompoLabel = idElement.getJSONObject(j).getString("label");
                             String valKurung = "";
+
                             int indx = nameDataEl.indexOf("(");
                             if (indx >= 0) {
                                 valKurung = nameDataEl.substring(indx);
@@ -1950,6 +2054,7 @@ public class frag_service_antarbank extends Fragment {
                                     break;
                                 }
                                 else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+
                                     RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                     if (rl.getChildAt(0) instanceof Spinner) {
                                         objEl.put(nameDataEl, "");
@@ -1967,8 +2072,11 @@ public class frag_service_antarbank extends Fragment {
                                             if (check.contains(":")) {
                                                 flagDot = true;
                                             }
+
+
                                             if (!flagDot) {
-                                                if (nameDataEl.contains("sumberdana") || (nameDataEl.contains("rekening") && nameDataEl.contains("penerima"))) {
+
+                                                if (nameDataEl.contains("sumberdana") || (nameDataEl.contains("rekeningpenerima"))) {
                                                     btnAddForm.setEnabled(false);
                                                     processGetDynamicURLSumberDana(spin,urlPath,nameDataEl);
                                                 } else {
@@ -2199,7 +2307,9 @@ public class frag_service_antarbank extends Fragment {
                                             }
                                         });
                                         break;
-                                    } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                    }
+                                    else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+
                                         objEl.put(nameDataEl, "");
                                         AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
 
@@ -2217,7 +2327,6 @@ public class frag_service_antarbank extends Fragment {
                                                         int idData = dataSpin.getId();
                                                         String results = dataSpin.getName();
                                                         String valCode = dataSpin.getCode();
-
                                                         try {
                                                             if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
                                                                 objEl.put(nameDataEl, results);
@@ -2227,9 +2336,11 @@ public class frag_service_antarbank extends Fragment {
                                                                     swiftCode = sp[0].trim();
                                                                     cityCode = sp[1].trim();
                                                                 }
-                                                            } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                                            }
+                                                            else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
                                                                 if (results.contains("\n")) {
                                                                     String[] sp = results.split("\n");
+
                                                                     String noRek = sp[1].trim();
                                                                     objEl.put(nameDataEl, noRek);
                                                                     destAccount = noRek;
@@ -2668,6 +2779,7 @@ public class frag_service_antarbank extends Fragment {
                         dataDropDownSource = new ArrayList<>();
                         int len = dataArr.length() + 1;
                         String[] sourceAcc = new String[len];
+
                         String textSelect = getString(R.string.choose_source_fund);
                         sourceAcc[0] = textSelect;
                         dataDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
@@ -2680,6 +2792,8 @@ public class frag_service_antarbank extends Fragment {
                             if (prodCode.equals("T21")) {
                                 continue;
                             }
+
+
                             if (dataArr.getJSONObject(i).has("acctStatus")) {
                                 String acctStatus = dataArr.getJSONObject(i).getString("acctStatus");
                                 if (!acctStatus.equals("A")) {
@@ -2832,6 +2946,7 @@ public class frag_service_antarbank extends Fragment {
                         }
                         ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
                         spin.setAdapter(adapter2);
+
 
                         SelectedPagerMatch();
                         ReCheckMatch();
@@ -3155,13 +3270,13 @@ public class frag_service_antarbank extends Fragment {
                     }
                 } else {
                     if (response.code() == 500) {
-                        Toast.makeText(mContext,"QRCode Expired",Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext,getString(R.string.qrcode_expired),Toast.LENGTH_LONG).show();
                         if (dataItems.size() > 0) {
                             if (noFormQR.size() > 0) {
                                 noFormQR.remove(dataItems.size() - 1);
                             }
-                            dataItems.remove(dataItems.size() - 1);
                             nameItemQR.remove(dataItems.size() - 1);
+                            dataItems.remove(dataItems.size() - 1);
                             recyclerViewAdapter.notifyDataSetChanged();
                             if (dataItems.size() == 0) {
                                 addData();

@@ -776,7 +776,6 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
                 camera.setPreviewDisplay(holder);
                 CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
                 if (manager == null) {
-                    Log.i("CEK", "camera manager is null");
                     return;
                 }
                 try {
