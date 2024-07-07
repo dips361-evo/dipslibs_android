@@ -770,8 +770,11 @@ public class DipsTransactionsCreate extends AppCompatActivity {
                         }
                         JSONObject objData = dataObj.getJSONObject("data");
                         JSONArray dataArr = objData.getJSONArray("portotabungan");
+                        String textSelect = getString(R.string.choose_source_fund);
                         ArrayList<FormSpin> dataDropDown = new ArrayList<>();
-                        String[] sourceAcc = new String[dataArr.length()];
+                        String[] sourceAcc = new String[dataArr.length()+1];
+                        sourceAcc[0] = textSelect;
+                        dataDropDown.add(new FormSpin(0,"0",textSelect,textSelect));
                         for (int i = 0; i < dataArr.length(); i++) {
                             int idData = i + 1;
 

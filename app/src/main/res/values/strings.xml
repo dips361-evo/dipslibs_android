@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name_dips" translatable="false">DiPS361</string>
-    <string name="welcometext" translatable="false">Selamat Datang\ndi DiPS361</string>
+    <string name="app_name_dips" translatable="false">DigiOps</string>
+    <string name="welcometext" translatable="false">Selamat Datang\ndi DigiOps</string>
     <string name="desc_welcome" translatable="false">Aplikasi Virtual Customer Support\nMudah, aman dan nyaman</string>
     <string name="wink" translatable="false">Kedipkan mata\nuntuk menangkap gambar.</string>
     <string name="msg_error" translatable="false">Terjadi Kesalahan</string>
-    <string name="not_using_dips" translatable="false">Maaf Anda Tidak Bisa Menggunakan Layanan DiPS361</string>
+    <string name="not_using_dips" translatable="false">Maaf Anda Tidak Bisa Menggunakan Layanan DigiOps</string>
     <string name="tutup" translatable="false">Tutup</string>
     <string name="chat" translatable="false">Pesan</string>
     <string name="confirm_accept" translatable="false">Demi kenyamanan bersama, percakapan ini akan terekam secara otomatis.\nApakah Anda setuju untuk menggunakan Layanan Digital Operations Bank Victoria?</string>
@@ -108,10 +108,10 @@
     <string name="error_field" translatable="false">Kolom masih kosong</string>
     <string name="error_image" translatable="false">Silahkan upload foto anda</string>
     <string name="alertRTGS" translatable="false">harus diisi/dipilih pada Formulir</string>
-    <string name="incoming_call" translatable="false">Panggilan masuk</string>
-    <string name="incoming_call1" translatable="false">Panggilan masuk .</string>
-    <string name="incoming_call2" translatable="false">Panggilan masuk . .</string>
-    <string name="incoming_call3" translatable="false">Panggilan masuk . . .</string>
+    <string name="incoming_call" translatable="false">Memanggil</string>
+    <string name="incoming_call1" translatable="false">Memanggil .</string>
+    <string name="incoming_call2" translatable="false">Memanggil . .</string>
+    <string name="incoming_call3" translatable="false">Memanggil . . .</string>
     <string name="waiting_conf" translatable="false">Mohon tunggu, proses Join sedang berlangsung</string>
     <string name="isi_form" translatable="false">Isi Form</string>
     <string name="konfirmasi_data" translatable="false">Konfirmasi Data</string>
@@ -373,6 +373,9 @@
     <string name="permintaan_anda_sedang_diproses" translatable="false">Permintaan Anda sedang diproses.</string>
     <string name="manajemen_investasi" translatable="false">Manajemen Investasi</string>
     <string name="qrcode_expired" translatable="false">QRCode Sudah Tidak Berlaku</string>
+    <string name="rejected_transaksi" translatable="false">Transaksi Gagal</string>
+    <string name="wording_gagal" translatable="false">Gagal!</string>
+    <string name="wording_melebihi_sumber_dana" translatable="false">Terdapat transaksi yang melebihi sumber dana!</string>
     <string name="foto_diri_ektp" translatable="false">*Foto Diri dengan eKTP untuk memperbarui data</string>
     <string name="wording_maintenance" translatable="false">Fitur Ini akan segera hadir di Digital Operations</string>
 </resources>

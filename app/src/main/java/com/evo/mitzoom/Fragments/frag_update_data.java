@@ -929,6 +929,7 @@ public class frag_update_data extends Fragment {
         Server.getAPIService().CustGetDataCore(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
                 if (response.isSuccessful()) {
                     flagDataCore = true;
                     try {
@@ -942,6 +943,7 @@ public class frag_update_data extends Fragment {
                                 }
                             }
                         }
+                        Log.e("TAG processCustGetDataCore","dataObj = "+dataObj);
 
                         sessions.saveNasabah(dataNasabahObj.toString());
 
@@ -1626,6 +1628,7 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchData() {
+        Log.e("TAG Masuk","processMatchData");
         String dataOCR = sessions.getOCR();
         if (dataOCR != null) {
             try {
@@ -2009,6 +2012,7 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchDataFromeKTP() {
+        Log.e("TAG Masuk","processMatchDataFromeKTP");
         String getNasabah = sessions.getNasabah();
         JSONObject dataNasabah = null;
         try {
@@ -2650,9 +2654,9 @@ public class frag_update_data extends Fragment {
                                 e.printStackTrace();
                             }
                         }
-                        ConnectionRabbitHttp.mirroringKey(mirrObj);
                     }
                 }
+                ConnectionRabbitHttp.mirroringKey(mirrObj);
             }
 
 
@@ -2662,6 +2666,7 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchDataFromeSession() {
+        Log.e("TAG Masuk","processMatchDataFromeSession");
         try {
             JSONObject objDataSession = null;
             if (formId == 109) {
@@ -2698,7 +2703,6 @@ public class frag_update_data extends Fragment {
                                             ed.setText(valEl);
                                         }
 
-                                    } else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
                                     } else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                         if (objDataSession.has(nameDataEl)) {
                                             boolean b = objDataSession.getBoolean(nameDataEl);
@@ -2925,7 +2929,8 @@ public class frag_update_data extends Fragment {
                                     });
 
                                     break;
-                                } else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                     objEl.put(nameDataEl, false);
 
                                     CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
@@ -2958,7 +2963,8 @@ public class frag_update_data extends Fragment {
                                     });
 
                                     break;
-                                } else if (llFormBuild.getChildAt(i) instanceof Spinner) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof Spinner) {
                                     objEl.put(nameDataEl, "");
                                     Spinner spin = (Spinner) llFormBuild.getChildAt(i);
                                     spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -2981,7 +2987,8 @@ public class frag_update_data extends Fragment {
                                         }
                                     });
                                     break;
-                                } else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
                                     RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                     if (rl.getChildAt(0) instanceof Spinner) {
                                         objEl.put(nameDataEl, "");
@@ -3131,7 +3138,8 @@ public class frag_update_data extends Fragment {
                                         });
 
                                     }
-                                } else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
                                     objEl.put(nameDataEl, "");
 
                                     AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
@@ -3165,7 +3173,8 @@ public class frag_update_data extends Fragment {
                                     });
 
                                     break;
-                                } else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
+                                }
+                                else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
                                     LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
                                     if (ll.findViewById(R.id.llCurrency) != null) {
                                         EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
@@ -3440,7 +3449,8 @@ public class frag_update_data extends Fragment {
                                                 }
                                             }
                                         }
-                                    } else {
+                                    }
+                                    else {
                                         processMatchDataFromeKTP();
                                         if (ocrKTP) {
                                             processMatchData();

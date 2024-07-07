@@ -79,8 +79,10 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -256,6 +258,7 @@ public class frag_service_antarbank extends Fragment {
         return views;
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -294,6 +297,7 @@ public class frag_service_antarbank extends Fragment {
             setNameItemQR();
         }
         setRecyler();
+
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -340,7 +344,10 @@ public class frag_service_antarbank extends Fragment {
                         }
 
                         biayaLayanan = 0;
+
                         processGetFeeCharge(loopInq);
+
+
                     } else {
                         Toast.makeText(mContext,labelTypeServ+" "+getString(R.string.alertRTGS),Toast.LENGTH_LONG).show();
                     }
@@ -428,6 +435,57 @@ public class frag_service_antarbank extends Fragment {
         }
     }
 
+    private boolean validasiNominalSumberdana(JSONArray transactions) {
+        Map<String, Long> accountToTotalAmountMap = new HashMap<>();
+
+        try {
+            for (int i = 0; i < transactions.length(); i++) {
+                JSONObject transaction = transactions.getJSONObject(i).getJSONObject("data");
+                String fromAccountNumber = transaction.getString("fromAccountNumber");
+                long amount = Long.parseLong(transaction.getString("amount")) /100;
+
+                // Calculate total amount per fromAccountNumber
+                if (accountToTotalAmountMap.containsKey(fromAccountNumber)) {
+                    long currentTotal = accountToTotalAmountMap.get(fromAccountNumber);
+                    long newTotal = currentTotal + amount;
+                    accountToTotalAmountMap.put(fromAccountNumber, newTotal);
+                } else {
+                    accountToTotalAmountMap.put(fromAccountNumber, amount);
+                }
+            }
+
+            // Validate against rekeningsumberdana
+            for (String fromAccount : accountToTotalAmountMap.keySet()) {
+                long totalAmount = accountToTotalAmountMap.get(fromAccount);
+
+                // Retrieve nominaltransaksi from the transaction data
+                JSONObject firstTransaction = transactions.getJSONObject(0);
+                JSONObject data = firstTransaction.getJSONObject("data");
+                String nominalString = data.getString("rekeningsumberdana");
+
+                String nominalValueStr = nominalString.split("Rp\\. ")[1]; // Get the part after "Rp. "
+                long nominalValue = parseNominal(nominalValueStr) / 100;
+
+                if (totalAmount > nominalValue) {
+                    return false;
+                }
+            }
+
+            // All validations passed
+            return true;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private long parseNominal(String nominalValueStr) {
+        // Remove non-numeric characters and parse as long
+        String cleanedStr = nominalValueStr.replaceAll("[^\\d]", "");
+        return Long.parseLong(cleanedStr);
+    }
+
     private void addUpQRCode() {
         int sizeItem = dataItems.size() + 1;
         String to = "to";
@@ -467,7 +525,6 @@ public class frag_service_antarbank extends Fragment {
     private void setRecylerPager() {
         recylerViewLayoutManagerPager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         rv_itemPage.setLayoutManager(recylerViewLayoutManagerPager);
-
         recyclerViewAdapterPager = new AdapterNumPager();
         rv_itemPage.setAdapter(recyclerViewAdapterPager);
         recyclerViewAdapterPager.notifyItemInserted(dataTrxArr.length() - 1);
@@ -536,7 +593,7 @@ public class frag_service_antarbank extends Fragment {
                         btnContinue.setEnabled(true);
                         btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                         processNihilDataForm();
-                        processMatchDataForm(dataParse);
+                       processMatchDataForm(dataParse);
 
                     }
                 } catch (JSONException e) {
@@ -563,22 +620,16 @@ public class frag_service_antarbank extends Fragment {
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 itemView.setOnClickListener(this);
-
                 cvPage = (CardView) itemView.findViewById(R.id.cvPage);
                 tvNumPage = (TextView) itemView.findViewById(R.id.tvNumPage);
             }
 
             @Override
             public void onClick(View v) {
+                if (getBindingAdapterPosition() == RecyclerView.NO_POSITION) return;
                 notifyItemChanged(selected_position);
                 selected_position = getBindingAdapterPosition();
                 notifyItemChanged(selected_position);
-                try {
-                    JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
-                    Log.e("dataTrx","dataTrx = "+dataTrx);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
             }
         }
     }
@@ -685,7 +736,6 @@ public class frag_service_antarbank extends Fragment {
                                                     String valEl = dataParse.getString(nameDataEl);
                                                     if (nameDataEl.contains("sumber") && nameDataEl.contains("dana")) {
                                                         String noRekSelected = "";
-                                                        Log.e("CEK","Komponen = "+nameDataEl+" | value = "+valEl);
                                                         if (valEl.contains("/")) {
                                                             String[] sp = valEl.split(" / ");
                                                             String no_nama_Rek = sp[1].trim();
@@ -888,11 +938,7 @@ public class frag_service_antarbank extends Fragment {
                                         spin.setSelection(0);
                                     }
                                     else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
-                                        Log.e("nameDataEl","AutoCompleteTextView | Spinner = "+nameDataEl);
                                         AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
-                                        Log.e("nameDataEl","AutoCompleteTextView value = "+autoText.getText().toString());
-                                        autoText.setText("");
-                                        autoText.setText("");
                                         autoText.setText("");
                                     }
                                 }
@@ -1007,13 +1053,25 @@ public class frag_service_antarbank extends Fragment {
                                 } else {
                                     DipsSwafoto.showProgress(false);
                                 }
-                                Bundle bundle = new Bundle();
-                                bundle.putString("labelserv",labelserv);
-                                bundle.putString("idElementMulti", idElementMulti.toString());
-                                bundle.putString("dataTrxArr", dataTrxArrNew.toString());
-                                bundle.putString("messageError", messageError);
-                                bundle.putStringArrayList("nameItemQR",nameItemQR);
-                                sendDataFragment(bundle, new frag_service_confirm_antarbank());
+
+                                if(validasiNominalSumberdana(dataTrxArrNew)){
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("labelserv",labelserv);
+                                    bundle.putString("idElementMulti", idElementMulti.toString());
+                                    bundle.putString("dataTrxArr", dataTrxArrNew.toString());
+                                    bundle.putString("messageError", messageError);
+                                    bundle.putStringArrayList("nameItemQR",nameItemQR);
+                                    sendDataFragment(bundle, new frag_service_confirm_antarbank());
+                                }
+                                else {
+                                    if (isSessionZoom) {
+                                        BaseMeetingActivity.showProgress(false);
+                                    } else {
+                                        DipsSwafoto.showProgress(false);
+                                    }
+                                    Toast.makeText(mContext,R.string.wording_melebihi_sumber_dana,Toast.LENGTH_LONG).show();
+                                }
+
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
@@ -1607,7 +1665,7 @@ public class frag_service_antarbank extends Fragment {
         Server.getAPIWAITING_PRODUCT().getFormBuilder(formId,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("response",""+response);
+
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     llFormBuild.removeAllViewsInLayout();
@@ -2098,6 +2156,7 @@ public class frag_service_antarbank extends Fragment {
                                                         FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
                                                         String results = dataSpin.getName();
                                                         accountType = dataSpin.getCode();
+
                                                         if (results.indexOf("\n") > 0) {
                                                             String[] sp = results.split("\n");
                                                             String typeAccount = sp[0].trim();
@@ -2133,6 +2192,7 @@ public class frag_service_antarbank extends Fragment {
                                                             btnContinue.setEnabled(false);
                                                             btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
                                                         }
+
                                                         results = results.replaceAll("\n"," / ");
                                                         try {
                                                             objEl.put(nameDataEl, results);
@@ -2199,7 +2259,8 @@ public class frag_service_antarbank extends Fragment {
                                                                     edNamePenerima.setBackground(mContext.getResources().getDrawable(R.drawable.bg_textinput));
                                                                     edNamePenerima.setTextColor(mContext.getResources().getColor(R.color.zm_text));
                                                                 }
-                                                            } else if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                            }
+                                                            else if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
                                                                 beneficiaryCode = idData;
                                                                 String valCode = dataSpin.getCode();
                                                                 if (valCode.contains("|")) {
@@ -2383,8 +2444,8 @@ public class frag_service_antarbank extends Fragment {
                                                                 getObjTrx.put("swiftCode", swiftCode);
                                                                 getObjTrx.put("cityCode", cityCode);
                                                             }
-                                                            dataTrxArr.put(selected_position, getObjTrx);
 
+                                                            dataTrxArr.put(selected_position, getObjTrx);
                                                             if (isSessionZoom) {
                                                                 dataTrxArrMirror.put(selected_position, reqFormMirroring);
                                                                 mirrObj.put(labelTrx, dataTrxArrMirror);
@@ -3144,6 +3205,7 @@ public class frag_service_antarbank extends Fragment {
             } else {
                 DipsSwafoto.showProgress(true);
             }
+            Log.e("GetBarcodeData","results = "+results);
             getBarcodeDataByURL(results);
         }
     }
@@ -3169,6 +3231,53 @@ public class frag_service_antarbank extends Fragment {
                     try {
                         JSONObject dataObjBody = new JSONObject(dataS);
                         JSONObject dataBody1 = dataObjBody.getJSONObject("data");
+                        if (dataBody1.has("jenisTransaksi")){
+                                String jenisTransaksi = dataBody1.getString("jenisTransaksi").toLowerCase().trim();
+                            if (formIdAwal == 48 && (jenisTransaksi.equals("rekening-sendiri") || jenisTransaksi.equals("antar-rekening"))){
+                                messageBarcodeFailed();
+                                if (dataItems.size() > 0) {
+                                    nameItemQR.remove(dataItems.size() - 1);
+                                    dataItems.remove(dataItems.size() - 1);
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                    if (dataItems.size() == 0) {
+                                        addData();
+                                        setRecyler();
+                                    }
+                                }
+                                return;
+                            }
+
+                            if (formIdAwal == 49 && !jenisTransaksi.equals("antar-rekening")){
+                                messageBarcodeFailed();
+                                if (dataItems.size() > 0) {
+
+                                    nameItemQR.remove(dataItems.size() - 1);
+                                    dataItems.remove(dataItems.size() - 1);
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                    if (dataItems.size() == 0) {
+                                        addData();
+                                        setRecyler();
+                                    }
+                                }
+                                return;
+                            }
+
+
+                            if (formIdAwal == 56 && !jenisTransaksi.equals("rekening-sendiri")){
+                                messageBarcodeFailed();
+                                if (dataItems.size() > 0) {
+
+                                    nameItemQR.remove(dataItems.size() - 1);
+                                    dataItems.remove(dataItems.size() - 1);
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                    if (dataItems.size() == 0) {
+                                        addData();
+                                        setRecyler();
+                                    }
+                                }
+                                return;
+                            }
+                        }
                         String retrievalReferenceNumber = dataBody1.getString("retrievalReferenceNumber");
                         String systemTraceAuditNumber = dataBody1.getString("systemTraceAuditNumber");
                         JSONObject dataBank = dataBody1.getJSONObject("data");
@@ -3268,7 +3377,8 @@ public class frag_service_antarbank extends Fragment {
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
-                } else {
+                }
+                else {
                     if (response.code() == 500) {
                         Toast.makeText(mContext,getString(R.string.qrcode_expired),Toast.LENGTH_LONG).show();
                         if (dataItems.size() > 0) {
@@ -3289,6 +3399,7 @@ public class frag_service_antarbank extends Fragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                Toast.makeText(mContext, ""+t.getMessage(), Toast.LENGTH_SHORT).show();
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {

@@ -129,6 +129,7 @@ public class frag_service_antarbank_resi extends Fragment {
             if (getArguments().containsKey("typeTransaction")) {
                 typeTransaction = getArguments().getString("typeTransaction");
             }
+
         }
     }
 
@@ -161,16 +162,24 @@ public class frag_service_antarbank_resi extends Fragment {
         dataDownloadResi = new JSONArray();
         swipe.setRefreshing(true);
 
-        if (dataTrxArr.length() > 1) {
-            imgResume.setVisibility(View.GONE);
-            btnUnduh.setVisibility(View.GONE);
-            rv_item.setVisibility(View.VISIBLE);
-            btnAllUnduh.setVisibility(View.VISIBLE);
-        }
+
+
 
         parseTrxResi();
-        int loopResi = 0;
-        getResumeResi(loopResi);
+
+
+        if(dataSuccessResi.length() > 0){
+            int loopResi = 0;
+            getResumeResi(loopResi);
+        }
+        else {
+            tvTitle.setText(R.string.wording_gagal);
+            tvSubTitle.setText(R.string.transaksi_anda_gagal);
+            swipe.setRefreshing(false);
+            imgResume.setVisibility(View.GONE);
+            btnUnduh.setVisibility(View.GONE);
+        }
+
 
         getFailResi();
 
@@ -179,13 +188,22 @@ public class frag_service_antarbank_resi extends Fragment {
         titleHeadline = titleHeadline.replace("Bank XYZ",getString(R.string.bank_name)).replace("XYZ Bank",getString(R.string.bank_name));
         tvMsgThanks.setText(titleHeadline);
 
+        if (dataTrxArr.length() > 1 && dataSuccessResi.length() > 1) {
+            imgResume.setVisibility(View.GONE);
+            btnUnduh.setVisibility(View.GONE);
+            rv_item.setVisibility(View.VISIBLE);
+            btnAllUnduh.setVisibility(View.VISIBLE);
+        }
+
         swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 dataResiArr = new JSONArray();
                 dataDownloadResi = new JSONArray();
-                int loopResi = 0;
-                getResumeResi(loopResi);
+                if(dataSuccessResi.length() > 0){
+                    int loopResi = 0;
+                    getResumeResi(loopResi);
+                }
             }
         });
 
@@ -275,13 +293,7 @@ public class frag_service_antarbank_resi extends Fragment {
                 }
             }
         } else {
-            //try {
-                /*JSONObject dataTrx = dataValueForm.getJSONObject(0);
-                JSONObject dataParse = dataTrx.getJSONObject("data");*/
                 dataSuccessResi.put(dataValueForm);
-            /*} catch (JSONException e) {
-                throw new RuntimeException(e);
-            }*/
         }
     }
 
@@ -325,15 +337,16 @@ public class frag_service_antarbank_resi extends Fragment {
 
             JSONArray idFormMulti = new JSONArray();
 
-            for (int i = 0; i < dataTrxArr.length(); i++) {
-                JSONObject dataTrx = dataTrxArr.getJSONObject(i);
-                JSONObject dataParse = dataTrx.getJSONObject("data");
-                String idForm = dataParse.getString("idForm");
+            for (int i = 0; i < dataSuccessResi.length(); i++) {
+                JSONObject dataTrx = dataSuccessResi.getJSONObject(i);
+                String idForm = dataTrx.getString("idForm");
                 idFormMulti.put(idForm);
             }
 
             objReq.put("idForm",idFormMulti);
             objReq.put("bahasa",sessions.getLANG());
+
+            Log.e("TAG","objReq = "+objReq);
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), objReq.toString());
 
@@ -360,24 +373,14 @@ public class frag_service_antarbank_resi extends Fragment {
                                 Locale.getDefault()).format(new Date());
 
                         String filename = "Transaction_"+timeStamp+".zip";
-                        //String filename2 = "Transaction_ke-2_"+timeStamp+".zip";
+
 
                         File mediaFile = new File(dir.getPath() + File.separator +
                                 filename);
-                        /*File mediaFile2 = new File(dir.getPath() + File.separator +
-                                filename2);*/
+
 
                         try {
                             Files.asByteSink(mediaFile).write(response.body().bytes());
-
-                            /*FileOutputStream output = new FileOutputStream(mediaFile);
-
-                            byte[] data = new byte[4096];
-                            int count;
-                            while ((count = ins.read(data)) != -1) {
-                                output.write(data, 0, count);
-                            }
-                            output.close();*/
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

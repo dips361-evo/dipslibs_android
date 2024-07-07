@@ -13,6 +13,6 @@ dependencyResolutionManagement {
         }
     }
 }
-rootProject.name = "DiPS361"
+rootProject.name = "DigiOps"
 include ':app'
 include ':liveness'

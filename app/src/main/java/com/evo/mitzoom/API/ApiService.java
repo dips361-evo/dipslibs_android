@@ -510,6 +510,11 @@ public interface ApiService {
                                     @Header("exchangeToken") String exchangeToken);
 
     @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @GET("deposit-type/get-deposito-code-channel")
+    Call<JsonObject> DepositoChannel(@Header("Authorization") String authHeader,
+                                   @Header("exchangeToken") String exchangeToken);
+
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
     @GET("dropdown/list/code/ARO")
     Call<JsonObject> InstruksiARO(@Header("Authorization") String authHeader,
                                    @Header("exchangeToken") String exchangeToken);

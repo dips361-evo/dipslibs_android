@@ -39,25 +39,9 @@ public class AdapterFailResi extends RecyclerView.Adapter<AdapterFailResi.ViewHo
 
             JSONObject dataObj = dataTrx.getJSONObject(position);
 
-            if (dataObj.has("jenislayanan")) {
-                if (!dataObj.isNull("jenislayanan")) {
-                    String typeService = dataObj.getString("jenislayanan");
-                    String labelService = "";
-                    if (typeService.equals("ONLINE") || typeService.equals("RTGS") || typeService.equals("SKN")) {
-                        labelService = loopPos + ". Antar Bank - " + typeService;
-                    } else if (typeService.contains("private")) {
-                        labelService = loopPos + ". Transaksi Sendiri";
-                    } else {
-                        labelService = loopPos + ". Antar Rekening";
-                    }
-
-                    holder.tvTitle.setText(labelService);
-                }
-            }
-
             if (dataObj.has("messageApprove")) {
                 if (!dataObj.isNull("messageApprove")) {
-                    String messageApprove = dataObj.getString("messageApprove");
+                    String messageApprove = loopPos+". "+dataObj.getString("messageApprove");
                     holder.tvMessages.setText(messageApprove);
                 }
             }
@@ -72,13 +56,11 @@ public class AdapterFailResi extends RecyclerView.Adapter<AdapterFailResi.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvTitle;
         private final TextView tvMessages;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             tvMessages = (TextView) itemView.findViewById(R.id.tvMessages);
         }
     }

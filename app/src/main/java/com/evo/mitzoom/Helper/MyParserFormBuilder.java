@@ -1088,6 +1088,7 @@ public class MyParserFormBuilder {
                                 autoText.setLayoutParams(lp);
                                 autoText.setHint(compPlaceholder);
                                 autoText.setThreshold(1);
+
                                 autoText.setEms(10);
                                 autoText.setGravity(Gravity.CENTER_VERTICAL);
                                 //autoText.setSingleLine(true);
@@ -1100,6 +1101,9 @@ public class MyParserFormBuilder {
                                     autoText.setBackground(mContext.getDrawable(R.drawable.bg_textinput_disable));
                                     autoText.setTextColor(mContext.getResources().getColor(R.color.zm_text));
                                 }
+                                int idsAuto = autoText.getId();
+                                String elName2 = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
+                                String keyLabelIndAuto = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
                                 autoText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                                     @Override
                                     public void onFocusChange(View view, boolean hasFocus) {
@@ -1107,6 +1111,10 @@ public class MyParserFormBuilder {
                                             autoText.postDelayed(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    if (keyLabelIndAuto.contains("rekening") && keyLabelIndAuto.contains("penerima")) {
+                                                        int dropDownHeight = 300;
+                                                        autoText.setDropDownHeight(dropDownHeight);
+                                                    }
                                                     autoText.showDropDown();
                                                 }
                                             }, 500);
@@ -1128,10 +1136,6 @@ public class MyParserFormBuilder {
                                     }
                                 });
 
-                                int idsAuto = autoText.getId();
-                                String elName2 = compLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
-                                String keyLabelIndAuto = keyLabel.toLowerCase().replace(" ", "").replace("-", "").replace("/", "").replace(".", "");
-
                                 if (!urlPath.isEmpty()) {
                                     if (keyLabelIndAuto.contains("rekening") && keyLabelIndAuto.contains("penerima")) {
                                         processGetDynamicURLSumberDanaPenerima(autoText, urlPath);
@@ -1148,7 +1152,8 @@ public class MyParserFormBuilder {
                                         dataAuto.add(new FormSpin(idOpt, kodeOpt, labelOpt, labelOpt));
                                     }
 
-                                    ArrayAdapter<FormSpin> adapterAuto = new ArrayAdapter<FormSpin>(mContext, R.layout.support_simple_spinner_dropdown_item, dataAuto);
+
+                                    ArrayAdapter<FormSpin> adapterAuto = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataAuto);
                                     autoText.setAdapter(adapterAuto);
                                 }
 

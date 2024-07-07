@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_dips">DiPS361</string>
-    <string name="welcometext">Welcome\nto DiPS361</string>
+    <string name="app_name_dips">DigiOps</string>
+    <string name="welcometext">Welcome\nto DigiOps</string>
     <string name="desc_welcome">Virtual Customer Support Application\nEasy, safe and convenient</string>
     <string name="wink">Please blink\nto take a picture.</string>
     <string name="msg_error">There is an error</string>
-    <string name="not_using_dips">Sorry You Can\'t Use DiPS361 Services</string>
+    <string name="not_using_dips">Sorry You Can\'t Use DigiOps Services</string>
     <string name="tutup">Close</string>
     <string name="chat">Chat</string>
     <string name="confirm_accept">For mutual convenience, this conversation will be recorded automatically. Do you agree to use Bank Victoria\'s Digital Operations services?</string>
@@ -109,10 +109,10 @@
     <string name="error_field">Field is empty</string>
     <string name="error_image">Please upload your photo</string>
     <string name="alertRTGS">must be filled/selected on Form</string>
-    <string name="incoming_call">Incoming call</string>
-    <string name="incoming_call1">Incoming call .</string>
-    <string name="incoming_call2">Incoming Call . .</string>
-    <string name="incoming_call3">Incoming call . . .</string>
+    <string name="incoming_call">Calling</string>
+    <string name="incoming_call1">Calling .</string>
+    <string name="incoming_call2">Calling . .</string>
+    <string name="incoming_call3">Calling . . .</string>
     <string name="waiting_conf">Please wait, the Join process is in progress</string>
     <string name="isi_form">Field Form</string>
     <string name="konfirmasi_data">Data Confirmation</string>
@@ -375,5 +375,8 @@
     <string name="maintenance_and_administration" translatable="false">Maintenance And Administration</string>
     <string name="blokir_saldo" translatable="false">Block Balance</string>
     <string name="manajemen_investasi" translatable="false">Fund Manager</string>
+    <string name="rejected_transaksi" translatable="false">Rejected Transaction</string>
+    <string name="wording_gagal" translatable="false">Failed!</string>
+    <string name="wording_melebihi_sumber_dana" translatable="false">There are transactions that exceed the source of funds!</string>
     <string name="wording_maintenance" translatable="false">This feature will be ready soon in Digital Operations</string>
 </resources>

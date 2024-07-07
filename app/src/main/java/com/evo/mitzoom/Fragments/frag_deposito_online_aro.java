@@ -41,6 +41,7 @@ import com.evo.mitzoom.Adapter.OnClickUploadImageListener;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.DownloadTaskHelper;
+import com.evo.mitzoom.Model.FormSpin;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
 import com.evo.mitzoom.ui.Alternative.DipsSwafoto;
@@ -51,6 +52,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
@@ -162,7 +165,7 @@ public class frag_deposito_online_aro extends Fragment {
                         } else {
                             DipsSwafoto.showProgress(true);
                         }
-                        processActiveDeposit();
+                        processGetDepositoChannel();
                     } else if (checkedId == R.id.valAsing) {
                         valIDR.setTextColor(ColorStateList.valueOf(mContext.getResources().getColor(R.color.zm_text)));
                         valAsing.setTextColor(ColorStateList.valueOf(mContext.getResources().getColor(R.color.white)));
@@ -214,7 +217,7 @@ public class frag_deposito_online_aro extends Fragment {
             });
 
         } else {
-            processActiveDeposit();
+            processGetDepositoChannel();
         }
 
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -453,7 +456,12 @@ public class frag_deposito_online_aro extends Fragment {
         });
     }
 
-    private void processActiveDeposit() {
+    private void processActiveDeposit(JSONArray arrayDepo) {
+        if (isSessionZoom) {
+            BaseMeetingActivity.showProgress(true);
+        } else {
+            DipsSwafoto.showProgress(true);
+        }
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIService().ActiveDeposit(noCif,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
@@ -467,9 +475,87 @@ public class frag_deposito_online_aro extends Fragment {
 
                 if (response.isSuccessful()) {
                     try {
-                        JSONObject dataBody = new JSONObject(response.body().toString());
-                        dataArr = dataBody.getJSONArray("data");
+
+                        //Loop depo channel
+                        for (int i = 0; i < arrayDepo.length(); i++) {
+                            String depoChannelCode = arrayDepo.getString(i);
+
+                            //Balikan aktif depo
+                            JSONObject dataBody = new JSONObject(response.body().toString());
+                            JSONArray arrayAktifDepoData = dataBody.getJSONArray("data");
+
+                            for (int j = 0; j < arrayAktifDepoData.length(); j++) {
+                                String depoChannelAktifCode = arrayAktifDepoData.getJSONObject(j).getString("depoCode");
+                                if (!depoChannelAktifCode.equals(depoChannelCode)){
+                                    continue;
+                                }
+                                dataArr.put(arrayAktifDepoData.getJSONObject(j));
+                            }
+                        }
+
+                        Log.e("TAG","processActiveDeposit = "+dataArr);
                         setRecyler();
+
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    String msg = "";
+                    if (response.errorBody().toString().isEmpty()) {
+                        String dataS = response.errorBody().toString();
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("message")) {
+                                msg = dataObj.getString("message");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        String dataS = null;
+                        try {
+                            dataS = response.errorBody().string();
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("message")) {
+                                msg = dataObj.getString("message");
+                            }
+                        } catch (IOException | JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void processGetDepositoChannel() {
+        String authAccess = "Bearer "+sessions.getAuthToken();
+        String exchangeToken = sessions.getExchangeToken();
+        Server.getAPIService().DepositoChannel(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                if (response.isSuccessful()) {
+                    try {
+                        JSONObject dataBody = new JSONObject(response.body().toString());
+                        JSONArray arrayBody = dataBody.getJSONArray("data");
+                        processActiveDeposit(arrayBody);
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
