@@ -140,7 +140,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "3" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(199);
                         bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
                         bundle.putString("subLayanan",labelserv);
@@ -156,7 +156,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "4" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(190);
                         bundle.putInt("idGenerateForm",49);
                         bundle.putString("idService", dataList.get(position).getId());
@@ -173,7 +173,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "5" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(250);
                         //bundle.putInt("idGenerateForm",59);
                         bundle.putInt("idGenerateForm",77);
@@ -195,7 +195,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "16" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(200);
                         bundle.putInt("idGenerateForm",56);
                         bundle.putString("idService", dataList.get(position).getId());
@@ -216,7 +216,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "19" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(197);
                         bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
                         bundle.putString("subLayanan",labelserv);
@@ -234,7 +234,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 //                    }
 //                    break;
                 case "33" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(191);
                         bundle.putInt("idGenerateForm",48);
                         bundle.putString("idService", dataList.get(position).getId());
@@ -268,7 +268,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     break;
                 case "192" :
                 case "193" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(210);
                         fragment = new frag_deposito_online_aro();
                         bundle.putString("idService", dataList.get(position).getId());
@@ -278,7 +278,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "194" :
-                    if (!isSessionZoom) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(275);
                         fragment = new frag_deposito_online_aro();
                         bundle.putString("idService", dataList.get(position).getId());
