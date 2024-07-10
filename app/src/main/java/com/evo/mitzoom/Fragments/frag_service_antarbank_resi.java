@@ -111,7 +111,6 @@ public class frag_service_antarbank_resi extends Fragment {
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         dataTrxArr = new JSONArray();
         if (getArguments() != null) {
-            Log.e("TAG","getArguments = "+getArguments());
             if (getArguments().containsKey("formCode")) {
                 formCode = getArguments().getInt("formCode");
             }
@@ -399,8 +398,6 @@ public class frag_service_antarbank_resi extends Fragment {
 
             objReq.put("idForm",idFormMulti);
             objReq.put("bahasa",sessions.getLANG());
-
-            Log.e("TAG","objReq = "+objReq);
 
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), objReq.toString());
 

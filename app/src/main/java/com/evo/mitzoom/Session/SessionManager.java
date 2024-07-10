@@ -287,7 +287,7 @@ public class SessionManager {
         return pref.getString(KEY_REKTABUNGAN,null);
     }
     public String getKEY_IdDips (){
-        return pref.getString(KEY_IdDips,null); ///hKb0hLGc9rPzq784
+        return pref.getString(KEY_IdDips,null);
     }
     public String getSessionIdDips (){
         return pref.getString(KEY_SESSIONID_DIPS,null);

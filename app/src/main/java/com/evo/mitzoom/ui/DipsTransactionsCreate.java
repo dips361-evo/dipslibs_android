@@ -778,14 +778,12 @@ public class DipsTransactionsCreate extends AppCompatActivity {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        Log.e("TAG","Req = "+jsons);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIService().getDynamicUrlPost(urlPath,requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("TAG","RESPONSE = "+response);
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     try {

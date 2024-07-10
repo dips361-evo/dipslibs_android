@@ -103,7 +103,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 
         holder.ads.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            Log.e("TAG","id = "+dataList.get(position).getId());
             switch (dataList.get(position).getId()){
                 case "0" :
                     ConnectionRabbitHttp.mirroringEndpoint(201);
@@ -226,14 +225,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                         getFragmentPage(fragment);
                     }
                     break;
-//                case "20" :
-//                    if (isSessionZoom) {
-//                        bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
-//                        fragment = new frag_assurance();
-//                        fragment.setArguments(bundle);
-//                        getFragmentPageBackStack(fragment);
-//                    }
-//                    break;
                 case "33" :
                     if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(191);

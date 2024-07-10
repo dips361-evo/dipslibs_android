@@ -943,7 +943,6 @@ public class frag_update_data extends Fragment {
                                 }
                             }
                         }
-                        Log.e("TAG processCustGetDataCore","dataObj = "+dataObj);
 
                         sessions.saveNasabah(dataNasabahObj.toString());
 
@@ -1628,7 +1627,6 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchData() {
-        Log.e("TAG Masuk","processMatchData");
         String dataOCR = sessions.getOCR();
         if (dataOCR != null) {
             try {
@@ -2012,7 +2010,6 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchDataFromeKTP() {
-        Log.e("TAG Masuk","processMatchDataFromeKTP");
         String getNasabah = sessions.getNasabah();
         JSONObject dataNasabah = null;
         try {
@@ -2666,7 +2663,6 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchDataFromeSession() {
-        Log.e("TAG Masuk","processMatchDataFromeSession");
         try {
             JSONObject objDataSession = null;
             if (formId == 109) {

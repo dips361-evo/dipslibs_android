@@ -53,7 +53,6 @@ import com.evo.mitzoom.Adapter.AdapterSourceAccount;
 import com.evo.mitzoom.Adapter.OnClickUploadImageListener;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
-import com.evo.mitzoom.Helper.HideSoftKeyboard;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Model.FormSpin;
 import com.evo.mitzoom.Model.ItemModel;
@@ -310,7 +309,6 @@ public class frag_service_antarbank extends Fragment {
         tvAddUpQRCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HideSoftKeyboard.hideSoftKeyboard(getActivity());
                 addUpQRCode();
                 longNumCurrent = 0;
                 minNominal = "0";
@@ -321,7 +319,6 @@ public class frag_service_antarbank extends Fragment {
         btnAddForm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                HideSoftKeyboard.hideSoftKeyboard(getActivity());
                 formId = formIdAwal;
                 longNumCurrent = 0;
                 minNominal = "0";
@@ -333,7 +330,6 @@ public class frag_service_antarbank extends Fragment {
         btnContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HideSoftKeyboard.hideSoftKeyboard(getActivity());
                 if (labelTrx.equals("antarbank")) {
                     if (!jenislayanan.isEmpty()) {
                         int loopInq = 0 ;
@@ -565,37 +561,41 @@ public class frag_service_antarbank extends Fragment {
                     JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
                     String label = dataTrx.getString("label");
                     int idGenerateForm = dataTrx.getInt("idGenerateForm");
-                    if (idGenerateForm != formId && !reCheck) {
-                        formId = idGenerateForm;
-                        selectedpager = true;
-                        if (isSessionZoom) {
-                            BaseMeetingActivity.showProgress(true);
-                        } else {
-                            DipsSwafoto.showProgress(true);
-                        }
-                        dataTrx.put("idGenerateForm",formId);
-                        dataTrxArr.put(selected_position,dataTrx);
-                        processGetForm(formId);
-                    }
-                    else {
-                        String noForm = dataTrx.getString("noForm");
-                        JSONObject dataParse = dataTrx.getJSONObject("data");
-                        int posSelected = selected_position + 1;
-                        String sPosSelected = String.valueOf(posSelected);
-                        tvNoFormulir.setText(noForm);
-                        if (label.equals("non_qr")) {
-                            String cLabel = getResources().getString(R.string.transaksi_non_qr) + " " + sPosSelected;
-                            tvTrxQR.setText(cLabel);
-                        } else {
-                            String cLabel = getResources().getString(R.string.transaksi_qr) + " " + sPosSelected;
-                            tvTrxQR.setText(cLabel);
-                        }
-                        btnContinue.setEnabled(true);
-                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
-                        processNihilDataForm();
-                       processMatchDataForm(dataParse);
 
+                    if (dataTrx.has("label") || dataTrx.has("idGenerateForm")){
+                        if (idGenerateForm != formId && !reCheck) {
+                            formId = idGenerateForm;
+                            selectedpager = true;
+                            if (isSessionZoom) {
+                                BaseMeetingActivity.showProgress(true);
+                            } else {
+                                DipsSwafoto.showProgress(true);
+                            }
+                            dataTrx.put("idGenerateForm",formId);
+                            dataTrxArr.put(selected_position,dataTrx);
+                            processGetForm(formId);
+                        }
+                        else {
+                            String noForm = dataTrx.getString("noForm");
+                            JSONObject dataParse = dataTrx.getJSONObject("data");
+                            int posSelected = selected_position + 1;
+                            String sPosSelected = String.valueOf(posSelected);
+                            tvNoFormulir.setText(noForm);
+                            if (label.equals("non_qr")) {
+                                String cLabel = getResources().getString(R.string.transaksi_non_qr) + " " + sPosSelected;
+                                tvTrxQR.setText(cLabel);
+                            } else {
+                                String cLabel = getResources().getString(R.string.transaksi_qr) + " " + sPosSelected;
+                                tvTrxQR.setText(cLabel);
+                            }
+                            btnContinue.setEnabled(true);
+                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                            processNihilDataForm();
+                            processMatchDataForm(dataParse);
+
+                        }
                     }
+
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
                 }
@@ -929,9 +929,11 @@ public class frag_service_antarbank extends Fragment {
                                         Spinner spin = (Spinner) rl.getChildAt(0);
                                         if (nameDataEl.contains("sumberdana")) {
                                             if (dataSelectedSource.length() > 0) {
-                                                ArrayList<FormSpin> getSpinDataSource = (ArrayList<FormSpin>) dataSelectedSource.get(selected_position);
-                                                AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext, R.layout.dropdown_multiline, getSpinDataSource);
-                                                spin.setAdapter(adapterSourceAcc);
+                                                if (!dataSelectedSource.isNull(0)){
+                                                    ArrayList<FormSpin> getSpinDataSource = (ArrayList<FormSpin>) dataSelectedSource.get(selected_position);
+                                                    AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext, R.layout.dropdown_multiline, getSpinDataSource);
+                                                    spin.setAdapter(adapterSourceAcc);
+                                                }
                                             }
                                         }
                                         spin.setSelection(0);
@@ -3205,7 +3207,6 @@ public class frag_service_antarbank extends Fragment {
             } else {
                 DipsSwafoto.showProgress(true);
             }
-            Log.e("GetBarcodeData","results = "+results);
             getBarcodeDataByURL(results);
         }
     }

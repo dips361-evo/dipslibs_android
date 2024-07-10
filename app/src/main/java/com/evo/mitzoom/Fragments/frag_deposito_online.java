@@ -396,10 +396,6 @@ public class frag_deposito_online extends Fragment {
                                         }
                                     }
 
-
-
-                                    Log.e("TAG","Suku Bunga = "+nomDepo+" | months "+months+" | ratePercent "+rate+" | th = "+th+" | tr = "+tr+" | td = "+td);
-
                                     if (th == 2){
                                         if (tr == 1){
                                             tvTR1TD2.setText(rate);
@@ -546,6 +542,7 @@ public class frag_deposito_online extends Fragment {
                     try {
                         JSONObject dataBody = new JSONObject(response.body().toString());
                         JSONObject dataObj = dataBody.getJSONObject("data");
+
                         if (dataObj.has("depoCode")) {
                             depoCode = dataObj.getString("depoCode");
                         }
@@ -562,6 +559,8 @@ public class frag_deposito_online extends Fragment {
                                 DipsSwafoto.showProgress(false);
                             }
                         }
+
+
                     } catch (JSONException e) {
                         throw new RuntimeException(e);
                     }
@@ -1096,8 +1095,18 @@ public class frag_deposito_online extends Fragment {
                                                             String getNominalRek = valueNominalRek.replaceAll("\\D+","");
                                                             nominalRek = Long.valueOf(getNominalRek) / 100;
 
+
                                                             if (!nominalInput.isEmpty()) {
                                                                 if (longNumCurrent > nominalRek) {
+                                                                    String contexAlert = "";
+                                                                    if (idService.equals("191")) {
+                                                                        if (!noRekSource.isEmpty()){
+                                                                            contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
+                                                                        }
+                                                                    } else {
+                                                                        contexAlert = mContext.getResources().getString(R.string.alert_nominal);
+                                                                    }
+                                                                    tvAlertNominal.setText(contexAlert);
                                                                     tvAlertNominal.setVisibility(View.VISIBLE);
                                                                     btnContinue.setEnabled(false);
                                                                     btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
@@ -1296,7 +1305,9 @@ public class frag_deposito_online extends Fragment {
                                                             if (longNumCurrent > nominalRek) {
                                                                 String contexAlert = "";
                                                                 if (idService.equals("191")) {
-                                                                    contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
+                                                                    if (!noRekSource.isEmpty()){
+                                                                        contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
+                                                                    }
                                                                 } else {
                                                                     contexAlert = mContext.getResources().getString(R.string.alert_nominal);
                                                                 }
@@ -1320,17 +1331,21 @@ public class frag_deposito_online extends Fragment {
                                                                     if (jenisPenduduk.isEmpty()) {
                                                                         jenisPenduduk = "PENDUDUK";
                                                                     }
-                                                                    JSONObject dataObjDepo = new JSONObject();
-                                                                    dataObjDepo.put("months", timePeriode);
-                                                                    dataObjDepo.put("currency", prefixLocal);
-                                                                    dataObjDepo.put("chanel", "IBMB");
-                                                                    dataObjDepo.put("resident", jenisPenduduk);
-                                                                    if (isSessionZoom) {
-                                                                        BaseMeetingActivity.showProgress(true);
-                                                                    } else {
-                                                                        DipsSwafoto.showProgress(true);
+
+                                                                    if (!timePeriode.isEmpty()){
+                                                                        JSONObject dataObjDepo = new JSONObject();
+                                                                        dataObjDepo.put("months", timePeriode);
+                                                                        dataObjDepo.put("currency", prefixLocal);
+                                                                        dataObjDepo.put("chanel", "IBMB");
+                                                                        dataObjDepo.put("resident", jenisPenduduk);
+                                                                        if (isSessionZoom) {
+                                                                            BaseMeetingActivity.showProgress(true);
+                                                                        } else {
+                                                                            DipsSwafoto.showProgress(true);
+                                                                        }
+                                                                        processDepoCode(dataObjDepo);
                                                                     }
-                                                                    processDepoCode(dataObjDepo);
+
                                                                 } else {
                                                                     NumberFormat nf = null;
                                                                     if (sessions.getLANG().equals("id")) {
@@ -1474,14 +1489,12 @@ public class frag_deposito_online extends Fragment {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        Log.e("TAG","processGetDynamicURLSumberDana Req = "+jsons);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIService().getDynamicUrlPost(urlPath,requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("TAG","processGetDynamicURLSumberDana Res = "+response);
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     try {

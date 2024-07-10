@@ -493,7 +493,6 @@ public class frag_deposito_online_aro extends Fragment {
                             }
                         }
 
-                        Log.e("TAG","processActiveDeposit = "+dataArr);
                         setRecyler();
 
                     } catch (JSONException e) {
