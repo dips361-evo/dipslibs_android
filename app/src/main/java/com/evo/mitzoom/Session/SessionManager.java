@@ -272,13 +272,13 @@ public class SessionManager {
     }
 
     public String getLANG() {
-        return pref.getString(KEY_LANG,null); // id
+        return pref.getString(KEY_LANG,null);
     }
     public String getRTGS() {
         return pref.getString(KEY_RTGS,null);
     }
     public String getCIF() {
-        return pref.getString(KEY_CIF,null); ///"39922534"
+        return pref.getString(KEY_CIF,null);
     }
     public String getNasabah() {
         return pref.getString(KEY_NASABAH,null);
@@ -354,7 +354,7 @@ public class SessionManager {
         return pref.getString(KEY_FORMREQMIRRORING,null);
     }
     public String getNoCIF() {
-        return pref.getString(KEY_NOCIF,null); ///39922534
+        return pref.getString(KEY_NOCIF,null);
     }
     public String getNoComplaint() {
         return pref.getString(KEY_noComplaint,null);

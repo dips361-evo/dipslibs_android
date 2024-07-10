@@ -1,14 +1,20 @@
 package com.evo.mitzoom.Fragments;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -104,6 +111,7 @@ public class frag_service_antarbank_resi extends Fragment {
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         dataTrxArr = new JSONArray();
         if (getArguments() != null) {
+            Log.e("TAG","getArguments = "+getArguments());
             if (getArguments().containsKey("formCode")) {
                 formCode = getArguments().getInt("formCode");
             }
@@ -226,7 +234,18 @@ public class frag_service_antarbank_resi extends Fragment {
                     } else {
                         DipsSwafoto.showProgress(true);
                     }
-                    getResumeResilZip();
+                    if (hasStoragePermission(100)){
+                        getResumeResilZip();
+                    }
+                    else {
+                        Toast.makeText(mContext, getString(R.string.storage_permission_not_allowed), Toast.LENGTH_SHORT).show();
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(false);
+                        } else {
+                            DipsSwafoto.showProgress(false);
+                        }
+                    }
+
                     /*for (int i = 0; i < dataDownloadResi.length(); i++) {
                         try {
                             JSONObject dataObj = dataDownloadResi.getJSONObject(i);
@@ -265,11 +284,46 @@ public class frag_service_antarbank_resi extends Fragment {
                     Toast.makeText(mContext,"Tidak dapat mengunduh Formulir",Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if (hasStoragePermission(100)){
+                    processDownloadbyUrl();
+                }
+                else {
+                    Toast.makeText(mContext, getString(R.string.storage_permission_not_allowed), Toast.LENGTH_SHORT).show();
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                }
 
-                processDownloadbyUrl();
             }
         });
 
+    }
+
+    protected boolean hasStoragePermission(int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+            if (!Environment.isExternalStorageManager()) {
+                Intent getpermission = new Intent();
+                getpermission.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(getpermission,requestCode);
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(mContext,Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
+                return false;
+            } else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
     }
 
     private void parseTrxResi() {

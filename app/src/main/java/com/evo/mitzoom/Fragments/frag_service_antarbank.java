@@ -3233,7 +3233,7 @@ public class frag_service_antarbank extends Fragment {
                         JSONObject dataBody1 = dataObjBody.getJSONObject("data");
                         if (dataBody1.has("jenisTransaksi")){
                                 String jenisTransaksi = dataBody1.getString("jenisTransaksi").toLowerCase().trim();
-                            if (formIdAwal == 48 && (jenisTransaksi.equals("rekening-sendiri") || jenisTransaksi.equals("antar-rekening"))){
+                            if (formId == 48 && (jenisTransaksi.equals("rekening-sendiri") || jenisTransaksi.equals("antar-rekening"))){
                                 messageBarcodeFailed();
                                 if (dataItems.size() > 0) {
                                     nameItemQR.remove(dataItems.size() - 1);
@@ -3247,7 +3247,7 @@ public class frag_service_antarbank extends Fragment {
                                 return;
                             }
 
-                            if (formIdAwal == 49 && !jenisTransaksi.equals("antar-rekening")){
+                            if (formId == 49 && !jenisTransaksi.equals("antar-rekening")){
                                 messageBarcodeFailed();
                                 if (dataItems.size() > 0) {
 
@@ -3263,7 +3263,7 @@ public class frag_service_antarbank extends Fragment {
                             }
 
 
-                            if (formIdAwal == 56 && !jenisTransaksi.equals("rekening-sendiri")){
+                            if (formId == 56 && !jenisTransaksi.equals("rekening-sendiri")){
                                 messageBarcodeFailed();
                                 if (dataItems.size() > 0) {
 

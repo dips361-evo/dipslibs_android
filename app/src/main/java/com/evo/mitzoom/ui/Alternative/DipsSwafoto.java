@@ -50,6 +50,7 @@ import androidx.work.WorkRequest;
 
 import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
+import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Fragments.frag_cif_new;
 import com.evo.mitzoom.Fragments.frag_conferee_agree;
 import com.evo.mitzoom.Fragments.frag_ibmb;
@@ -162,6 +163,10 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
 
         previewHolder();
 
+        btnSchedule.setTextColor(DipsSwafoto.this.getResources().getColorStateList(R.color.white));
+        btnSchedule.setBackgroundTintList(DipsSwafoto.this.getResources().getColorStateList(R.color.btnFalse));
+        btnSchedule.setEnabled(false);
+
         Intent intent = getIntent();
         useFacing = intent.getIntExtra(KEY_USE_FACING, Camera.CameraInfo.CAMERA_FACING_FRONT);
         boolean cekformCode = getIntent().hasExtra("formCode");
@@ -229,12 +234,12 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
         sessions.saveScheduledTime(null);
         new AsyncProcess().execute();
 
-        btnSchedule.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopUpSchedule();
-            }
-        });
+//        btnSchedule.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                PopUpSchedule();
+//            }
+//        });
 
         btnEndCall.setOnClickListener(new View.OnClickListener() {
             @Override

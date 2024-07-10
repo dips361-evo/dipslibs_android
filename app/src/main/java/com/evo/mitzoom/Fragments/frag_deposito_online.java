@@ -63,7 +63,10 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -270,12 +273,47 @@ public class frag_deposito_online extends Fragment {
                             int th = 1;
                             int tr = 1;
                             int td = 1;
-                            for (int i = 0; i < dataArr.length(); i++) {
-                                String minNominal = dataArr.getJSONObject(i).getString("minNominal");
-                                String maxNominal = dataArr.getJSONObject(i).getString("maxNominal");
-                                String months = dataArr.getJSONObject(i).getString("months");
-                                double ratePercent = dataArr.getJSONObject(i).getDouble("ratePercent");
 
+                            List<JSONObject> jsonList = new ArrayList<>();
+                            for (int i = 0; i < dataArr.length(); i++) {
+                                jsonList.add(dataArr.getJSONObject(i));
+                            }
+
+                            Collections.sort(jsonList, new Comparator<JSONObject>() {
+                                @Override
+                                public int compare(JSONObject a, JSONObject b) {
+                                    Long minNominalA = 0L;
+                                    Long minNominalB = 0L;
+                                    Integer monthsA = 0;
+                                    Integer monthsB = 0;
+                                    try {
+                                        minNominalA = Long.parseLong(a.getString("minNominal"));
+                                        minNominalB = Long.parseLong(b.getString("minNominal"));
+                                        monthsA = extractMonths(a.getString("months"));
+                                        monthsB = extractMonths(b.getString("months"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    int compareResult = minNominalA.compareTo(minNominalB);
+                                    if (compareResult == 0) {
+                                        compareResult = monthsA.compareTo(monthsB);
+                                    }
+                                    return compareResult;
+                                }
+                            });
+
+                            JSONArray sortedJsonArray = new JSONArray(jsonList);
+
+                            for (int i = 0; i < sortedJsonArray.length(); i++) {
+                                if (i == 0) {
+                                    getMinNominal = sortedJsonArray.getJSONObject(i).getString("minNominal");
+                                }
+                                String minNominal = sortedJsonArray.getJSONObject(i).getString("minNominal");
+                                String maxNominal = sortedJsonArray.getJSONObject(i).getString("maxNominal");
+                                long tempMaxNom = Long.parseLong(maxNominal);
+                                String months = sortedJsonArray.getJSONObject(i).getString("months");
+                                double ratePercent = sortedJsonArray.getJSONObject(i).getDouble("ratePercent");
+                                String nomDepo = "";
                                 String bilangRibu = "Rb";
                                 for(int min=0; min < 3; min++)
                                 {
@@ -320,20 +358,29 @@ public class frag_deposito_online extends Fragment {
                                     }
                                 }
 
-                                String nomDepo = minNominal + " <= " + maxNominal;
 
-                                if (i == 0) {
-                                    getMinNominal = dataArr.getJSONObject(i).getString("minNominal");
+                                if (tempMaxNom > 5000000000L){
+                                    nomDepo = ">"+minNominal;
+                                }
+                                else {
+                                     nomDepo = minNominal + " <= " + maxNominal;
                                 }
 
+
+
+
+
                                 String rate = ratePercent + "%";
+
+
 
                                 if (!months.isEmpty()) {
                                     if (i == 0) {
                                         tvTH1.setText(months);
                                         tvTR1TD.setText(nomDepo);
                                         tvTR1TD1.setText(rate);
-                                    } else {
+                                    }
+                                    else {
                                         String monthsPre = dataArr.getJSONObject(i-1).getString("months");
                                         if (!months.equals(monthsPre)) {
                                             th++;
@@ -349,54 +396,83 @@ public class frag_deposito_online extends Fragment {
                                         }
                                     }
 
-                                    if (th == 1) {
-                                        if (i == 1) {
-                                            tvTR2TD.setText(nomDepo);
-                                            tvTR2TD1.setText(rate);
-                                        } else if (i == 2) {
-                                            tvTR3TD.setText(nomDepo);
-                                            tvTR3TD1.setText(rate);
-                                        } else if (i == 3) {
-                                            tvTR4TD.setText(nomDepo);
-                                            tvTR4TD1.setText(rate);
+
+
+                                    Log.e("TAG","Suku Bunga = "+nomDepo+" | months "+months+" | ratePercent "+rate+" | th = "+th+" | tr = "+tr+" | td = "+td);
+
+                                    if (th == 2){
+                                        if (tr == 1){
+                                            tvTR1TD2.setText(rate);
                                         }
                                     }
-
-                                    if (th == 2) {
-                                        if (tr == 1) {
-                                            tvTR1TD2.setText(rate);
-                                        } else if (tr == 2) {
+                                    else if (th == 3){
+                                        if (tr == 1){
+                                            tvTR1TD3.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 4){
+                                        if (tr == 1){
+                                            tvTR1TD4.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 5){
+                                        if (tr == 1){
+                                            tvTR2TD.setText(nomDepo);
+                                            tvTR2TD1.setText(rate);
+                                        }
+                                        else if (tr ==2){
                                             tvTR2TD2.setText(rate);
-                                        } else if (tr == 3) {
+                                        }
+                                    }
+                                    else if (th == 6){
+                                        if (tr == 1){
+                                            tvTR2TD3.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 7){
+                                        if (tr == 1){
+                                            tvTR2TD4.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 8){
+                                        if (tr == 1){
+                                            tvTR3TD.setText(nomDepo);
+                                            tvTR3TD1.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 9){
+                                        if (tr == 1){
                                             tvTR3TD2.setText(rate);
-                                        } else if (tr == 4) {
+                                        }
+                                        else if (tr == 2){
+                                            tvTR3TD3.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 10){
+                                        if (tr == 1){
+                                            tvTR3TD4.setText(rate);
+                                        }
+                                    }
+                                    else if (th == 11){
+                                      if (tr == 1){
+                                          tvTR4TD.setText(nomDepo);
+                                          tvTR4TD1.setText(rate);
+                                      }
+                                    }
+                                    else if (th == 12){
+                                        if (tr == 1){
                                             tvTR4TD2.setText(rate);
                                         }
                                     }
-
-                                    if (th == 3) {
-                                        if (tr == 1) {
-                                            tvTR1TD3.setText(rate);
-                                        } else if (tr == 2) {
-                                            tvTR2TD3.setText(rate);
-                                        } else if (tr == 3) {
-                                            tvTR3TD3.setText(rate);
-                                        } else if (tr == 4) {
+                                    else if (th == 13){
+                                        if (tr == 1){
                                             tvTR4TD3.setText(rate);
                                         }
-                                    }
-
-                                    if (th == 4) {
-                                        if (tr == 1) {
-                                            tvTR1TD4.setText(rate);
-                                        } else if (tr == 2) {
-                                            tvTR2TD4.setText(rate);
-                                        } else if (tr == 3) {
-                                            tvTR3TD4.setText(rate);
-                                        } else if (tr == 4) {
+                                        else if (tr == 2){
                                             tvTR4TD4.setText(rate);
                                         }
                                     }
+
 
                                     tr++;
                                 }
@@ -442,6 +518,19 @@ public class frag_deposito_online extends Fragment {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // Helper method to extract the number of months from the string
+    private static int extractMonths(String monthsStr) {
+        if (monthsStr != null && !monthsStr.isEmpty()) {
+            String[] parts = monthsStr.split(" ");
+            try {
+                return Integer.parseInt(parts[0]);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
     }
 
     private void processDepoCode(JSONObject dataReq) {
@@ -1253,7 +1342,7 @@ public class frag_deposito_online extends Fragment {
                                                                     BigDecimal parsed = new BigDecimal(cleanString);
                                                                     String nfS = nf.format(parsed);
 
-                                                                    String contexAlert = "Mininum Deposito "+nfS;
+                                                                    String contexAlert = getString(R.string.minimum_deposito_alert)+" "+nfS;
                                                                     tvAlertNominal.setText(contexAlert);
                                                                     tvAlertNominal.setVisibility(View.VISIBLE);
                                                                     btnContinue.setEnabled(false);
@@ -1385,12 +1474,14 @@ public class frag_deposito_online extends Fragment {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+        Log.e("TAG","processGetDynamicURLSumberDana Req = "+jsons);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIService().getDynamicUrlPost(urlPath,requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                Log.e("TAG","processGetDynamicURLSumberDana Res = "+response);
                 if (response.isSuccessful()) {
                     String dataS = response.body().toString();
                     try {
@@ -1405,6 +1496,11 @@ public class frag_deposito_online extends Fragment {
                         JSONArray dataArr = objData.getJSONArray("portotabungan");
                         ArrayList<FormSpin> dataDropDown = new ArrayList<>();
                         String[] sourceAcc = new String[dataArr.length()];
+
+                        String textSelect = getString(R.string.choose_source_fund);
+                        sourceAcc[0] = textSelect;
+
+                        dataDropDown.add(new FormSpin(0,"0",textSelect,textSelect));
                         for (int i = 0; i < dataArr.length(); i++) {
                             int idData = i + 1;
 
