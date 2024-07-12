@@ -21,20 +21,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
-import com.evo.mitzoom.Fragments.frag_assurance;
-import com.evo.mitzoom.Fragments.frag_blokir_saldo;
 import com.evo.mitzoom.Fragments.frag_deposito_online;
 import com.evo.mitzoom.Fragments.frag_deposito_online_aro;
 import com.evo.mitzoom.Fragments.frag_ibmb;
 import com.evo.mitzoom.Fragments.frag_open_account_product;
 import com.evo.mitzoom.Fragments.frag_service_antarbank;
-import com.evo.mitzoom.Fragments.frag_service_antarbank_resi;
 import com.evo.mitzoom.Fragments.frag_service_item_new;
 import com.evo.mitzoom.Fragments.frag_service_new;
 import com.evo.mitzoom.Fragments.frag_update_data;
 import com.evo.mitzoom.Fragments.frag_wealth_management;
 import com.evo.mitzoom.Fragments.frag_wm_transactions;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.Model.ItemModel;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
@@ -67,6 +65,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
     private Fragment fragment;
     private JSONObject dataNasabahObj = null;
 
+
     public ItemServiceGridAdapter(ArrayList<ItemModel> dataList, Context mContext) {
         this.dataList = dataList;
         this.mContext = mContext;
@@ -78,19 +77,22 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
     @Override
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View views = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid, parent, false);
-        sessions = new SessionManager(mContext);
-        idDips = sessions.getKEY_IdDips();
-        String dataNasabah = sessions.getNasabah();
-        if (!dataNasabah.isEmpty()) {
-            try {
+        try {
+            // Set the global exception handler
+            sessions = new SessionManager(mContext);
+            idDips = sessions.getKEY_IdDips();
+            String dataNasabah = sessions.getNasabah();
+            if (!dataNasabah.isEmpty()) {
                 dataNasabahObj = new JSONObject(dataNasabah);
                 if (dataNasabahObj.has("nik")) {
                     NIK = dataNasabahObj.getString("nik");
                 }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+
             }
+        } catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
+
         return new ItemHolder(views);
     }
 

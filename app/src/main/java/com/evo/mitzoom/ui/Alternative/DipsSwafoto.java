@@ -61,6 +61,7 @@ import com.evo.mitzoom.Fragments.frag_service_antarbank;
 import com.evo.mitzoom.Fragments.frag_service_new;
 import com.evo.mitzoom.Fragments.frag_wm_transactions;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.Helper.MyWorker;
 import com.evo.mitzoom.Helper.OutboundServiceNew;
 import com.evo.mitzoom.R;
@@ -138,101 +139,101 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        mContext = this;
-        sessions = new SessionManager(mContext);
-        String lang = sessions.getLANG();
-        setLocale(this,lang);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dips_swafoto);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        try {
+            mContext = this;
+            sessions = new SessionManager(mContext);
+            String lang = sessions.getLANG();
+            setLocale(this,lang);
+            setContentView(R.layout.activity_dips_swafoto);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        sessions.saveRTGS(null);
-        sessions.saveCSID(null);
-        sessions.saveIsSwafoto(false);
-        idDips = sessions.getKEY_IdDips();
-        isCust = sessions.getKEY_iSCust();
-        isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+            sessions.saveRTGS(null);
+            sessions.saveCSID(null);
+            sessions.saveIsSwafoto(false);
+            idDips = sessions.getKEY_IdDips();
+            isCust = sessions.getKEY_iSCust();
+            isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
 
-        CardView cardSurf = findViewById(R.id.cardSurf);
-        preview = findViewById(R.id.mySurface);
-        btnSchedule = findViewById(R.id.btnSchedule);
-        btnEndCall = findViewById(R.id.end_call);
-        rlprogress = findViewById(R.id.rlprogress);
-        tvLoading = (TextView) findViewById(R.id.tvLoading);
+            CardView cardSurf = findViewById(R.id.cardSurf);
+            preview = findViewById(R.id.mySurface);
+            btnSchedule = findViewById(R.id.btnSchedule);
+            btnEndCall = findViewById(R.id.end_call);
+            rlprogress = findViewById(R.id.rlprogress);
+            tvLoading = (TextView) findViewById(R.id.tvLoading);
 
-        previewHolder();
+            previewHolder();
 
-        btnSchedule.setTextColor(DipsSwafoto.this.getResources().getColorStateList(R.color.white));
-        btnSchedule.setBackgroundTintList(DipsSwafoto.this.getResources().getColorStateList(R.color.btnFalse));
-        btnSchedule.setEnabled(false);
+            btnSchedule.setTextColor(DipsSwafoto.this.getResources().getColorStateList(R.color.white));
+            btnSchedule.setBackgroundTintList(DipsSwafoto.this.getResources().getColorStateList(R.color.btnFalse));
+            btnSchedule.setEnabled(false);
 
-        Intent intent = getIntent();
-        useFacing = intent.getIntExtra(KEY_USE_FACING, Camera.CameraInfo.CAMERA_FACING_FRONT);
-        boolean cekformCode = getIntent().hasExtra("formCode");
-        int formCode = 0;
-        boolean ocrKTP = false;
-        if (cekformCode) {
-            formCode = getIntent().getExtras().getInt("formCode");
-            ocrKTP = getIntent().getExtras().getBoolean("OCRKTP");
-        }
+            Intent intent = getIntent();
+            useFacing = intent.getIntExtra(KEY_USE_FACING, Camera.CameraInfo.CAMERA_FACING_FRONT);
+            boolean cekformCode = getIntent().hasExtra("formCode");
+            int formCode = 0;
+            boolean ocrKTP = false;
+            if (cekformCode) {
+                formCode = getIntent().getExtras().getInt("formCode");
+                ocrKTP = getIntent().getExtras().getBoolean("OCRKTP");
+            }
 
-        Fragment fragment = null;
-        if (formCode == 22 || formCode == 4) {
-            Bundle bundle = new Bundle();
-            sessions.saveFormCOde(formCode);
-            fragment = new frag_cif_new();
-            bundle.putBoolean("swaOCR",ocrKTP);
-            fragment.setArguments(bundle);
-        } else {
-            //fragment = new frag_inputdata_new();
+            Fragment fragment = null;
+            if (formCode == 22 || formCode == 4) {
+                Bundle bundle = new Bundle();
+                sessions.saveFormCOde(formCode);
+                fragment = new frag_cif_new();
+                bundle.putBoolean("swaOCR",ocrKTP);
+                fragment.setArguments(bundle);
+            } else {
+                //fragment = new frag_inputdata_new();
             /*if (isSessionZoom) {
                 ConnectionRabbitHttp.mirroringEndpoint(191);
             }*/
             /*Bundle bundle = new Bundle();
             bundle.putInt("idGenerateForm",48);*/
 
-            fragment = new frag_service_new(); ///Rubah disini
+                fragment = new frag_service_new(); ///Rubah disini
 
-            //fragment = new frag_list_produk();
+                //fragment = new frag_list_produk();
             /*Bundle bundle = new Bundle();
             bundle.putInt("idGenerateForm",56);
             bundle.putString("idService", "16");
             bundle.putString("labelserv", "Rekening Sendiri");
             fragment = new frag_service_antarbank();
             fragment.setArguments(bundle);*/
-            sessions.saveIsCust(isCust);
-        }
-        getFragmentPage(fragment);
-
-        View dialogView = getLayoutInflater().inflate(R.layout.layout_dialog_sweet, null);
-        ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
-        TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);
-        TextView tvBodyDialog = dialogView.findViewById(R.id.tvBodyDialog);
-        Button btnCancelDialog = dialogView.findViewById(R.id.btnCancelDialog);
-        Button btnConfirmDialog = dialogView.findViewById(R.id.btnConfirmDialog);
-
-        imgDialog.setImageDrawable(getDrawable(R.drawable.v_dialog_info));
-        tvTitleDialog.setVisibility(View.GONE);
-        tvBodyDialog.setText(getString(R.string.prepare_id_card_glasses));
-        btnCancelDialog.setVisibility(View.GONE);
-
-        SweetAlertDialog sweet = new SweetAlertDialog(mContext,SweetAlertDialog.NORMAL_TYPE);
-        sweet.setCustomView(dialogView);
-        sweet.setCancelable(false);
-        sweet.hideConfirmButton();
-        sweet.show();
-
-        btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sweet.dismissWithAnimation();
+                sessions.saveIsCust(isCust);
             }
-        });
+            getFragmentPage(fragment);
 
-        sessions.saveScheduledDate(null);
-        sessions.saveScheduledTime(null);
-        new AsyncProcess().execute();
+            View dialogView = getLayoutInflater().inflate(R.layout.layout_dialog_sweet, null);
+            ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
+            TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);
+            TextView tvBodyDialog = dialogView.findViewById(R.id.tvBodyDialog);
+            Button btnCancelDialog = dialogView.findViewById(R.id.btnCancelDialog);
+            Button btnConfirmDialog = dialogView.findViewById(R.id.btnConfirmDialog);
+
+            imgDialog.setImageDrawable(getDrawable(R.drawable.v_dialog_info));
+            tvTitleDialog.setVisibility(View.GONE);
+            tvBodyDialog.setText(getString(R.string.prepare_id_card_glasses));
+            btnCancelDialog.setVisibility(View.GONE);
+
+            SweetAlertDialog sweet = new SweetAlertDialog(mContext,SweetAlertDialog.NORMAL_TYPE);
+            sweet.setCustomView(dialogView);
+            sweet.setCancelable(false);
+            sweet.hideConfirmButton();
+            sweet.show();
+
+            btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    sweet.dismissWithAnimation();
+                }
+            });
+
+            sessions.saveScheduledDate(null);
+            sessions.saveScheduledTime(null);
+            new AsyncProcess().execute();
 
 //        btnSchedule.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -241,12 +242,17 @@ public class DipsSwafoto extends AppCompatActivity implements com.wdullaer.mater
 //            }
 //        });
 
-        btnEndCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                OutApps();
-            }
-        });
+            btnEndCall.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    OutApps();
+                }
+            });
+        }
+        catch (Exception exception){
+            GlobalExceptionHandler.getLog(exception);
+        }
+
 
     }
 

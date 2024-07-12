@@ -35,6 +35,7 @@ import com.chaos.view.PinView;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
@@ -116,76 +117,76 @@ public class frag_service_confirm_antarbank extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            mContext = getContext();
+            sessions = new SessionManager(mContext);
+            isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+            idDips = sessions.getKEY_IdDips();
+            ConnectionRabbitHttp.init(mContext);
 
-        mContext = getContext();
-        sessions = new SessionManager(mContext);
-        isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-        idDips = sessions.getKEY_IdDips();
-        ConnectionRabbitHttp.init(mContext);
+            dataTrxArrMirror = new JSONArray();
+            mirrObj = new JSONObject();
 
-        dataTrxArrMirror = new JSONArray();
-        mirrObj = new JSONObject();
-        
-        if (getArguments() != null) {
-            String getidElement = getArguments().getString("idElementMulti");
-            String getdataTrxArr = getArguments().getString("dataTrxArr");
-            if (getArguments().containsKey("messageError")) {
-                messageError = getArguments().getString("messageError");
-            }
-            if (getArguments().containsKey("nameItemQR")) {
-                nameItemQR = getArguments().getStringArrayList("nameItemQR");
-            }
-            if (getArguments().containsKey("labelserv")) {
-                labelserv = getArguments().getString("labelserv");
-            }
-            try {
-                idElementMulti = new JSONArray(getidElement);
-                dataTrxArr = new JSONArray(getdataTrxArr);
-                JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
-                formId = dataTrx.getInt("idGenerateForm");
-
-                if (formId == 48 || formId == 54 || formId == 55) {
-                    labelTrx = "antarbank";
-                } else if (formId == 49) {
-                    labelTrx = "interbank";
-                } else if (formId == 56) {
-                    labelTrx = "privatetransaction";
+            if (getArguments() != null) {
+                String getidElement = getArguments().getString("idElementMulti");
+                String getdataTrxArr = getArguments().getString("dataTrxArr");
+                if (getArguments().containsKey("messageError")) {
+                    messageError = getArguments().getString("messageError");
                 }
-
-                for (int i = 0; i < dataTrxArr.length(); i++) {
-                    JSONObject dataSelect = dataTrxArr.getJSONObject(i);
-                    JSONObject reqFormMirroring = dataSelect.getJSONObject("data");
-                    dataTrxArrMirror.put(i,reqFormMirroring);
+                if (getArguments().containsKey("nameItemQR")) {
+                    nameItemQR = getArguments().getStringArrayList("nameItemQR");
                 }
-                mirrObj.put(labelTrx,dataTrxArrMirror);
-                mirrObj.put("activeIndex",selected_position);
-                ConnectionRabbitHttp.mirroringKey(mirrObj);
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+                if (getArguments().containsKey("labelserv")) {
+                    labelserv = getArguments().getString("labelserv");
+                }
+                try {
+                    idElementMulti = new JSONArray(getidElement);
+                    dataTrxArr = new JSONArray(getdataTrxArr);
+                    JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
+                    formId = dataTrx.getInt("idGenerateForm");
+
+                    if (formId == 48 || formId == 54 || formId == 55) {
+                        labelTrx = "antarbank";
+                    } else if (formId == 49) {
+                        labelTrx = "interbank";
+                    } else if (formId == 56) {
+                        labelTrx = "privatetransaction";
+                    }
+
+                    for (int i = 0; i < dataTrxArr.length(); i++) {
+                        JSONObject dataSelect = dataTrxArr.getJSONObject(i);
+                        JSONObject reqFormMirroring = dataSelect.getJSONObject("data");
+                        dataTrxArrMirror.put(i,reqFormMirroring);
+                    }
+                    mirrObj.put(labelTrx,dataTrxArrMirror);
+                    mirrObj.put("activeIndex",selected_position);
+                    ConnectionRabbitHttp.mirroringKey(mirrObj);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             }
-        }
 
-        if (labelTrx.equals("antarbank")) {
-            ConnectionRabbitHttp.mirroringEndpoint(195);
-        } else if (labelTrx.equals("privatetransaction")) {
-            ConnectionRabbitHttp.mirroringEndpoint(202);
-        } else {
-            ConnectionRabbitHttp.mirroringEndpoint(194);
-        }
+            if (labelTrx.equals("antarbank")) {
+                ConnectionRabbitHttp.mirroringEndpoint(195);
+            } else if (labelTrx.equals("privatetransaction")) {
+                ConnectionRabbitHttp.mirroringEndpoint(202);
+            } else {
+                ConnectionRabbitHttp.mirroringEndpoint(194);
+            }
 
-        String dataNasabah = sessions.getNasabah();
-        if (!dataNasabah.isEmpty()) {
-            try {
-                dataNasabahObj = new JSONObject(dataNasabah);
+            String dataNasabah = sessions.getNasabah();
+            if (!dataNasabah.isEmpty()) {
+                try {
+                    dataNasabahObj = new JSONObject(dataNasabah);
                 /*if (dataNasabahObj.has("namaLengkap")) {
                     namaLengkap = dataNasabahObj.getString("namaLengkap");
                 }
                 if (dataNasabahObj.has("alamat")) {
                     alamat = dataNasabahObj.getString("alamat");
                 }*/
-                if (dataNasabahObj.has("noHp")) {
-                    no_handphone = dataNasabahObj.getString("noHp");
-                }
+                    if (dataNasabahObj.has("noHp")) {
+                        no_handphone = dataNasabahObj.getString("noHp");
+                    }
                 /*if (dataNasabahObj.has("nik")) {
                     nik = dataNasabahObj.getString("nik");
                 }
@@ -193,9 +194,12 @@ public class frag_service_confirm_antarbank extends Fragment {
                     branchCode = dataNasabahObj.getString("branchCode");
                 }*/
 
-            } catch (JSONException e) {
-                e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
+        } catch (NullPointerException e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
@@ -263,106 +267,110 @@ public class frag_service_confirm_antarbank extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        try {
+            if (dataTrxArr.length() == 1) {
+                llDeleteTrx.setVisibility(View.GONE);
+            }
 
-        if (dataTrxArr.length() == 1) {
-            llDeleteTrx.setVisibility(View.GONE);
-        }
+            if (!labelserv.isEmpty()) {
+                tvtitleHead.setText(labelserv);
+            }
 
-        if (!labelserv.isEmpty()) {
-            tvtitleHead.setText(labelserv);
-        }
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isSessionZoom) {
+                        if (labelTrx.equals("antarbank")) {
+                            ConnectionRabbitHttp.mirroringEndpoint(191);
+                        } else if (labelTrx.equals("privatetransaction")) {
+                            ConnectionRabbitHttp.mirroringEndpoint(200);
+                        } else {
+                            ConnectionRabbitHttp.mirroringEndpoint(190);
+                        }
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isSessionZoom) {
-                    if (labelTrx.equals("antarbank")) {
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("reCheck",true);
+                    bundle.putString("labelserv",labelserv);
+                    bundle.putString("dataTrxArr",dataTrxArr.toString());
+                    bundle.putString("idElementMulti",idElementMulti.toString());
+                    bundle.putStringArrayList("nameItemQR",nameItemQR);
+                    sendDataFragment(bundle, new frag_service_antarbank());
+                }
+            });
+
+            llDeleteTrx.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (dataTrxArr.length() > 1) {
+                        dataTrxArr.remove(selected_position);
+                        dataTrxArrMirror.remove(selected_position);
+                        idElementMulti.remove(selected_position);
+                        recyclerViewAdapterPager.notifyItemRemoved(selected_position);
+                        selected_position = dataTrxArr.length() - 1;
+                        setRecylerPager();
+                        recyclerViewAdapterPager.notifyItemChanged(selected_position);
+
+                        try {
+                            mirrObj.put(labelTrx,dataTrxArrMirror);
+                            mirrObj.put("activeIndex",selected_position);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                        ConnectionRabbitHttp.mirroringKey(mirrObj);
+
+                        if (dataTrxArr.length() == 1) {
+                            llDeleteTrx.setVisibility(View.GONE);
+                        }
+                    }
+                }
+            });
+
+            btnReCheck.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(191);
-                    } else if (labelTrx.equals("privatetransaction")) {
-                        ConnectionRabbitHttp.mirroringEndpoint(200);
+                    }
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("reCheck",true);
+                    bundle.putString("dataTrxArr",dataTrxArr.toString());
+                    bundle.putString("idElementMulti",idElementMulti.toString());
+                    bundle.putStringArrayList("nameItemQR",nameItemQR);
+                    sendDataFragment(bundle, new frag_service_antarbank());
+                }
+            });
+
+            btnContinue.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(true);
                     } else {
-                        ConnectionRabbitHttp.mirroringEndpoint(190);
+                        DipsSwafoto.showProgress(true);
                     }
 
+                    processSendOTP();
+                        /*int loopSave = 0;
+                        APISaveForm(loopSave);*/
                 }
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("reCheck",true);
-                bundle.putString("labelserv",labelserv);
-                bundle.putString("dataTrxArr",dataTrxArr.toString());
-                bundle.putString("idElementMulti",idElementMulti.toString());
-                bundle.putStringArrayList("nameItemQR",nameItemQR);
-                sendDataFragment(bundle, new frag_service_antarbank());
+            });
+
+            if (!messageError.isEmpty()) {
+                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                btnContinue.setEnabled(false);
+                PopUp();
+            } else {
+                btnContinue.setEnabled(true);
+                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
             }
-        });
 
-        llDeleteTrx.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dataTrxArr.length() > 1) {
-                    dataTrxArr.remove(selected_position);
-                    dataTrxArrMirror.remove(selected_position);
-                    idElementMulti.remove(selected_position);
-                    recyclerViewAdapterPager.notifyItemRemoved(selected_position);
-                    selected_position = dataTrxArr.length() - 1;
-                    setRecylerPager();
-                    recyclerViewAdapterPager.notifyItemChanged(selected_position);
-
-                    try {
-                        mirrObj.put(labelTrx,dataTrxArrMirror);
-                        mirrObj.put("activeIndex",selected_position);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    ConnectionRabbitHttp.mirroringKey(mirrObj);
-
-                    if (dataTrxArr.length() == 1) {
-                        llDeleteTrx.setVisibility(View.GONE);
-                    }
-                }
-            }
-        });
-
-        btnReCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isSessionZoom) {
-                    ConnectionRabbitHttp.mirroringEndpoint(191);
-                }
-                Bundle bundle = new Bundle();
-                bundle.putBoolean("reCheck",true);
-                bundle.putString("dataTrxArr",dataTrxArr.toString());
-                bundle.putString("idElementMulti",idElementMulti.toString());
-                bundle.putStringArrayList("nameItemQR",nameItemQR);
-                sendDataFragment(bundle, new frag_service_antarbank());
-            }
-        });
-
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(true);
-                } else {
-                    DipsSwafoto.showProgress(true);
-                }
-
-                processSendOTP();
-                /*int loopSave = 0;
-                APISaveForm(loopSave);*/
-            }
-        });
-
-        if (!messageError.isEmpty()) {
-            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
-            btnContinue.setEnabled(false);
-            PopUp();
-        } else {
-            btnContinue.setEnabled(true);
-            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+            setRecyler();
+            setRecylerPager();
+        } catch (NullPointerException e) {
+            GlobalExceptionHandler.getLog(e);
         }
 
-        setRecyler();
-        setRecylerPager();
     }
 
     private void PopUp(){
@@ -482,8 +490,9 @@ public class frag_service_confirm_antarbank extends Fragment {
 
                     }
                 }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+            }
+            catch (Exception e) {
+                GlobalExceptionHandler.getLog(e);
             }
         }
 

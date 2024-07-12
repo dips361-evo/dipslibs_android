@@ -540,6 +540,7 @@ public class frag_deposito_online_aro extends Fragment {
     }
 
     private void processGetDepositoChannel() {
+        dataArr = new JSONArray();
         String authAccess = "Bearer "+sessions.getAuthToken();
         String exchangeToken = sessions.getExchangeToken();
         Server.getAPIService().DepositoChannel(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {

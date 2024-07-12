@@ -40,6 +40,7 @@ import com.evo.mitzoom.Adapter.AdapterFailResi;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.DownloadTaskHelper;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
 import com.evo.mitzoom.ui.Alternative.DipsSwafoto;
@@ -103,40 +104,43 @@ public class frag_service_antarbank_resi extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mContext = getContext();
-        sessions = new SessionManager(mContext);
-        idDips = sessions.getKEY_IdDips();
-
-        isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-        dataTrxArr = new JSONArray();
-        if (getArguments() != null) {
-            if (getArguments().containsKey("formCode")) {
-                formCode = getArguments().getInt("formCode");
-            }
-            if (getArguments().containsKey("dataTrxArr")) {
-                String getdataTrxArr = getArguments().getString("dataTrxArr");
-                try {
-                    dataTrxArr = new JSONArray(getdataTrxArr);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+        try {
+            mContext = getContext();
+            sessions = new SessionManager(mContext);
+            idDips = sessions.getKEY_IdDips();
+            isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+            dataTrxArr = new JSONArray();
+            if (getArguments() != null) {
+                if (getArguments().containsKey("formCode")) {
+                    formCode = getArguments().getInt("formCode");
                 }
-            }
-            if (getArguments().containsKey("dataValueForm")) {
-                String getData = getArguments().getString("dataValueForm");
-                try {
-                    dataValueForm = new JSONObject(getData);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                if (getArguments().containsKey("dataTrxArr")) {
+                    String getdataTrxArr = getArguments().getString("dataTrxArr");
+                    try {
+                        dataTrxArr = new JSONArray(getdataTrxArr);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-            if (getArguments().containsKey("idForm")) {
-                idFormDepo = getArguments().getString("idForm");
-            }
-            if (getArguments().containsKey("typeTransaction")) {
-                typeTransaction = getArguments().getString("typeTransaction");
-            }
+                if (getArguments().containsKey("dataValueForm")) {
+                    String getData = getArguments().getString("dataValueForm");
+                    try {
+                        dataValueForm = new JSONObject(getData);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (getArguments().containsKey("idForm")) {
+                    idFormDepo = getArguments().getString("idForm");
+                }
+                if (getArguments().containsKey("typeTransaction")) {
+                    typeTransaction = getArguments().getString("typeTransaction");
+                }
 
+            }
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
@@ -164,86 +168,72 @@ public class frag_service_antarbank_resi extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        dataResiArr = new JSONArray();
-        dataDownloadResi = new JSONArray();
-        swipe.setRefreshing(true);
-
-
-
-
-        parseTrxResi();
-
-
-        if(dataSuccessResi.length() > 0){
-            int loopResi = 0;
-            getResumeResi(loopResi);
-        }
-        else {
-            tvTitle.setText(R.string.wording_gagal);
-            tvSubTitle.setText(R.string.transaksi_anda_gagal);
-            swipe.setRefreshing(false);
-            imgResume.setVisibility(View.GONE);
-            btnUnduh.setVisibility(View.GONE);
-        }
-
-
-        getFailResi();
-
-        String titleHeadline = getString(R.string.redaksi_form);
-
-        titleHeadline = titleHeadline.replace("Bank XYZ",getString(R.string.bank_name)).replace("XYZ Bank",getString(R.string.bank_name));
-        tvMsgThanks.setText(titleHeadline);
-
-        if (dataTrxArr.length() > 1 && dataSuccessResi.length() > 1) {
-            imgResume.setVisibility(View.GONE);
-            btnUnduh.setVisibility(View.GONE);
-            rv_item.setVisibility(View.VISIBLE);
-            btnAllUnduh.setVisibility(View.VISIBLE);
-        }
-
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                dataResiArr = new JSONArray();
-                dataDownloadResi = new JSONArray();
-                if(dataSuccessResi.length() > 0){
-                    int loopResi = 0;
-                    getResumeResi(loopResi);
+        try {
+            dataResiArr = new JSONArray();
+            dataDownloadResi = new JSONArray();
+            swipe.setRefreshing(true);
+            parseTrxResi();
+            if(dataSuccessResi.length() > 0){
+                int loopResi = 0;
+                getResumeResi(loopResi);
+            }
+            else {
+                tvTitle.setText(R.string.wording_gagal);
+                tvSubTitle.setText(R.string.transaksi_anda_gagal);
+                swipe.setRefreshing(false);
+                imgResume.setVisibility(View.GONE);
+                btnUnduh.setVisibility(View.GONE);
+            }
+            getFailResi();
+            String titleHeadline = getString(R.string.redaksi_form);
+            titleHeadline = titleHeadline.replace("Bank XYZ",getString(R.string.bank_name)).replace("XYZ Bank",getString(R.string.bank_name));
+            tvMsgThanks.setText(titleHeadline);
+            if (dataTrxArr.length() > 1 && dataSuccessResi.length() > 1) {
+                imgResume.setVisibility(View.GONE);
+                btnUnduh.setVisibility(View.GONE);
+                rv_item.setVisibility(View.VISIBLE);
+                btnAllUnduh.setVisibility(View.VISIBLE);
+            }
+            swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    dataResiArr = new JSONArray();
+                    dataDownloadResi = new JSONArray();
+                    if(dataSuccessResi.length() > 0){
+                        int loopResi = 0;
+                        getResumeResi(loopResi);
+                    }
                 }
-            }
-        });
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //RabbitMirroring.MirroringSendEndpoint(14);
-                ConnectionRabbitHttp.mirroringEndpoint(14);
-                sessions.clearCIF();
-                getFragmentPage(new frag_portfolio_new());
-            }
-        });
-
-        btnAllUnduh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (dataResiArr.length() > 1) {
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(true);
-                    } else {
-                        DipsSwafoto.showProgress(true);
-                    }
-                    if (hasStoragePermission(100)){
-                        getResumeResilZip();
-                    }
-                    else {
-                        Toast.makeText(mContext, getString(R.string.storage_permission_not_allowed), Toast.LENGTH_SHORT).show();
+            });
+            btnOK.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //RabbitMirroring.MirroringSendEndpoint(14);
+                    ConnectionRabbitHttp.mirroringEndpoint(14);
+                    sessions.clearCIF();
+                    getFragmentPage(new frag_portfolio_new());
+                }
+            });
+            btnAllUnduh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (dataResiArr.length() > 1) {
                         if (isSessionZoom) {
-                            BaseMeetingActivity.showProgress(false);
+                            BaseMeetingActivity.showProgress(true);
                         } else {
-                            DipsSwafoto.showProgress(false);
+                            DipsSwafoto.showProgress(true);
                         }
-                    }
+                        if (hasStoragePermission(100)){
+                            getResumeResilZip();
+                        }
+                        else {
+                            Toast.makeText(mContext, getString(R.string.storage_permission_not_allowed), Toast.LENGTH_SHORT).show();
+                            if (isSessionZoom) {
+                                BaseMeetingActivity.showProgress(false);
+                            } else {
+                                DipsSwafoto.showProgress(false);
+                            }
+                        }
 
                     /*for (int i = 0; i < dataDownloadResi.length(); i++) {
                         try {
@@ -272,32 +262,34 @@ public class frag_service_antarbank_resi extends Fragment {
                         }
 
                     }*/
-                }
-            }
-        });
-
-        btnUnduh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (bytePhoto == null) {
-                    Toast.makeText(mContext,"Tidak dapat mengunduh Formulir",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (hasStoragePermission(100)){
-                    processDownloadbyUrl();
-                }
-                else {
-                    Toast.makeText(mContext, getString(R.string.storage_permission_not_allowed), Toast.LENGTH_SHORT).show();
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(false);
-                    } else {
-                        DipsSwafoto.showProgress(false);
                     }
                 }
+            });
+            btnUnduh.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (bytePhoto == null) {
+                        Toast.makeText(mContext,"Tidak dapat mengunduh Formulir",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (hasStoragePermission(100)){
+                        processDownloadbyUrl();
+                    }
+                    else {
+                        Toast.makeText(mContext, getString(R.string.storage_permission_not_allowed), Toast.LENGTH_SHORT).show();
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(false);
+                        } else {
+                            DipsSwafoto.showProgress(false);
+                        }
+                    }
 
-            }
-        });
-
+                }
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     protected boolean hasStoragePermission(int requestCode) {
@@ -326,62 +318,84 @@ public class frag_service_antarbank_resi extends Fragment {
     }
 
     private void parseTrxResi() {
-        dataFailResi = new JSONArray();
-        dataSuccessResi = new JSONArray();
-        if (dataValueForm == null) {
-            for (int i = 0; i < dataTrxArr.length(); i++) {
-                try {
-                    JSONObject dataTrx = dataTrxArr.getJSONObject(i);
-                    JSONObject dataParse = dataTrx.getJSONObject("data");
-                    if (dataParse.has("statusApprove")) {
-                        boolean statusApprove = dataParse.getBoolean("statusApprove");
-                        if (!statusApprove) {
-                            dataFailResi.put(dataParse);
-                        } else {
-                            dataSuccessResi.put(dataParse);
+        try {
+            dataFailResi = new JSONArray();
+            dataSuccessResi = new JSONArray();
+            if (dataValueForm == null) {
+                for (int i = 0; i < dataTrxArr.length(); i++) {
+                    try {
+                        JSONObject dataTrx = dataTrxArr.getJSONObject(i);
+                        JSONObject dataParse = dataTrx.getJSONObject("data");
+                        if (dataParse.has("statusApprove")) {
+                            boolean statusApprove = dataParse.getBoolean("statusApprove");
+                            if (!statusApprove) {
+                                dataFailResi.put(dataParse);
+                            } else {
+                                dataSuccessResi.put(dataParse);
+                            }
                         }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
                 }
-            }
-        } else {
+            } else {
                 dataSuccessResi.put(dataValueForm);
+            }
         }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void getFailResi() {
-        if (dataFailResi.length() > 0) {
-            llFailed.setVisibility(View.VISIBLE);
-            setRecyclerFail();
+        try {
+            if (dataFailResi.length() > 0) {
+                llFailed.setVisibility(View.VISIBLE);
+                setRecyclerFail();
+            }
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
     private void setRecyclerFail() {
-        recylerViewLayoutManagerFail = new LinearLayoutManager(getContext());
-        rv_item_fail.setLayoutManager(recylerViewLayoutManagerFail);
-        recyclerViewAdapterFail = new AdapterFailResi(mContext, dataFailResi);
-        rv_item_fail.setAdapter(recyclerViewAdapterFail);
-        recyclerViewAdapterFail.notifyDataSetChanged();
+        try {
+            recylerViewLayoutManagerFail = new LinearLayoutManager(getContext());
+            rv_item_fail.setLayoutManager(recylerViewLayoutManagerFail);
+            recyclerViewAdapterFail = new AdapterFailResi(mContext, dataFailResi);
+            rv_item_fail.setAdapter(recyclerViewAdapterFail);
+            recyclerViewAdapterFail.notifyDataSetChanged();
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     private void processDownloadbyUrl() {
-        ProgressDialog mProgressDialog = new ProgressDialog(mContext);
-        mProgressDialog.setMessage(getString(R.string.label_downloaded));
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setCancelable(true);
+        try {
+            ProgressDialog mProgressDialog = new ProgressDialog(mContext);
+            mProgressDialog.setMessage(getString(R.string.label_downloaded));
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog.setCancelable(true);
 
-        DownloadTaskHelper downloadTaskHelper = new DownloadTaskHelper(mContext, mProgressDialog);
-        downloadTaskHelper.execute(pdfFile,filenames);
+            DownloadTaskHelper downloadTaskHelper = new DownloadTaskHelper(mContext, mProgressDialog);
+            downloadTaskHelper.execute(pdfFile,filenames);
 
-        mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
 
-            @Override
-            public void onCancel(DialogInterface dialog) {
-                downloadTaskHelper.cancel(true); //cancel the task
-            }
-        });
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    downloadTaskHelper.cancel(true); //cancel the task
+                }
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void getResumeResilZip() {
@@ -456,8 +470,8 @@ public class frag_service_antarbank_resi extends Fragment {
                 }
             });
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
@@ -497,42 +511,75 @@ public class frag_service_antarbank_resi extends Fragment {
                 ApiGetResi(loopResi,typeService,idForm);
             }
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
     private void ApiGetResi(int loopResi, String typeService, String idForm) {
-        String authAccess = "Bearer " + sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
+        try {
+            String authAccess = "Bearer " + sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
 
-        Server.getAPIService().getResiTransaction(typeService,typeTransaction,idForm,authAccess,exchangeToken,sessions.getLANG()).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                    String dataS = response.body().toString();
-                    try {
-                        JSONObject dataObj = new JSONObject(dataS);
-                        if (dataObj.has("token")) {
-                            String accessToken = dataObj.getString("token");
-                            String exchangeToken = dataObj.getString("exchange");
-                            sessions.saveAuthToken(accessToken);
-                            sessions.saveExchangeToken(exchangeToken);
-                        }
-
-                        dataObj.put("trxTo",loopResi+1);
-
-                        dataResiArr.put(dataObj);
-
-                        if (dataValueForm == null) {
-
-                            if (loopResi < dataSuccessResi.length() - 1) {
-                                int addLoopResi = loopResi + 1;
-                                getResumeResi(addLoopResi);
+            Server.getAPIService().getResiTransaction(typeService,typeTransaction,idForm,authAccess,exchangeToken,sessions.getLANG()).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful()) {
+                        assert response.body() != null;
+                        String dataS = response.body().toString();
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("token")) {
+                                String accessToken = dataObj.getString("token");
+                                String exchangeToken = dataObj.getString("exchange");
+                                sessions.saveAuthToken(accessToken);
+                                sessions.saveExchangeToken(exchangeToken);
                             }
 
-                            if (loopResi == dataSuccessResi.length()-1) {
+                            dataObj.put("trxTo",loopResi+1);
+
+                            dataResiArr.put(dataObj);
+
+                            if (dataValueForm == null) {
+
+                                if (loopResi < dataSuccessResi.length() - 1) {
+                                    int addLoopResi = loopResi + 1;
+                                    getResumeResi(addLoopResi);
+                                }
+
+                                if (loopResi == dataSuccessResi.length()-1) {
+                                    swipe.setRefreshing(false);
+                                    if (isSessionZoom) {
+                                        BaseMeetingActivity.showProgress(false);
+                                    } else {
+                                        DipsSwafoto.showProgress(false);
+                                    }
+
+                                    if (dataResiArr.length() > 1) {
+                                        btnAllUnduh.setEnabled(true);
+                                        btnAllUnduh.setBackgroundTintList(ContextCompat.getColorStateList(mContext, R.color.zm_button));
+                                        imgResume.setVisibility(View.GONE);
+                                        btnUnduh.setVisibility(View.GONE);
+                                        rv_item.setVisibility(View.VISIBLE);
+                                        btnAllUnduh.setVisibility(View.VISIBLE);
+
+                                        recylerViewLayoutManager = new LinearLayoutManager(getContext());
+                                        rv_item.setLayoutManager(recylerViewLayoutManager);
+                                        recyclerViewAdapter = new AdapterDownloadResi(mContext, dataResiArr, dataDownloadResi);
+                                        rv_item.setAdapter(recyclerViewAdapter);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+
+                                    } else {
+                                        String base64Image = dataResiArr.getJSONObject(0).getJSONObject("data").getString("image");
+                                        pdfFile = dataResiArr.getJSONObject(0).getJSONObject("data").getString("pdf");
+                                        filenames = pdfFile.substring(pdfFile.lastIndexOf("/"));
+                                        bytePhoto = Base64.decode(base64Image, Base64.DEFAULT);
+                                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                                        imgResume.setImageBitmap(bitmap);
+                                    }
+                                }
+
+                            } else {
                                 swipe.setRefreshing(false);
                                 if (isSessionZoom) {
                                     BaseMeetingActivity.showProgress(false);
@@ -540,73 +587,30 @@ public class frag_service_antarbank_resi extends Fragment {
                                     DipsSwafoto.showProgress(false);
                                 }
 
-                                if (dataResiArr.length() > 1) {
-                                    btnAllUnduh.setEnabled(true);
-                                    btnAllUnduh.setBackgroundTintList(ContextCompat.getColorStateList(mContext, R.color.zm_button));
-                                    imgResume.setVisibility(View.GONE);
-                                    btnUnduh.setVisibility(View.GONE);
-                                    rv_item.setVisibility(View.VISIBLE);
-                                    btnAllUnduh.setVisibility(View.VISIBLE);
-
-                                    recylerViewLayoutManager = new LinearLayoutManager(getContext());
-                                    rv_item.setLayoutManager(recylerViewLayoutManager);
-                                    recyclerViewAdapter = new AdapterDownloadResi(mContext, dataResiArr, dataDownloadResi);
-                                    rv_item.setAdapter(recyclerViewAdapter);
-                                    recyclerViewAdapter.notifyDataSetChanged();
-
-                                } else {
-                                    String base64Image = dataResiArr.getJSONObject(0).getJSONObject("data").getString("image");
-                                    pdfFile = dataResiArr.getJSONObject(0).getJSONObject("data").getString("pdf");
-                                    filenames = pdfFile.substring(pdfFile.lastIndexOf("/"));
-                                    bytePhoto = Base64.decode(base64Image, Base64.DEFAULT);
-                                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
-                                    imgResume.setImageBitmap(bitmap);
-                                }
-                            }
-
-                        } else {
-                            swipe.setRefreshing(false);
-                            if (isSessionZoom) {
-                                BaseMeetingActivity.showProgress(false);
-                            } else {
-                                DipsSwafoto.showProgress(false);
-                            }
-
-                            String base64Image = dataResiArr.getJSONObject(0).getJSONObject("data").getString("image");
-                            pdfFile = dataResiArr.getJSONObject(0).getJSONObject("data").getString("pdf");
-                            filenames = pdfFile.substring(pdfFile.lastIndexOf("/"));
-                            bytePhoto = Base64.decode(base64Image, Base64.DEFAULT);
-                            Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
+                                String base64Image = dataResiArr.getJSONObject(0).getJSONObject("data").getString("image");
+                                pdfFile = dataResiArr.getJSONObject(0).getJSONObject("data").getString("pdf");
+                                filenames = pdfFile.substring(pdfFile.lastIndexOf("/"));
+                                bytePhoto = Base64.decode(base64Image, Base64.DEFAULT);
+                                Bitmap bitmap = BitmapFactory.decodeByteArray(bytePhoto, 0, bytePhoto.length);
                             /*LinearLayout.LayoutParams lpImg = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1200);
                             lpImg.setMargins(0,-140,0,-120);
                             imgResume.setLayoutParams(lpImg);
                             imgResume.setScaleX(0.7f);
                             imgResume.setScaleY(0.7f);
                             imgResume.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
-                            imgResume.setImageBitmap(bitmap);
+                                imgResume.setImageBitmap(bitmap);
 
-                            btnUnduh.setText(mContext.getResources().getString(R.string.unduh_resi));
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    swipe.setRefreshing(false);
-                    String msg = "";
-                    if (response.body() != null) {
-                        String dataS = response.body().toString();
-                        try {
-                            JSONObject dataObj = new JSONObject(dataS);
-                            if (dataObj.has("message")) {
-                                msg = dataObj.getString("message");
+                                btnUnduh.setText(mContext.getResources().getString(R.string.unduh_resi));
                             }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     } else {
-                        if (response.errorBody().toString().isEmpty()) {
-                            String dataS = response.errorBody().toString();
+                        swipe.setRefreshing(false);
+                        String msg = "";
+                        if (response.body() != null) {
+                            String dataS = response.body().toString();
                             try {
                                 JSONObject dataObj = new JSONObject(dataS);
                                 if (dataObj.has("message")) {
@@ -616,26 +620,42 @@ public class frag_service_antarbank_resi extends Fragment {
                                 e.printStackTrace();
                             }
                         } else {
-                            String dataS = null;
-                            try {
-                                dataS = response.errorBody().string();
-                                JSONObject dataObj = new JSONObject(dataS);
-                                if (dataObj.has("message")) {
-                                    msg = dataObj.getString("message");
+                            if (response.errorBody().toString().isEmpty()) {
+                                String dataS = response.errorBody().toString();
+                                try {
+                                    JSONObject dataObj = new JSONObject(dataS);
+                                    if (dataObj.has("message")) {
+                                        msg = dataObj.getString("message");
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (IOException | JSONException e) {
-                                e.printStackTrace();
+                            } else {
+                                String dataS = null;
+                                try {
+                                    dataS = response.errorBody().string();
+                                    JSONObject dataObj = new JSONObject(dataS);
+                                    if (dataObj.has("message")) {
+                                        msg = dataObj.getString("message");
+                                    }
+                                } catch (IOException | JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                swipe.setRefreshing(false);
-            }
-        });
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    swipe.setRefreshing(false);
+                }
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void getFragmentPage(Fragment fragment){

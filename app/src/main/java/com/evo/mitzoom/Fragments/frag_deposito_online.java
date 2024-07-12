@@ -1522,6 +1522,9 @@ public class frag_deposito_online extends Fragment {
                             if (prodCode.equals("T21")) {
                                 continue;
                             }
+                            if (prodCode.equals("T10")) {
+                                continue;
+                            }
                             if (dataArr.getJSONObject(i).has("acctStatus")) {
                                 String acctStatus = dataArr.getJSONObject(i).getString("acctStatus");
                                 if (!acctStatus.equals("A")) {

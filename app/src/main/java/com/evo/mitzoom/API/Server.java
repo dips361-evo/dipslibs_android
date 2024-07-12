@@ -37,6 +37,10 @@ public class Server {
         return Client.getClientUnsafe(BASE_URL_API2).create(ApiService.class);
     }
 
+    public static ApiService getAPIServiceLogger() {
+        return Client.getClientUnsafe("https://app.dips361.co.id/gwnode/api/").create(ApiService.class);
+    }
+
     public static ApiService getAPIWAITING_PRODUCT() {
         return Client.getClientUnsafe(BASE_URL_API).create(ApiService.class);
     }

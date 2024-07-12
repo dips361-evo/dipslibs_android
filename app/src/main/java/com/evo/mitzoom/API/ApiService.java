@@ -480,6 +480,11 @@ public interface ApiService {
     Call<JsonObject> RabbHttpMirroringEndpoint(@Body RequestBody body,
                                         @Header("Authorization") String authHeader,
                                         @Header("exchangeToken") String exchangeToken);
+
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @POST("android-log")
+    Call<JsonObject> LoggerAndroid(@Body RequestBody body);
+
     @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
     @POST("mirror-key")
     Call<JsonObject> RabbHttpMirroringKey(@Body RequestBody body,

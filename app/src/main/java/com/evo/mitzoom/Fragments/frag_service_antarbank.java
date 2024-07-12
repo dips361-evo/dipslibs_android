@@ -53,6 +53,7 @@ import com.evo.mitzoom.Adapter.AdapterSourceAccount;
 import com.evo.mitzoom.Adapter.OnClickUploadImageListener;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Model.FormSpin;
 import com.evo.mitzoom.Model.ItemModel;
@@ -185,51 +186,51 @@ public class frag_service_antarbank extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            mContext = getContext();
+            sessions = new SessionManager(mContext);
+            isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+            ConnectionRabbitHttp.init(mContext);
+            if (getArguments() != null) {
+                if (getArguments().containsKey("idGenerateForm")) {
+                    formIdAwal = getArguments().getInt("idGenerateForm");
+                }
+                if (getArguments().containsKey("idService")) {
+                    idService = getArguments().getString("idService");
+                }
+                if (getArguments().containsKey("reCheck")) {
+                    reCheck = getArguments().getBoolean("reCheck");
+                }
+                if (getArguments().containsKey("labelserv")) {
+                    labelserv = getArguments().getString("labelserv");
+                }
+                if (getArguments().containsKey("dataTrxArr")) {
+                    String getdataTrxArr = getArguments().getString("dataTrxArr");
+                    try {
+                        dataTrxArr = new JSONArray(getdataTrxArr);
 
-        mContext = getContext();
-        sessions = new SessionManager(mContext);
-        isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
+                        JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
+                        formIdAwal = dataTrx.getInt("idGenerateForm");
 
-        ConnectionRabbitHttp.init(mContext);
-
-        if (getArguments() != null) {
-            if (getArguments().containsKey("idGenerateForm")) {
-                formIdAwal = getArguments().getInt("idGenerateForm");
-            }
-            if (getArguments().containsKey("idService")) {
-                idService = getArguments().getString("idService");
-            }
-            if (getArguments().containsKey("reCheck")) {
-                reCheck = getArguments().getBoolean("reCheck");
-            }
-            if (getArguments().containsKey("labelserv")) {
-                labelserv = getArguments().getString("labelserv");
-            }
-            if (getArguments().containsKey("dataTrxArr")) {
-                String getdataTrxArr = getArguments().getString("dataTrxArr");
-                try {
-                    dataTrxArr = new JSONArray(getdataTrxArr);
-
-                    JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
-                    formIdAwal = dataTrx.getInt("idGenerateForm");
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (getArguments().containsKey("idElementMulti")) {
+                    String getidElement = getArguments().getString("idElementMulti");
+                    try {
+                        idElementMulti = new JSONArray(getidElement);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (getArguments().containsKey("nameItemQR")) {
+                    nameItemQR = getArguments().getStringArrayList("nameItemQR");
                 }
             }
-            if (getArguments().containsKey("idElementMulti")) {
-                String getidElement = getArguments().getString("idElementMulti");
-                try {
-                    idElementMulti = new JSONArray(getidElement);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (getArguments().containsKey("nameItemQR")) {
-                nameItemQR = getArguments().getStringArrayList("nameItemQR");
-            }
+        } catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
-
     }
 
     @Override
@@ -261,77 +262,94 @@ public class frag_service_antarbank extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        if (!labelserv.isEmpty()) {
-            tvtitleHead.setText(labelserv);
-        }
-
-        formId = formIdAwal;
-        if (formId == 48 || (idService.equals("33") && isSessionZoom)) {
-            labelTrx = "antarbank";
-        } else if (formId == 49 || (idService.equals("4") && isSessionZoom)) {
-            labelTrx = "interbank";
-        } else if (formId == 56 || (idService.equals("16") && isSessionZoom)) {
-            labelTrx = "privatetransaction";
-        }
-
-        if (!reCheck) {
-            dataTrxArr = new JSONArray();
-        }
-        dataTrxArrMirror = new JSONArray();
-        dataSelectedSource = new JSONArray();
-        if (idElementMulti == null) {
-            idElementMulti = new JSONArray();
-        }
-        if (isSessionZoom) {
-            BaseMeetingActivity.showProgress(true);
-        } else {
-            DipsSwafoto.showProgress(true);
-        }
-
-        processGetForm(formId);
-        if (nameItemQR == null) {
-            addData();
-        } else {
-            setNameItemQR();
-        }
-        setRecyler();
-
-
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ConnectionRabbitHttp.mirroringEndpoint(199);
-                getActivity().getSupportFragmentManager().popBackStack("FragService", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        try {
+            if (!labelserv.isEmpty()) {
+                tvtitleHead.setText(labelserv);
             }
-        });
 
-        tvAddUpQRCode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addUpQRCode();
-                longNumCurrent = 0;
-                minNominal = "0";
-                maxNominal = "0";
+            formId = formIdAwal;
+            if (formId == 48 || (idService.equals("33") && isSessionZoom)) {
+                labelTrx = "antarbank";
+            } else if (formId == 49 || (idService.equals("4") && isSessionZoom)) {
+                labelTrx = "interbank";
+            } else if (formId == 56 || (idService.equals("16") && isSessionZoom)) {
+                labelTrx = "privatetransaction";
             }
-        });
 
-        btnAddForm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                formId = formIdAwal;
-                longNumCurrent = 0;
-                minNominal = "0";
-                maxNominal = "0";
-                addItemsPager();
+            if (!reCheck) {
+                dataTrxArr = new JSONArray();
             }
-        });
+            dataTrxArrMirror = new JSONArray();
+            dataSelectedSource = new JSONArray();
+            if (idElementMulti == null) {
+                idElementMulti = new JSONArray();
+            }
+            if (isSessionZoom) {
+                BaseMeetingActivity.showProgress(true);
+            } else {
+                DipsSwafoto.showProgress(true);
+            }
 
-        btnContinue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (labelTrx.equals("antarbank")) {
-                    if (!jenislayanan.isEmpty()) {
+            processGetForm(formId);
+            if (nameItemQR == null) {
+                addData();
+            } else {
+                setNameItemQR();
+            }
+            setRecyler();
+
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ConnectionRabbitHttp.mirroringEndpoint(199);
+                    getActivity().getSupportFragmentManager().popBackStack("FragService", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
+            });
+
+            tvAddUpQRCode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addUpQRCode();
+                    longNumCurrent = 0;
+                    minNominal = "0";
+                    maxNominal = "0";
+                }
+            });
+
+            btnAddForm.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    formId = formIdAwal;
+                    longNumCurrent = 0;
+                    minNominal = "0";
+                    maxNominal = "0";
+                    addItemsPager();
+                }
+            });
+
+            btnContinue.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (labelTrx.equals("antarbank")) {
+                        if (!jenislayanan.isEmpty()) {
+                            int loopInq = 0 ;
+                            if (isSessionZoom) {
+                                BaseMeetingActivity.showProgress(true);
+                            } else {
+                                DipsSwafoto.showProgress(true);
+                            }
+
+                            biayaLayanan = 0;
+
+                            processGetFeeCharge(loopInq);
+
+
+                        } else {
+                            Toast.makeText(mContext,labelTypeServ+" "+getString(R.string.alertRTGS),Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else {
+                        jenislayanan = "interbank";
                         int loopInq = 0 ;
                         if (isSessionZoom) {
                             BaseMeetingActivity.showProgress(true);
@@ -340,140 +358,131 @@ public class frag_service_antarbank extends Fragment {
                         }
 
                         biayaLayanan = 0;
-
                         processGetFeeCharge(loopInq);
-
-
-                    } else {
-                        Toast.makeText(mContext,labelTypeServ+" "+getString(R.string.alertRTGS),Toast.LENGTH_LONG).show();
                     }
-                }
-                else {
-                    jenislayanan = "interbank";
-                    int loopInq = 0 ;
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(true);
-                    } else {
-                        DipsSwafoto.showProgress(true);
-                    }
-
-                    biayaLayanan = 0;
-                    processGetFeeCharge(loopInq);
-                }
                 /*else {
                     processInquiryOnline(loopInq);
                 }*/
-            }
-        });
+                }
+            });
 
-        llDeleteTrx.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    if (dataTrxArr.getJSONObject(selected_position).has("noForm")) {
-                        String noForm = dataTrxArr.getJSONObject(selected_position).getString("noForm");
-                        for (int i = 0; i < noFormQR.size(); i++) {
-                            String getNoForm = noFormQR.get(i);
-                            if (noForm.equals(getNoForm)) {
-                                noFormQR.remove(i);
-                                dataItems.remove(i);
-                                nameItemQR.remove(i);
-                                recyclerViewAdapter.notifyDataSetChanged();
-                                if (dataItems.size() == 0) {
-                                    addData();
-                                    setRecyler();
+            llDeleteTrx.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        if (dataTrxArr.getJSONObject(selected_position).has("noForm")) {
+                            String noForm = dataTrxArr.getJSONObject(selected_position).getString("noForm");
+                            for (int i = 0; i < noFormQR.size(); i++) {
+                                String getNoForm = noFormQR.get(i);
+                                if (noForm.equals(getNoForm)) {
+                                    noFormQR.remove(i);
+                                    dataItems.remove(i);
+                                    nameItemQR.remove(i);
+                                    recyclerViewAdapter.notifyDataSetChanged();
+                                    if (dataItems.size() == 0) {
+                                        addData();
+                                        setRecyler();
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                         }
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-                dataTrxArr.remove(selected_position);
-                dataTrxArrMirror.remove(selected_position);
-                idElementMulti.remove(selected_position);
-                dataSelectedSource.remove(selected_position);
-                recyclerViewAdapterPager.notifyItemRemoved(selected_position);
+                    dataTrxArr.remove(selected_position);
+                    dataTrxArrMirror.remove(selected_position);
+                    idElementMulti.remove(selected_position);
+                    dataSelectedSource.remove(selected_position);
+                    recyclerViewAdapterPager.notifyItemRemoved(selected_position);
 
-                try {
-                    mirrObj.put(labelTrx,dataTrxArrMirror);
-                    mirrObj.put("activeIndex",selected_position);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-                ConnectionRabbitHttp.mirroringKey(mirrObj);
+                    try {
+                        mirrObj.put(labelTrx,dataTrxArrMirror);
+                        mirrObj.put("activeIndex",selected_position);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    ConnectionRabbitHttp.mirroringKey(mirrObj);
 
-                if (dataTrxArr.length() > 0) {
-                    selected_position = dataTrxArr.length() - 1;
-                    setRecylerPager();
-                    recyclerViewAdapterPager.notifyItemChanged(selected_position);
-                } else {
-                    llLayout.setVisibility(View.GONE);
+                    if (dataTrxArr.length() > 0) {
+                        selected_position = dataTrxArr.length() - 1;
+                        setRecylerPager();
+                        recyclerViewAdapterPager.notifyItemChanged(selected_position);
+                    } else {
+                        llLayout.setVisibility(View.GONE);
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     private void addData() {
-        dataItems = new ArrayList<>();
-        noFormQR = new ArrayList<>();
-        nameItemQR = new ArrayList<>();
-        String to = "to";
-        if (sessions.getLANG().equals("id")) {
-            to = "ke";
+        try {
+            dataItems = new ArrayList<>();
+            noFormQR = new ArrayList<>();
+            nameItemQR = new ArrayList<>();
+            String to = "to";
+            if (sessions.getLANG().equals("id")) {
+                to = "ke";
+            }
+            for (int i = 1; i <= 1; i++) {
+                String strQr = getResources().getString(R.string.insertqrcode_trx)+" "+to+" "+i;
+                String ij = String.valueOf(i);
+                dataItems.add(new ItemModel(ij,strQr,0));
+                nameItemQR.add(strQr);
+            }
         }
-        for (int i = 1; i <= 1; i++) {
-            String strQr = getResources().getString(R.string.insertqrcode_trx)+" "+to+" "+i;
-            String ij = String.valueOf(i);
-            dataItems.add(new ItemModel(ij,strQr,0));
-            nameItemQR.add(strQr);
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
         }
+
     }
 
     private boolean validasiNominalSumberdana(JSONArray transactions) {
-        Map<String, Long> accountToTotalAmountMap = new HashMap<>();
+            Map<String, Long> accountToTotalAmountMap = new HashMap<>();
+            try {
+                for (int i = 0; i < transactions.length(); i++) {
+                    JSONObject transaction = transactions.getJSONObject(i).getJSONObject("data");
+                    String fromAccountNumber = transaction.getString("fromAccountNumber");
+                    long amount = Long.parseLong(transaction.getString("amount")) /100;
 
-        try {
-            for (int i = 0; i < transactions.length(); i++) {
-                JSONObject transaction = transactions.getJSONObject(i).getJSONObject("data");
-                String fromAccountNumber = transaction.getString("fromAccountNumber");
-                long amount = Long.parseLong(transaction.getString("amount")) /100;
-
-                // Calculate total amount per fromAccountNumber
-                if (accountToTotalAmountMap.containsKey(fromAccountNumber)) {
-                    long currentTotal = accountToTotalAmountMap.get(fromAccountNumber);
-                    long newTotal = currentTotal + amount;
-                    accountToTotalAmountMap.put(fromAccountNumber, newTotal);
-                } else {
-                    accountToTotalAmountMap.put(fromAccountNumber, amount);
+                    // Calculate total amount per fromAccountNumber
+                    if (accountToTotalAmountMap.containsKey(fromAccountNumber)) {
+                        long currentTotal = accountToTotalAmountMap.get(fromAccountNumber);
+                        long newTotal = currentTotal + amount;
+                        accountToTotalAmountMap.put(fromAccountNumber, newTotal);
+                    } else {
+                        accountToTotalAmountMap.put(fromAccountNumber, amount);
+                    }
                 }
-            }
 
-            // Validate against rekeningsumberdana
-            for (String fromAccount : accountToTotalAmountMap.keySet()) {
-                long totalAmount = accountToTotalAmountMap.get(fromAccount);
+                // Validate against rekeningsumberdana
+                for (String fromAccount : accountToTotalAmountMap.keySet()) {
+                    long totalAmount = accountToTotalAmountMap.get(fromAccount);
 
-                // Retrieve nominaltransaksi from the transaction data
-                JSONObject firstTransaction = transactions.getJSONObject(0);
-                JSONObject data = firstTransaction.getJSONObject("data");
-                String nominalString = data.getString("rekeningsumberdana");
+                    // Retrieve nominaltransaksi from the transaction data
+                    JSONObject firstTransaction = transactions.getJSONObject(0);
+                    JSONObject data = firstTransaction.getJSONObject("data");
+                    String nominalString = data.getString("rekeningsumberdana");
 
-                String nominalValueStr = nominalString.split("Rp\\. ")[1]; // Get the part after "Rp. "
-                long nominalValue = parseNominal(nominalValueStr) / 100;
+                    String nominalValueStr = nominalString.split("Rp\\. ")[1]; // Get the part after "Rp. "
+                    long nominalValue = parseNominal(nominalValueStr) / 100;
 
-                if (totalAmount > nominalValue) {
-                    return false;
+                    if (totalAmount > nominalValue) {
+                        return false;
+                    }
                 }
+
+                // All validations passed
+                return true;
+
             }
-
-            // All validations passed
-            return true;
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return false;
-        }
+            catch (Exception e){
+                GlobalExceptionHandler.getLog(e);
+                return false;
+            }
     }
 
     private long parseNominal(String nominalValueStr) {
@@ -483,56 +492,82 @@ public class frag_service_antarbank extends Fragment {
     }
 
     private void addUpQRCode() {
-        int sizeItem = dataItems.size() + 1;
-        String to = "to";
-        if (sessions.getLANG().equals("id")) {
-            to = "ke";
+        try {
+            int sizeItem = dataItems.size() + 1;
+            String to = "to";
+            if (sessions.getLANG().equals("id")) {
+                to = "ke";
+            }
+            String strQr = getResources().getString(R.string.insertqrcode_trx)+" "+to+" "+sizeItem;
+            String ij = String.valueOf(sizeItem);
+            dataItems.add(new ItemModel(ij,strQr,0));
+            nameItemQR.add(strQr);
+            recyclerViewAdapter.notifyDataSetChanged();
         }
-        String strQr = getResources().getString(R.string.insertqrcode_trx)+" "+to+" "+sizeItem;
-        String ij = String.valueOf(sizeItem);
-        dataItems.add(new ItemModel(ij,strQr,0));
-        nameItemQR.add(strQr);
-        recyclerViewAdapter.notifyDataSetChanged();
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void setNameItemQR() {
-        dataItems = new ArrayList<>();
-        noFormQR = new ArrayList<>();
-        int idQr = 1;
-        for (int i = 0; i < nameItemQR.size(); i++) {
-            String strQr = nameItemQR.get(i);
-            String ij = String.valueOf(idQr);
-            dataItems.add(new ItemModel(ij,strQr,0));
-            idQr++;
+        try {
+            dataItems = new ArrayList<>();
+            noFormQR = new ArrayList<>();
+            int idQr = 1;
+            for (int i = 0; i < nameItemQR.size(); i++) {
+                String strQr = nameItemQR.get(i);
+                String ij = String.valueOf(idQr);
+                dataItems.add(new ItemModel(ij,strQr,0));
+                idQr++;
+            }
+        }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
     private void setRecyler(){
-        recylerViewLayoutManager = new LinearLayoutManager(getContext());
-        rv_item.setLayoutManager(recylerViewLayoutManager);
+        try {
+            recylerViewLayoutManager = new LinearLayoutManager(getContext());
+            rv_item.setLayoutManager(recylerViewLayoutManager);
 
-        recyclerViewAdapter = new AdapterQR(frag_service_antarbank.this, getContext(), dataItems);
-        uploadImageListener = (OnClickUploadImageListener) recyclerViewAdapter;
-        rv_item.setAdapter(recyclerViewAdapter);
-        recyclerViewAdapter.notifyDataSetChanged();
-
+            recyclerViewAdapter = new AdapterQR(frag_service_antarbank.this, getContext(), dataItems);
+            uploadImageListener = (OnClickUploadImageListener) recyclerViewAdapter;
+            rv_item.setAdapter(recyclerViewAdapter);
+            recyclerViewAdapter.notifyDataSetChanged();
+        }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     private void setRecylerPager() {
-        recylerViewLayoutManagerPager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        rv_itemPage.setLayoutManager(recylerViewLayoutManagerPager);
-        recyclerViewAdapterPager = new AdapterNumPager();
-        rv_itemPage.setAdapter(recyclerViewAdapterPager);
-        recyclerViewAdapterPager.notifyItemInserted(dataTrxArr.length() - 1);
+        try {
+            recylerViewLayoutManagerPager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+            rv_itemPage.setLayoutManager(recylerViewLayoutManagerPager);
+            recyclerViewAdapterPager = new AdapterNumPager();
+            rv_itemPage.setAdapter(recyclerViewAdapterPager);
+            recyclerViewAdapterPager.notifyItemInserted(dataTrxArr.length() - 1);
+        }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void addItemsPager() {
-        if (isSessionZoom) {
-            BaseMeetingActivity.showProgress(true);
-        } else {
-            DipsSwafoto.showProgress(true);
+        try {
+            if (isSessionZoom) {
+                BaseMeetingActivity.showProgress(true);
+            } else {
+                DipsSwafoto.showProgress(true);
+            }
+            processGenerateNoForm();
         }
-        processGenerateNoForm();
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     private class AdapterNumPager extends RecyclerView.Adapter<AdapterNumPager.ViewHolder>{
@@ -546,14 +581,13 @@ public class frag_service_antarbank extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull AdapterNumPager.ViewHolder holder, int position) {
-            int pos = position + 1;
-            String sPos = String.valueOf(pos);
-            holder.tvNumPage.setText(sPos);
-            holder.cvPage.setBackgroundTintList(selected_position == position ? AppCompatResources.getColorStateList(mContext,R.color.zm_button) : AppCompatResources.getColorStateList(mContext,R.color.zm_bg_grey));
-            holder.tvNumPage.setTextColor(selected_position == position ? getResources().getColor(R.color.white) : getResources().getColor(R.color.zm_text));
-
-            if (selected_position == position) {
-                try {
+            try {
+                int pos = position + 1;
+                String sPos = String.valueOf(pos);
+                holder.tvNumPage.setText(sPos);
+                holder.cvPage.setBackgroundTintList(selected_position == position ? AppCompatResources.getColorStateList(mContext,R.color.zm_button) : AppCompatResources.getColorStateList(mContext,R.color.zm_bg_grey));
+                holder.tvNumPage.setTextColor(selected_position == position ? getResources().getColor(R.color.white) : getResources().getColor(R.color.zm_text));
+                if (selected_position == position) {
                     tvAlertNominal.setVisibility(View.GONE);
                     if (tvAlertRek != null) {
                         tvAlertRek.setVisibility(View.GONE);
@@ -595,12 +629,11 @@ public class frag_service_antarbank extends Fragment {
 
                         }
                     }
-
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
                 }
             }
-
+            catch (Exception e) {
+                GlobalExceptionHandler.getLog(e);
+            }
         }
 
         @Override
@@ -635,335 +668,345 @@ public class frag_service_antarbank extends Fragment {
     }
 
     private void processMatchDataForm(JSONObject dataParse) {
-        if (isSessionZoom) {
-            BaseMeetingActivity.showProgress(true);
-        } else {
-            DipsSwafoto.showProgress(true);
-        }
-        flagData = 1;
-        int child = llFormBuild.getChildCount();
-        if (child > 0 && idElement.length() > 0) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    for (int i = 0; i < child; i++) {
-                        int idEl = llFormBuild.getChildAt(i).getId();
-                        if (idEl > 0 || idEl < -1) {
-                            for (int j = 0; j < idElement.length(); j++) {
-                                try {
-                                    int idDataEl = idElement.getJSONObject(j).getInt("id");
-                                    String nameDataEl = idElement.getJSONObject(j).getString("name");
-                                    if (idEl == idDataEl) {
-                                        if (llFormBuild.getChildAt(i) instanceof EditText) {
-                                            EditText ed = (EditText) llFormBuild.getChildAt(i);
-                                            if (dataParse.has(nameDataEl)) {
-                                                String valEl = dataParse.getString(nameDataEl);
-                                                ed.setText(valEl);
-                                            }
-                                        }
-                                        else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
-                                            RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
-                                            for(int ch = 0; ch < rg.getChildCount(); ch++) {
-                                                int idRad = rg.getChildAt(ch).getId();
-                                                RadioButton rb = rg.findViewById(idRad);
-                                                String labelRad = rb.getText().toString();
+        try {
+            if (isSessionZoom) {
+                BaseMeetingActivity.showProgress(true);
+            } else {
+                DipsSwafoto.showProgress(true);
+            }
+            flagData = 1;
+            int child = llFormBuild.getChildCount();
+            if (child > 0 && idElement.length() > 0) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (int i = 0; i < child; i++) {
+                            int idEl = llFormBuild.getChildAt(i).getId();
+                            if (idEl > 0 || idEl < -1) {
+                                for (int j = 0; j < idElement.length(); j++) {
+                                    try {
+                                        int idDataEl = idElement.getJSONObject(j).getInt("id");
+                                        String nameDataEl = idElement.getJSONObject(j).getString("name");
+                                        if (idEl == idDataEl) {
+                                            if (llFormBuild.getChildAt(i) instanceof EditText) {
+                                                EditText ed = (EditText) llFormBuild.getChildAt(i);
                                                 if (dataParse.has(nameDataEl)) {
                                                     String valEl = dataParse.getString(nameDataEl);
-                                                    String valRad = valEl.toLowerCase();
+                                                    ed.setText(valEl);
+                                                }
+                                            }
+                                            else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
+                                                RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
+                                                for(int ch = 0; ch < rg.getChildCount(); ch++) {
+                                                    int idRad = rg.getChildAt(ch).getId();
+                                                    RadioButton rb = rg.findViewById(idRad);
+                                                    String labelRad = rb.getText().toString();
+                                                    if (dataParse.has(nameDataEl)) {
+                                                        String valEl = dataParse.getString(nameDataEl);
+                                                        String valRad = valEl.toLowerCase();
 
-                                                    String valKurung = "";
-                                                    int indx = valEl.indexOf("(");
-                                                    if (indx >= 0) {
-                                                        valKurung = valEl.substring(indx);
-                                                    }
-
-                                                    if (valEl.toLowerCase().equals("kawin" + valKurung)) {
-                                                        valRad = "menikah";
-                                                    }
-                                                    if (labelRad.toLowerCase().equals(valRad)) {
-                                                        rb.setChecked(true);
-                                                        break;
-                                                    } else {
-                                                        if (valRad.contains("laki") && valRad.contains("-")) {
-                                                            String[] sp = valRad.split("-");
-                                                            valRad = sp[0] + " - " + sp[1];
-                                                            if (labelRad.toLowerCase().equals(valRad)) {
-                                                                rb.setChecked(true);
-                                                                break;
-                                                            }
+                                                        String valKurung = "";
+                                                        int indx = valEl.indexOf("(");
+                                                        if (indx >= 0) {
+                                                            valKurung = valEl.substring(indx);
                                                         }
-                                                        else if ((valRad.contains("man") || valRad.contains("woman")) && (labelRad.toLowerCase().contains("kelamin") || labelRad.toLowerCase().contains("gender"))) {
+
+                                                        if (valEl.toLowerCase().equals("kawin" + valKurung)) {
+                                                            valRad = "menikah";
+                                                        }
+                                                        if (labelRad.toLowerCase().equals(valRad)) {
                                                             rb.setChecked(true);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        }
-                                        else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
-                                            CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
-                                            String labelCheck = chk.getText().toString();
-                                            if (dataParse.has(nameDataEl)) {
-                                                boolean valEl = dataParse.getBoolean(nameDataEl);
-                                                chk.setChecked(valEl);
-                                            } else if (dataParse.has(labelCheck)) {
-                                                boolean valEl = dataParse.getBoolean(labelCheck);
-                                                chk.setChecked(valEl);
-                                            }
-                                            break;
-                                        }
-                                        else if (llFormBuild.getChildAt(i) instanceof Spinner) {
-                                            Spinner spin = (Spinner) llFormBuild.getChildAt(i);
-                                            if (dataParse.has(nameDataEl)) {
-                                                String valEl = dataParse.getString(nameDataEl);
-                                                for (int ch = 0; ch < spin.getCount(); ch++) {
-                                                    if (spin.getItemAtPosition(ch).toString().equals(valEl)) {
-                                                        spin.setSelection(ch);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        }
-                                        else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
-                                            RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                            if (rl.getChildAt(0) instanceof Spinner) {
-                                                Spinner spin = (Spinner) rl.getChildAt(0);
-                                                if (spin.getCount() == 0) {
-                                                    break;
-                                                }
-                                                if (dataParse.has(nameDataEl)) {
-                                                    String valEl = dataParse.getString(nameDataEl);
-                                                    if (nameDataEl.contains("sumber") && nameDataEl.contains("dana")) {
-                                                        String noRekSelected = "";
-                                                        if (valEl.contains("/")) {
-                                                            String[] sp = valEl.split(" / ");
-                                                            String no_nama_Rek = sp[1].trim();
-                                                            if (no_nama_Rek.indexOf("-") > 0) {
-                                                                String[] sp2 = no_nama_Rek.split("-");
-                                                                noRekSelected = sp2[0].trim();
+                                                            break;
+                                                        } else {
+                                                            if (valRad.contains("laki") && valRad.contains("-")) {
+                                                                String[] sp = valRad.split("-");
+                                                                valRad = sp[0] + " - " + sp[1];
+                                                                if (labelRad.toLowerCase().equals(valRad)) {
+                                                                    rb.setChecked(true);
+                                                                    break;
+                                                                }
+                                                            }
+                                                            else if ((valRad.contains("man") || valRad.contains("woman")) && (labelRad.toLowerCase().contains("kelamin") || labelRad.toLowerCase().contains("gender"))) {
+                                                                rb.setChecked(true);
                                                             }
                                                         }
-                                                        for (int ch = 0; ch < spin.getCount(); ch++) {
-                                                            String dataAcc = spin.getItemAtPosition(ch).toString();
-                                                            String noRek = "";
-                                                            if (dataAcc.contains("\n")) {
-                                                                String[] sp = dataAcc.split("\n");
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                            else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                                CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
+                                                String labelCheck = chk.getText().toString();
+                                                if (dataParse.has(nameDataEl)) {
+                                                    boolean valEl = dataParse.getBoolean(nameDataEl);
+                                                    chk.setChecked(valEl);
+                                                } else if (dataParse.has(labelCheck)) {
+                                                    boolean valEl = dataParse.getBoolean(labelCheck);
+                                                    chk.setChecked(valEl);
+                                                }
+                                                break;
+                                            }
+                                            else if (llFormBuild.getChildAt(i) instanceof Spinner) {
+                                                Spinner spin = (Spinner) llFormBuild.getChildAt(i);
+                                                if (dataParse.has(nameDataEl)) {
+                                                    String valEl = dataParse.getString(nameDataEl);
+                                                    for (int ch = 0; ch < spin.getCount(); ch++) {
+                                                        if (spin.getItemAtPosition(ch).toString().equals(valEl)) {
+                                                            spin.setSelection(ch);
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                            else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                                RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                                if (rl.getChildAt(0) instanceof Spinner) {
+                                                    Spinner spin = (Spinner) rl.getChildAt(0);
+                                                    if (spin.getCount() == 0) {
+                                                        break;
+                                                    }
+                                                    if (dataParse.has(nameDataEl)) {
+                                                        String valEl = dataParse.getString(nameDataEl);
+                                                        if (nameDataEl.contains("sumber") && nameDataEl.contains("dana")) {
+                                                            String noRekSelected = "";
+                                                            if (valEl.contains("/")) {
+                                                                String[] sp = valEl.split(" / ");
                                                                 String no_nama_Rek = sp[1].trim();
                                                                 if (no_nama_Rek.indexOf("-") > 0) {
                                                                     String[] sp2 = no_nama_Rek.split("-");
-                                                                    noRek = sp2[0].trim();
+                                                                    noRekSelected = sp2[0].trim();
                                                                 }
                                                             }
-                                                            if (!noRek.isEmpty()) {
-                                                                if (noRek.equals(noRekSelected)) {
+                                                            for (int ch = 0; ch < spin.getCount(); ch++) {
+                                                                String dataAcc = spin.getItemAtPosition(ch).toString();
+                                                                String noRek = "";
+                                                                if (dataAcc.contains("\n")) {
+                                                                    String[] sp = dataAcc.split("\n");
+                                                                    String no_nama_Rek = sp[1].trim();
+                                                                    if (no_nama_Rek.indexOf("-") > 0) {
+                                                                        String[] sp2 = no_nama_Rek.split("-");
+                                                                        noRek = sp2[0].trim();
+                                                                    }
+                                                                }
+                                                                if (!noRek.isEmpty()) {
+                                                                    if (noRek.equals(noRekSelected)) {
+                                                                        spin.setSelection(ch);
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                        } else {
+                                                            for (int ch = 0; ch < spin.getCount(); ch++) {
+                                                                String dataSpin = spin.getItemAtPosition(ch).toString();
+                                                                if (dataSpin.equals(valEl)) {
                                                                     spin.setSelection(ch);
                                                                     break;
                                                                 }
                                                             }
                                                         }
-                                                    } else {
-                                                        for (int ch = 0; ch < spin.getCount(); ch++) {
-                                                            String dataSpin = spin.getItemAtPosition(ch).toString();
-                                                            if (dataSpin.equals(valEl)) {
-                                                                spin.setSelection(ch);
-                                                                break;
-                                                            }
+
+                                                    }
+                                                    break;
+                                                } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                                    AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
+                                                    if (dataParse.has(nameDataEl)) {
+                                                        String valEl = dataParse.getString(nameDataEl);
+
+                                                        ListAdapter listA = autoText.getAdapter();
+                                                        if (listA == null) {
+                                                            break;
                                                         }
-                                                    }
-
-                                                }
-                                                break;
-                                            } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
-                                                AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
-                                                if (dataParse.has(nameDataEl)) {
-                                                    String valEl = dataParse.getString(nameDataEl);
-
-                                                    ListAdapter listA = autoText.getAdapter();
-                                                    if (listA == null) {
-                                                        break;
-                                                    }
-                                                    if (listA.getCount() == 0) {
-                                                        break;
-                                                    }
-                                                    ArrayList<FormSpin> dataDropDown = new ArrayList<>();
-                                                    for (int ch = 0; ch < listA.getCount(); ch++) {
-                                                        String getItem = listA.getItem(ch).toString();
-                                                        if (listA.getCount() > 1) {
-                                                            Object item = listA.getItem(ch);
-                                                            if (item instanceof FormSpin) {
-                                                                FormSpin dataSpin = (FormSpin) item;
-                                                                int idData = dataSpin.getId();
-                                                                String nameInd = dataSpin.getName();
-                                                                String valCode = dataSpin.getCode();
-                                                                String nameEng = dataSpin.getNameEng();
-                                                                dataDropDown.add(new FormSpin(idData, valCode, nameInd, nameEng));
-                                                            }
+                                                        if (listA.getCount() == 0) {
+                                                            break;
                                                         }
-                                                        if (!valEl.isEmpty()) {
-                                                            if (valEl.equals(getItem) || getItem.contains(valEl)) {
-                                                                int beneficiaryCode = 0;
-                                                                String swiftCode = "";
-                                                                String cityCode = "";
-
+                                                        ArrayList<FormSpin> dataDropDown = new ArrayList<>();
+                                                        for (int ch = 0; ch < listA.getCount(); ch++) {
+                                                            String getItem = listA.getItem(ch).toString();
+                                                            if (listA.getCount() > 1) {
                                                                 Object item = listA.getItem(ch);
                                                                 if (item instanceof FormSpin) {
                                                                     FormSpin dataSpin = (FormSpin) item;
                                                                     int idData = dataSpin.getId();
-                                                                    String results = dataSpin.getName();
+                                                                    String nameInd = dataSpin.getName();
                                                                     String valCode = dataSpin.getCode();
-                                                                    autoText.setText(results);
-
-                                                                    objEl.put(nameDataEl, results);
-
-                                                                    if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                        beneficiaryCode = idData;
-                                                                        if (valCode.contains("|")) {
-                                                                            String[] sp = valCode.split("\\|");
-                                                                            swiftCode = sp[0].trim();
-                                                                            cityCode = sp[1].trim();
-                                                                        }
-                                                                    } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                                                        if (results.contains("\n")) {
-                                                                            String[] sp = results.split("\n");
-                                                                            String noRek = sp[1].trim();
-                                                                            objEl.put(nameDataEl, noRek);
-                                                                            destAccount = noRek;
-                                                                        }
-                                                                    }
+                                                                    String nameEng = dataSpin.getNameEng();
+                                                                    dataDropDown.add(new FormSpin(idData, valCode, nameInd, nameEng));
                                                                 }
+                                                            }
+                                                            if (!valEl.isEmpty()) {
+                                                                if (valEl.equals(getItem) || getItem.contains(valEl)) {
+                                                                    int beneficiaryCode = 0;
+                                                                    String swiftCode = "";
+                                                                    String cityCode = "";
 
-                                                                if (!flagHitAPIForm) {
-                                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                                    getObjTrx.put("data", reqFormMirroring);
+                                                                    Object item = listA.getItem(ch);
+                                                                    if (item instanceof FormSpin) {
+                                                                        FormSpin dataSpin = (FormSpin) item;
+                                                                        int idData = dataSpin.getId();
+                                                                        String results = dataSpin.getName();
+                                                                        String valCode = dataSpin.getCode();
+                                                                        autoText.setText(results);
 
-                                                                    if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                        getObjTrx.put("beneficiaryCode", beneficiaryCode);
-                                                                        getObjTrx.put("swiftCode", swiftCode);
-                                                                        getObjTrx.put("cityCode", cityCode);
+                                                                        objEl.put(nameDataEl, results);
+
+                                                                        if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                            beneficiaryCode = idData;
+                                                                            if (valCode.contains("|")) {
+                                                                                String[] sp = valCode.split("\\|");
+                                                                                swiftCode = sp[0].trim();
+                                                                                cityCode = sp[1].trim();
+                                                                            }
+                                                                        } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                                                            if (results.contains("\n")) {
+                                                                                String[] sp = results.split("\n");
+                                                                                String noRek = sp[1].trim();
+                                                                                objEl.put(nameDataEl, noRek);
+                                                                                destAccount = noRek;
+                                                                            }
+                                                                        }
                                                                     }
-                                                                    dataTrxArr.put(selected_position, getObjTrx);
-                                                                    if (isSessionZoom) {
-                                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                                        mirrObj.put("activeIndex", selected_position);
-                                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
+
+                                                                    if (!flagHitAPIForm) {
+                                                                        JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                                        JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                                        getObjTrx.put("data", reqFormMirroring);
+
+                                                                        if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                            getObjTrx.put("beneficiaryCode", beneficiaryCode);
+                                                                            getObjTrx.put("swiftCode", swiftCode);
+                                                                            getObjTrx.put("cityCode", cityCode);
+                                                                        }
+                                                                        dataTrxArr.put(selected_position, getObjTrx);
+                                                                        if (isSessionZoom) {
+                                                                            dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                                            mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                                            mirrObj.put("activeIndex", selected_position);
+                                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                                        }
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    }
 
-                                                    if (listA.getCount() > 1) {
-                                                        ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
-                                                        autoText.setAdapter(adapter2);
+                                                        if (listA.getCount() > 1) {
+                                                            ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
+                                                            autoText.setAdapter(adapter2);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
+                                                LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
+                                                if (ll.findViewById(R.id.llCurrency) != null) {
+                                                    EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
+                                                    if (dataParse.has(nameDataEl)) {
+                                                        String valEl = dataParse.getString(nameDataEl);
+                                                        tvContentCurr.setText(valEl);
                                                     }
                                                 }
                                             }
                                         }
-                                        else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
-                                            LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
-                                            if (ll.findViewById(R.id.llCurrency) != null) {
-                                                EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
-                                                if (dataParse.has(nameDataEl)) {
-                                                    String valEl = dataParse.getString(nameDataEl);
-                                                    tvContentCurr.setText(valEl);
-                                                }
-                                            }
-                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
                                 }
                             }
                         }
+                        flagHitAPIForm = false;
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(false);
+                        } else {
+                            DipsSwafoto.showProgress(false);
+                        }
                     }
-                    flagHitAPIForm = false;
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(false);
-                    } else {
-                        DipsSwafoto.showProgress(false);
-                    }
-                }
-            },10000);
+                },10000);
+            }
         }
-
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     private void processNihilDataForm() {
-        flagData = 2;
-        int child = llFormBuild.getChildCount();
-        if (child > 0 && idElement.length() > 0) {
-            for (int i = 0; i < child; i++) {
-                int idEl = llFormBuild.getChildAt(i).getId();
-                if (idEl > 0 || idEl < -1) {
-                    for (int j = 0; j < idElement.length(); j++) {
-                        try {
-                            int idDataEl = idElement.getJSONObject(j).getInt("id");
-                            String nameDataEl = idElement.getJSONObject(j).getString("name");
-                            if (idEl == idDataEl) {
-                                if (llFormBuild.getChildAt(i) instanceof EditText) {
-                                    EditText ed = (EditText) llFormBuild.getChildAt(i);
-                                    ed.setText("");
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
-                                    RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
-                                    rg.clearCheck();
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
-                                    CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
-                                    chk.setChecked(false);
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof Spinner) {
-                                    Spinner spin = (Spinner) llFormBuild.getChildAt(i);
-                                    spin.setSelection(0);
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
-                                    RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                    if (rl.getChildAt(0) instanceof Spinner) {
+        try {
+            flagData = 2;
+            int child = llFormBuild.getChildCount();
+            if (child > 0 && idElement.length() > 0) {
+                for (int i = 0; i < child; i++) {
+                    int idEl = llFormBuild.getChildAt(i).getId();
+                    if (idEl > 0 || idEl < -1) {
+                        for (int j = 0; j < idElement.length(); j++) {
+                            try {
+                                int idDataEl = idElement.getJSONObject(j).getInt("id");
+                                String nameDataEl = idElement.getJSONObject(j).getString("name");
+                                if (idEl == idDataEl) {
+                                    if (llFormBuild.getChildAt(i) instanceof EditText) {
+                                        EditText ed = (EditText) llFormBuild.getChildAt(i);
+                                        ed.setText("");
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
+                                        RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
+                                        rg.clearCheck();
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                        CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
+                                        chk.setChecked(false);
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof Spinner) {
+                                        Spinner spin = (Spinner) llFormBuild.getChildAt(i);
+                                        spin.setSelection(0);
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                        RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                        if (rl.getChildAt(0) instanceof Spinner) {
 
-                                        Spinner spin = (Spinner) rl.getChildAt(0);
-                                        if (nameDataEl.contains("sumberdana")) {
-                                            if (dataSelectedSource.length() > 0) {
-                                                if (!dataSelectedSource.isNull(0)){
-                                                    ArrayList<FormSpin> getSpinDataSource = (ArrayList<FormSpin>) dataSelectedSource.get(selected_position);
-                                                    AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext, R.layout.dropdown_multiline, getSpinDataSource);
-                                                    spin.setAdapter(adapterSourceAcc);
+                                            Spinner spin = (Spinner) rl.getChildAt(0);
+                                            if (nameDataEl.contains("sumberdana")) {
+                                                if (dataSelectedSource.length() > 0) {
+                                                    if (!dataSelectedSource.isNull(0)){
+                                                        ArrayList<FormSpin> getSpinDataSource = (ArrayList<FormSpin>) dataSelectedSource.get(selected_position);
+                                                        AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext, R.layout.dropdown_multiline, getSpinDataSource);
+                                                        spin.setAdapter(adapterSourceAcc);
+                                                    }
                                                 }
                                             }
+                                            spin.setSelection(0);
+                                            spin.setSelection(0);
                                         }
-                                        spin.setSelection(0);
-                                        spin.setSelection(0);
+                                        else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                            AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
+                                            autoText.setText("");
+                                        }
                                     }
-                                    else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
-                                        AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
+                                    else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
+                                        AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
                                         autoText.setText("");
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
+                                        LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
+                                        if (ll.findViewById(R.id.llCurrency) != null) {
+                                            EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
+                                            tvContentCurr.setText("");
+                                        }
                                     }
                                 }
-                                else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
-                                    AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
-                                    autoText.setText("");
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
-                                    LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
-                                    if (ll.findViewById(R.id.llCurrency) != null) {
-                                        EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
-                                        tvContentCurr.setText("");
-                                    }
-                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
                     }
                 }
             }
         }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private static int randomId() {
@@ -1142,10 +1185,10 @@ public class frag_service_antarbank extends Fragment {
                 }
             });
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
         }
-
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
     }
 
     private void ParseDataTrxNew(int loopInq) {
@@ -1265,8 +1308,9 @@ public class frag_service_antarbank extends Fragment {
             dataTrxArrNew = new JSONArray(dataTrxArr.toString());
             dataTrxArrNew.put(loopInq, dataTrx);
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
@@ -1511,800 +1555,824 @@ public class frag_service_antarbank extends Fragment {
                 }
             }
         }
-        catch (JSONException e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
     private void processGenerateNoForm() {
-        flagHitAPIForm = false;
-        String authAccess = "Bearer "+sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
-
-        Server.getAPIService().GenerateNoForm(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful()) {
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(false);
-                    } else {
-                        DipsSwafoto.showProgress(false);
-                    }
-                    flagData = 0;
-                    String dataS = response.body().toString();
-                    try {
-                        JSONObject dataObj = new JSONObject(dataS);
-                        String dataNoForm = dataObj.getString("data");
-                        String noForm = dataNoForm;
-                        String retrievalReferenceNumber = "";
-                        String systemTraceAuditNumber = "";
-                        destAccount = "";
-                        noRekSource = "";
-
-                        if (noForm.contains("{")) {
-                            JSONObject parseForm = new JSONObject(dataNoForm);
-                            noForm = parseForm.getString("noForm");
-                            retrievalReferenceNumber = parseForm.getString("retrievalReferenceNumber");
-                            systemTraceAuditNumber = parseForm.getString("systemTraceAuditNumber");
-                        }
-                        dataObjTrx = new JSONObject();
-                        try {
-                            dataObjTrx.put("label","non_qr");
-                            dataObjTrx.put("idGenerateForm",formId);
-                            dataObjTrx.put("noForm",noForm);
-                            dataObjTrx.put("systemTraceAuditNumber",systemTraceAuditNumber);
-                            dataObjTrx.put("retrievalReferenceNumber",retrievalReferenceNumber);
-                            dataObjTrx.put("data",objElAwal);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                        dataTrxArr.put(dataObjTrx);
-                        parsingDataSourceAccount();
-                        processNihilDataForm();
-                        setRecylerPager();
-                        if (llLayout.getVisibility() != View.VISIBLE) {
-                            llLayout.setVisibility(View.VISIBLE);
-                        }
-
-                        selected_position = dataTrxArr.length() - 1;
-                        recyclerViewAdapterPager.notifyItemChanged(selected_position);
-                        nestedScroll.fullScroll(View.FOCUS_UP);
-                        try {
-                            idElementMulti.put(selected_position,idElement);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                        if (isSessionZoom) {
-                            JSONObject reqFormMirroring = dataReqFormMirroring();
-                            dataTrxArrMirror.put(selected_position,reqFormMirroring);
-                            mirrObj.put(labelTrx,dataTrxArrMirror);
-                            mirrObj.put("activeIndex",selected_position);
-                            ConnectionRabbitHttp.mirroringKey(mirrObj);
-                        }
-                        btnContinue.setEnabled(true);
-                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(false);
-                } else {
-                    DipsSwafoto.showProgress(false);
-                }
-            }
-        });
-    }
-
-    private void parsingDataSourceAccount() {
-        ArrayList<FormSpin> dataNewDropDownSource = new ArrayList<>();
-        String textSelect = getString(R.string.choose_source_fund);
-        dataNewDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
-        for (int i = 0; i < dataDropDownSource.size(); i++) {
-            int id = dataDropDownSource.get(i).getId();
-            String code = dataDropDownSource.get(i).getCode();
-            String dataAcc = dataDropDownSource.get(i).getName();
-            String dataAccEng = dataDropDownSource.get(i).getNameEng();
-            if (dataAcc.contains("\n")) {
-                String[] sp = dataAcc.split("\n");
-                String prodName = sp[0].trim();
-                String no_nama_Rek = sp[1].trim();
-                String noRek = "";
-                String accountName = "";
-                if (no_nama_Rek.indexOf("-") > 0) {
-                    String[] sp2 = no_nama_Rek.split("-");
-                    noRek = sp2[0].trim();
-                    accountName = sp2[1].trim();
-                }
-
-                String nominal = "";
-                String labelIdn = "";
-                if (sp.length > 2) {
-                    nominal = sp[2];
-                }
-
-                if (noRek.equals(noRekSource)) {
-                    String[] sp3 = nominal.split(" ");
-                    String acctCur = sp3[0].trim();
-                    long sub = nominalRek - longNumCurrent;
-
-                    Double d = Double.valueOf(sub);
-                    NumberFormat formatter = null;
-                    if (sessions.getLANG().equals("id")) {
-                        formatter = NumberFormat.getInstance(new Locale("id", "ID"));
-                    } else {
-                        formatter = NumberFormat.getInstance(new Locale("en", "US"));
-                    }
-                    formatter.setMinimumFractionDigits(2);
-                    String formattedNumber = formatter.format(d);
-
-                    labelIdn = prodName+"\n"+noRek+" - "+accountName+"\n"+acctCur+" "+formattedNumber;
-                    dataNewDropDownSource.add(new FormSpin(id,code,labelIdn,labelIdn));
-                } else {
-                    labelIdn = prodName+"\n"+noRek+" - "+accountName+"\n"+nominal;
-                    dataNewDropDownSource.add(new FormSpin(id,code,labelIdn,labelIdn));
-                }
-            }
-        }
-
         try {
-            dataSelectedSource.put(selected_position,dataDropDownSource);
-            int selected_position_Next = dataTrxArr.length() - 1;
-            dataSelectedSource.put(selected_position_Next,dataNewDropDownSource);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-    }
+            flagHitAPIForm = false;
+            String authAccess = "Bearer "+sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
 
-    private void processGetForm(int formId) {
-        flagHitAPIForm = true;
-        String authAccess = "Bearer "+sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
-        Server.getAPIWAITING_PRODUCT().getFormBuilder(formId,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
-                if (response.isSuccessful()) {
-                    String dataS = response.body().toString();
-                    llFormBuild.removeAllViewsInLayout();
-                    llFormBuild.setVisibility(View.VISIBLE);
-                    try {
-                        JSONObject dataObj = new JSONObject(dataS);
-                        if (dataObj.has("token")) {
-                            String accessToken = dataObj.getString("token");
-                            String exchangeToken = dataObj.getString("exchange");
-                            sessions.saveAuthToken(accessToken);
-                            sessions.saveExchangeToken(exchangeToken);
+            Server.getAPIService().GenerateNoForm(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful()) {
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(false);
+                        } else {
+                            DipsSwafoto.showProgress(false);
                         }
-                        JSONObject dataObjForm = dataObj.getJSONObject("data");
-                        String dataForm = dataObjForm.getString("data");
-                        new MyParserFormBuilder(mContext, dataForm, llFormBuild,idService);
-                        idElement = MyParserFormBuilder.getForm();
-
-                        idElementMulti.put(selected_position,idElement);
-
-                        tvAlertRek = (TextView) llFormBuild.findViewById(R.id.et_rek_penerima);
-                        tvAlertNominal = (TextView) llFormBuild.findViewById(R.id.et_nominal);
-                        processValidationActionForm();
-                        SelectedPagerMatch();
-                        ReCheckMatch();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                else {
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(false);
-                    } else {
-                        DipsSwafoto.showProgress(false);
-                    }
-                    String msg = "";
-                    if (response.body() != null) {
+                        flagData = 0;
                         String dataS = response.body().toString();
                         try {
                             JSONObject dataObj = new JSONObject(dataS);
-                            msg = dataObj.getString("message");
-                            Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                            String dataNoForm = dataObj.getString("data");
+                            String noForm = dataNoForm;
+                            String retrievalReferenceNumber = "";
+                            String systemTraceAuditNumber = "";
+                            destAccount = "";
+                            noRekSource = "";
+
+                            if (noForm.contains("{")) {
+                                JSONObject parseForm = new JSONObject(dataNoForm);
+                                noForm = parseForm.getString("noForm");
+                                retrievalReferenceNumber = parseForm.getString("retrievalReferenceNumber");
+                                systemTraceAuditNumber = parseForm.getString("systemTraceAuditNumber");
+                            }
+                            dataObjTrx = new JSONObject();
+                            try {
+                                dataObjTrx.put("label","non_qr");
+                                dataObjTrx.put("idGenerateForm",formId);
+                                dataObjTrx.put("noForm",noForm);
+                                dataObjTrx.put("systemTraceAuditNumber",systemTraceAuditNumber);
+                                dataObjTrx.put("retrievalReferenceNumber",retrievalReferenceNumber);
+                                dataObjTrx.put("data",objElAwal);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                            dataTrxArr.put(dataObjTrx);
+                            parsingDataSourceAccount();
+                            processNihilDataForm();
+                            setRecylerPager();
+                            if (llLayout.getVisibility() != View.VISIBLE) {
+                                llLayout.setVisibility(View.VISIBLE);
+                            }
+
+                            selected_position = dataTrxArr.length() - 1;
+                            recyclerViewAdapterPager.notifyItemChanged(selected_position);
+                            nestedScroll.fullScroll(View.FOCUS_UP);
+                            try {
+                                idElementMulti.put(selected_position,idElement);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                            if (isSessionZoom) {
+                                JSONObject reqFormMirroring = dataReqFormMirroring();
+                                dataTrxArrMirror.put(selected_position,reqFormMirroring);
+                                mirrObj.put(labelTrx,dataTrxArrMirror);
+                                mirrObj.put("activeIndex",selected_position);
+                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+                            }
+                            btnContinue.setEnabled(true);
+                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                }
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
+    }
+
+    private void parsingDataSourceAccount() {
+        try {
+            ArrayList<FormSpin> dataNewDropDownSource = new ArrayList<>();
+            String textSelect = getString(R.string.choose_source_fund);
+            dataNewDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
+            for (int i = 0; i < dataDropDownSource.size(); i++) {
+                int id = dataDropDownSource.get(i).getId();
+                String code = dataDropDownSource.get(i).getCode();
+                String dataAcc = dataDropDownSource.get(i).getName();
+                String dataAccEng = dataDropDownSource.get(i).getNameEng();
+                if (dataAcc.contains("\n")) {
+                    String[] sp = dataAcc.split("\n");
+                    String prodName = sp[0].trim();
+                    String no_nama_Rek = sp[1].trim();
+                    String noRek = "";
+                    String accountName = "";
+                    if (no_nama_Rek.indexOf("-") > 0) {
+                        String[] sp2 = no_nama_Rek.split("-");
+                        noRek = sp2[0].trim();
+                        accountName = sp2[1].trim();
+                    }
+
+                    String nominal = "";
+                    String labelIdn = "";
+                    if (sp.length > 2) {
+                        nominal = sp[2];
+                    }
+
+                    if (noRek.equals(noRekSource)) {
+                        String[] sp3 = nominal.split(" ");
+                        String acctCur = sp3[0].trim();
+                        long sub = nominalRek - longNumCurrent;
+
+                        Double d = Double.valueOf(sub);
+                        NumberFormat formatter = null;
+                        if (sessions.getLANG().equals("id")) {
+                            formatter = NumberFormat.getInstance(new Locale("id", "ID"));
+                        } else {
+                            formatter = NumberFormat.getInstance(new Locale("en", "US"));
+                        }
+                        formatter.setMinimumFractionDigits(2);
+                        String formattedNumber = formatter.format(d);
+
+                        labelIdn = prodName+"\n"+noRek+" - "+accountName+"\n"+acctCur+" "+formattedNumber;
+                        dataNewDropDownSource.add(new FormSpin(id,code,labelIdn,labelIdn));
+                    } else {
+                        labelIdn = prodName+"\n"+noRek+" - "+accountName+"\n"+nominal;
+                        dataNewDropDownSource.add(new FormSpin(id,code,labelIdn,labelIdn));
+                    }
+                }
+            }
+            dataSelectedSource.put(selected_position,dataDropDownSource);
+            int selected_position_Next = dataTrxArr.length() - 1;
+            dataSelectedSource.put(selected_position_Next,dataNewDropDownSource);
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
+    }
+
+    private void processGetForm(int formId) {
+        try {
+            flagHitAPIForm = true;
+            String authAccess = "Bearer "+sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
+            Server.getAPIWAITING_PRODUCT().getFormBuilder(formId,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                    if (response.isSuccessful()) {
+                        String dataS = response.body().toString();
+                        llFormBuild.removeAllViewsInLayout();
+                        llFormBuild.setVisibility(View.VISIBLE);
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("token")) {
+                                String accessToken = dataObj.getString("token");
+                                String exchangeToken = dataObj.getString("exchange");
+                                sessions.saveAuthToken(accessToken);
+                                sessions.saveExchangeToken(exchangeToken);
+                            }
+                            JSONObject dataObjForm = dataObj.getJSONObject("data");
+                            String dataForm = dataObjForm.getString("data");
+                            new MyParserFormBuilder(mContext, dataForm, llFormBuild,idService);
+                            idElement = MyParserFormBuilder.getForm();
+
+                            idElementMulti.put(selected_position,idElement);
+
+                            tvAlertRek = (TextView) llFormBuild.findViewById(R.id.et_rek_penerima);
+                            tvAlertNominal = (TextView) llFormBuild.findViewById(R.id.et_nominal);
+                            processValidationActionForm();
+                            SelectedPagerMatch();
+                            ReCheckMatch();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
                     else {
-                        if (response.errorBody().toString().isEmpty()) {
-                            String dataS = response.errorBody().toString();
-                            try {
-                                JSONObject dataObj = new JSONObject(dataS);
-                                msg = dataObj.getString("message");
-                                Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(false);
                         } else {
-                            String dataS = null;
+                            DipsSwafoto.showProgress(false);
+                        }
+                        String msg = "";
+                        if (response.body() != null) {
+                            String dataS = response.body().toString();
                             try {
-                                dataS = response.errorBody().string();
                                 JSONObject dataObj = new JSONObject(dataS);
                                 msg = dataObj.getString("message");
                                 Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
-                            } catch (IOException | JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(false);
-                } else {
-                    DipsSwafoto.showProgress(false);
-                }
-            }
-        });
-    }
-
-    private void ReCheckMatch() {
-        if (reCheck) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (isSessionZoom) {
-                        BaseMeetingActivity.showProgress(true);
-                    } else {
-                        DipsSwafoto.showProgress(true);
-                    }
-                    ((Activity) mContext).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isSessionZoom) {
-                                BaseMeetingActivity.showProgress(false);
-                            } else {
-                                DipsSwafoto.showProgress(false);
-                            }
-                            setRecylerPager();
-                            if (llLayout.getVisibility() != View.VISIBLE) {
-                                llLayout.setVisibility(View.VISIBLE);
-                            }
-                            selected_position = dataTrxArr.length() - 1;
-                            processNihilDataForm();
-                            recyclerViewAdapterPager.notifyItemChanged(selected_position);
-                            try {
-                                if (isSessionZoom) {
-                                    JSONObject reqFormMirroring = dataReqFormMirroring();
-                                    dataTrxArrMirror.put(selected_position,reqFormMirroring);
-                                    mirrObj.put(labelTrx,dataTrxArrMirror);
-                                    mirrObj.put("activeIndex",selected_position);
-                                    ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            btnContinue.setEnabled(true);
-                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                         }
-                    });
+                        else {
+                            if (response.errorBody().toString().isEmpty()) {
+                                String dataS = response.errorBody().toString();
+                                try {
+                                    JSONObject dataObj = new JSONObject(dataS);
+                                    msg = dataObj.getString("message");
+                                    Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                String dataS = null;
+                                try {
+                                    dataS = response.errorBody().string();
+                                    JSONObject dataObj = new JSONObject(dataS);
+                                    msg = dataObj.getString("message");
+                                    Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
+                                } catch (IOException | JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
                 }
-            },5000);
-        }
-    }
 
-    private void SelectedPagerMatch() {
-        if (selectedpager) {
-            new Handler().postDelayed(new Runnable() {
                 @Override
-                public void run() {
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Toast.makeText(mContext, t.getMessage(), Toast.LENGTH_SHORT).show();
                     if (isSessionZoom) {
                         BaseMeetingActivity.showProgress(false);
                     } else {
                         DipsSwafoto.showProgress(false);
                     }
-                    ((Activity) mContext).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
-                                String label = dataTrx.getString("label");
-                                String noForm = dataTrx.getString("noForm");
-                                JSONObject dataParse = dataTrx.getJSONObject("data");
-                                int posSelected = selected_position + 1;
-                                String sPosSelected = String.valueOf(posSelected);
-                                tvNoFormulir.setText(noForm);
-                                if (label.equals("non_qr")) {
-                                    String cLabel = getResources().getString(R.string.transaksi_non_qr) + " " + sPosSelected;
-                                    tvTrxQR.setText(cLabel);
-                                } else {
-                                    String cLabel = getResources().getString(R.string.transaksi_qr) + " " + sPosSelected;
-                                    tvTrxQR.setText(cLabel);
-                                }
-                                processNihilDataForm();
-                                processMatchDataForm(dataParse);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
                 }
-            },5000);
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
+    }
+
+    private void ReCheckMatch() {
+        try {
+            if (reCheck) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(true);
+                        } else {
+                            DipsSwafoto.showProgress(true);
+                        }
+                        ((Activity) mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (isSessionZoom) {
+                                    BaseMeetingActivity.showProgress(false);
+                                } else {
+                                    DipsSwafoto.showProgress(false);
+                                }
+                                setRecylerPager();
+                                if (llLayout.getVisibility() != View.VISIBLE) {
+                                    llLayout.setVisibility(View.VISIBLE);
+                                }
+                                selected_position = dataTrxArr.length() - 1;
+                                processNihilDataForm();
+                                recyclerViewAdapterPager.notifyItemChanged(selected_position);
+                                try {
+                                    if (isSessionZoom) {
+                                        JSONObject reqFormMirroring = dataReqFormMirroring();
+                                        dataTrxArrMirror.put(selected_position,reqFormMirroring);
+                                        mirrObj.put(labelTrx,dataTrxArrMirror);
+                                        mirrObj.put("activeIndex",selected_position);
+                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                btnContinue.setEnabled(true);
+                                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                            }
+                        });
+                    }
+                },5000);
+            }
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+    }
+
+    private void SelectedPagerMatch() {
+        try {
+            if (selectedpager) {
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isSessionZoom) {
+                            BaseMeetingActivity.showProgress(false);
+                        } else {
+                            DipsSwafoto.showProgress(false);
+                        }
+                        ((Activity) mContext).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
+                                    String label = dataTrx.getString("label");
+                                    String noForm = dataTrx.getString("noForm");
+                                    JSONObject dataParse = dataTrx.getJSONObject("data");
+                                    int posSelected = selected_position + 1;
+                                    String sPosSelected = String.valueOf(posSelected);
+                                    tvNoFormulir.setText(noForm);
+                                    if (label.equals("non_qr")) {
+                                        String cLabel = getResources().getString(R.string.transaksi_non_qr) + " " + sPosSelected;
+                                        tvTrxQR.setText(cLabel);
+                                    } else {
+                                        String cLabel = getResources().getString(R.string.transaksi_qr) + " " + sPosSelected;
+                                        tvTrxQR.setText(cLabel);
+                                    }
+                                    processNihilDataForm();
+                                    processMatchDataForm(dataParse);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                },5000);
+            }
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
     private void processValidationActionForm() {
-        int child = llFormBuild.getChildCount();
-        if (child > 0 && idElement.length() > 0) {
-            for (int i = 0; i < child; i++) {
-                int idEl = llFormBuild.getChildAt(i).getId();
-                if (idEl > 0 || idEl < -1) {
-                    for (int j = 0; j < idElement.length(); j++) {
-                        try {
-                            int idDataEl = idElement.getJSONObject(j).getInt("id");
-                            String nameDataEl = idElement.getJSONObject(j).getString("name");
-                            String CompoName = idElement.getJSONObject(j).getString("CompoName");
-                            String CompoLabel = idElement.getJSONObject(j).getString("label");
-                            String valKurung = "";
+        try {
+            int child = llFormBuild.getChildCount();
+            if (child > 0 && idElement.length() > 0) {
+                for (int i = 0; i < child; i++) {
+                    int idEl = llFormBuild.getChildAt(i).getId();
+                    if (idEl > 0 || idEl < -1) {
+                        for (int j = 0; j < idElement.length(); j++) {
+                            try {
+                                int idDataEl = idElement.getJSONObject(j).getInt("id");
+                                String nameDataEl = idElement.getJSONObject(j).getString("name");
+                                String CompoName = idElement.getJSONObject(j).getString("CompoName");
+                                String CompoLabel = idElement.getJSONObject(j).getString("label");
+                                String valKurung = "";
 
-                            int indx = nameDataEl.indexOf("(");
-                            if (indx >= 0) {
-                                valKurung = nameDataEl.substring(indx);
-                            }
-                            String urlPath = "";
-                            if (idElement.getJSONObject(j).has("url")) {
-                                urlPath = idElement.getJSONObject(j).getString("url");
-                            }
-                            if (idEl == idDataEl) {
-                                objElAwal.put(nameDataEl,"");
-                                String finalValKurung = valKurung;
-                                if (llFormBuild.getChildAt(i) instanceof EditText) {
-                                    EditText ed = (EditText) llFormBuild.getChildAt(i);
-                                    if (nameDataEl.contains("nama") && nameDataEl.contains("penerima")) {
-                                        edNamePenerima = ed;
-                                    }
-                                    if (!CompoName.equals("datalist")) {
-                                        ed.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                                            @Override
-                                            public void onFocusChange(View view, boolean b) {
-
-                                            }
-                                        });
-                                    }
-                                    ed.addTextChangedListener(new TextWatcher() {
-                                        @Override
-                                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                            if (nameDataEl.equals("npwp"+finalValKurung)) {
-                                                lasLenChar = charSequence.length();
-                                            }
+                                int indx = nameDataEl.indexOf("(");
+                                if (indx >= 0) {
+                                    valKurung = nameDataEl.substring(indx);
+                                }
+                                String urlPath = "";
+                                if (idElement.getJSONObject(j).has("url")) {
+                                    urlPath = idElement.getJSONObject(j).getString("url");
+                                }
+                                if (idEl == idDataEl) {
+                                    objElAwal.put(nameDataEl,"");
+                                    String finalValKurung = valKurung;
+                                    if (llFormBuild.getChildAt(i) instanceof EditText) {
+                                        EditText ed = (EditText) llFormBuild.getChildAt(i);
+                                        if (nameDataEl.contains("nama") && nameDataEl.contains("penerima")) {
+                                            edNamePenerima = ed;
                                         }
+                                        if (!CompoName.equals("datalist")) {
+                                            ed.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                                                @Override
+                                                public void onFocusChange(View view, boolean b) {
 
-                                        @Override
-                                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                                            if (flagData != 2) {
-                                                String inputData = charSequence.toString();
-                                                if (!noRekSource.isEmpty()) {
                                                 }
+                                            });
+                                        }
+                                        ed.addTextChangedListener(new TextWatcher() {
+                                            @Override
+                                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                                if (nameDataEl.equals("npwp"+finalValKurung)) {
+                                                    lasLenChar = charSequence.length();
+                                                }
+                                            }
 
-                                                if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                                    tvAlertRek.setVisibility(View.GONE);
-                                                    if (!inputData.isEmpty()) {
-                                                        if (inputData.length() >= 5) {
-                                                            if (inputData.startsWith("0888") || inputData.startsWith("8888")) {
-                                                                btnContinue.setEnabled(false);
-                                                                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                            @Override
+                                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                                                if (flagData != 2) {
+                                                    String inputData = charSequence.toString();
+                                                    if (!noRekSource.isEmpty()) {
+                                                    }
+
+                                                    if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                                        tvAlertRek.setVisibility(View.GONE);
+                                                        if (!inputData.isEmpty()) {
+                                                            if (inputData.length() >= 5) {
+                                                                if (inputData.startsWith("0888") || inputData.startsWith("8888")) {
+                                                                    btnContinue.setEnabled(false);
+                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                                                } else {
+                                                                    btnContinue.setEnabled(true);
+                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                                                                }
                                                             } else {
                                                                 btnContinue.setEnabled(true);
                                                                 btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                                                             }
-                                                        } else {
-                                                            btnContinue.setEnabled(true);
-                                                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                                                         }
                                                     }
-                                                }
 
-                                                try {
-                                                    objEl.put(nameDataEl, charSequence);
-                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                    getObjTrx.put("data", reqFormMirroring);
-                                                    dataTrxArr.put(selected_position, getObjTrx);
-                                                    if (isSessionZoom) {
-                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                        mirrObj.put("activeIndex",selected_position);
-                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void afterTextChanged(Editable s) {
-                                            if (nameDataEl.equals("npwp"+finalValKurung)) {
-                                                ed.removeTextChangedListener(this);
-                                                backSpaceChar = lasLenChar > s.length();
-                                                if (!backSpaceChar) {
-                                                    String dataNPWP = s.toString();
-                                                    String formatNPWP = "";
-                                                    if (dataNPWP.length() == 2 || dataNPWP.length() == 6 || dataNPWP.length() == 10 || dataNPWP.length() == 16) {
-                                                        formatNPWP = ".";
-                                                    } else if (dataNPWP.length() == 12) {
-                                                        formatNPWP = "-";
-                                                    }
-                                                    String cekBuilder = new StringBuilder(dataNPWP).insert(dataNPWP.length(), formatNPWP).toString();
-                                                    ed.setText(cekBuilder);
-                                                    ed.setSelection(cekBuilder.length());
-                                                }
-                                                ed.addTextChangedListener(this);
-                                            } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                                String dataVal = s.toString();
-                                                destAccount = dataVal;
-                                                if (dataVal.contains("\n")) {
-                                                    String[] strings = dataVal.split("\\r?\\n");
-                                                    String titleAcc = strings[0] + "\n";
-                                                    String acc = strings[1] + "\n";
-                                                    if (acc.contains("-")) {
-                                                        String[] sp = acc.split("-");
-                                                        String norekPenerima = sp[0].trim();
-                                                        ed.setText(norekPenerima);
-                                                    }
-                                                }
-
-                                                if (destAccount.length() > 3 && !noRekSource.isEmpty()) {
-                                                    handlerTimer.removeCallbacks(myHandlerTimer);
-                                                    handlerTimer.postDelayed(myHandlerTimer,3000);
-                                                }
-                                            } else if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                String dataVal = s.toString();
-                                                FormSpin dataSpin = (FormSpin) s;
-                                            }
-                                        }
-                                    });
-                                    objEl.put(nameDataEl, "");
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
-                                    objEl.put(nameDataEl, "");
-
-                                    RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
-                                    rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                                        @Override
-                                        public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                                            if (flagData != 2) {
-                                                int selectedId = rg.getCheckedRadioButtonId();
-                                                if (selectedId > 0 || selectedId < -1) {
-                                                    RadioButton rb = rg.findViewById(selectedId);
-                                                    String results = rb.getText().toString();
-                                                    processEnableComp(results);
                                                     try {
-                                                        objEl.put(nameDataEl, results);
-
-                                                        if (!flagHitAPIForm) {
-                                                            JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                            JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                            getObjTrx.put("data", reqFormMirroring);
-                                                            dataTrxArr.put(selected_position, getObjTrx);
-                                                            if (isSessionZoom) {
-                                                                dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                                mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                                mirrObj.put("activeIndex", selected_position);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                            }
-                                                            if (nameDataEl.contains("tipe") && nameDataEl.contains("layanan")) {
-                                                                if (results.toLowerCase().contains("proxy") && formId != 55) {
-                                                                    formId = 55;
-                                                                    if (!results.isEmpty()) {
-                                                                        reCheck = true;
-                                                                        if (isSessionZoom) {
-                                                                            BaseMeetingActivity.showProgress(true);
-                                                                        } else {
-                                                                            DipsSwafoto.showProgress(true);
-                                                                        }
-                                                                        processGetForm(formId);
-                                                                    }
-
-                                                                }
-                                                                else if (formId != 54) {
-                                                                    formId = 54;
-
-                                                                    if (!results.isEmpty()) {
-                                                                        reCheck = true;
-                                                                        if (isSessionZoom) {
-                                                                            BaseMeetingActivity.showProgress(true);
-                                                                        } else {
-                                                                            DipsSwafoto.showProgress(true);
-                                                                        }
-                                                                        getObjTrx.put("idGenerateForm", formId);
-                                                                        dataTrxArr.put(selected_position, getObjTrx);
-                                                                        llFormBuild.removeAllViewsInLayout();
-                                                                        processGetForm(formId);
-                                                                    }
-                                                                }
-                                                            }
+                                                        objEl.put(nameDataEl, charSequence);
+                                                        JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                        JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                        getObjTrx.put("data", reqFormMirroring);
+                                                        dataTrxArr.put(selected_position, getObjTrx);
+                                                        if (isSessionZoom) {
+                                                            dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                            mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                            mirrObj.put("activeIndex",selected_position);
+                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
                                                         }
                                                     } catch (JSONException e) {
                                                         e.printStackTrace();
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
 
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
-                                    objEl.put(nameDataEl, false);
-
-                                    CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
-                                    chk.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            if (flagData != 2) {
-                                                boolean isChk = chk.isChecked();
-                                                if (isChk) {
-                                                    try {
-                                                        objEl.put(nameDataEl, isChk);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                } else {
-                                                    try {
-                                                        objEl.put(nameDataEl, isChk);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                                JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                try {
-                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                    getObjTrx.put("data", reqFormMirroring);
-                                                    dataTrxArr.put(selected_position, getObjTrx);
-
-                                                    if (isSessionZoom) {
-                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                        mirrObj.put("activeIndex",selected_position);
-                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                    }
-                                                } catch (JSONException e) {
-                                                    throw new RuntimeException(e);
-                                                }
-                                            }
-                                        }
-                                    });
-
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof Spinner) {
-                                    objEl.put(nameDataEl, "");
-                                    Spinner spin = (Spinner) llFormBuild.getChildAt(i);
-                                    spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                        @Override
-                                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                            if (flagData != 2) {
-                                                String results = spin.getSelectedItem().toString();
-                                                try {
-                                                    objEl.put(nameDataEl, results);
-                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                    getObjTrx.put("data", reqFormMirroring);
-                                                    dataTrxArr.put(selected_position, getObjTrx);
-                                                    if (isSessionZoom) {
-                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                        mirrObj.put("activeIndex",selected_position);
-                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onNothingSelected(AdapterView<?> adapterView) {
-
-                                        }
-                                    });
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
-
-                                    RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                    if (rl.getChildAt(0) instanceof Spinner) {
-                                        objEl.put(nameDataEl, "");
-                                        Spinner spin = (Spinner) rl.getChildAt(0);
-
-                                        boolean flagDot = false;
-                                        if (!urlPath.isEmpty()) {
-                                            String[] spUrl = urlPath.split("/");
-                                            int indexs = spUrl.length - 1;
-                                            String check = spUrl[indexs];
-                                            if (check.isEmpty()) {
-                                                indexs = spUrl.length - 2;
-                                                check = spUrl[indexs];
-                                            }
-                                            if (check.contains(":")) {
-                                                flagDot = true;
-                                            }
-
-
-                                            if (!flagDot) {
-
-                                                if (nameDataEl.contains("sumberdana") || (nameDataEl.contains("rekeningpenerima"))) {
-                                                    btnAddForm.setEnabled(false);
-                                                    processGetDynamicURLSumberDana(spin,urlPath,nameDataEl);
-                                                } else {
-                                                    processGetDynamicURL(spin, urlPath, nameDataEl);
-                                                }
-                                            }
-                                        }
-
-                                        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                                             @Override
-                                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                                                if (flagData != 2) {
-                                                    String accountType = "";
-                                                    int beneficiaryCode = 0;
-                                                    String swiftCode = "";
-                                                    String cityCode = "";
-                                                    if (nameDataEl.contains("sumberdana")) {
-                                                        tvAlertNominal.setVisibility(View.GONE);
-                                                        FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
-                                                        String results = dataSpin.getName();
-                                                        accountType = dataSpin.getCode();
-
-                                                        if (results.indexOf("\n") > 0) {
-                                                            String[] sp = results.split("\n");
-                                                            String typeAccount = sp[0].trim();
-                                                            String no_nama_Rek = sp[1].trim();
-                                                            if (no_nama_Rek.indexOf("-") > 0) {
-                                                                String[] sp2 = no_nama_Rek.split("-");
-                                                                noRekSource = sp2[0].trim();
-                                                            }
-                                                            String valueNominalRek = sp[2].trim();
-                                                            String getNominalRek = valueNominalRek.replaceAll("\\D+","");
-                                                            nominalRek = Long.valueOf(getNominalRek) / 100;
-
-                                                            if (!dataNominal.isEmpty()) {
-                                                                if (longNumCurrent > nominalRek) {
-                                                                    String contexAlert = "";
-                                                                    if (idService.equals("191")) {
-                                                                        contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
-                                                                    } else {
-                                                                        contexAlert = mContext.getResources().getString(R.string.alert_nominal);
-                                                                    }
-                                                                    tvAlertNominal.setText(contexAlert);
-                                                                    tvAlertNominal.setVisibility(View.VISIBLE);
-                                                                    btnContinue.setEnabled(false);
-                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
-                                                                } else {
-                                                                    tvAlertNominal.setVisibility(View.GONE);
-                                                                    btnContinue.setEnabled(true);
-                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
-                                                                }
-                                                            }
-
-                                                        } else {
-                                                            btnContinue.setEnabled(false);
-                                                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                            public void afterTextChanged(Editable s) {
+                                                if (nameDataEl.equals("npwp"+finalValKurung)) {
+                                                    ed.removeTextChangedListener(this);
+                                                    backSpaceChar = lasLenChar > s.length();
+                                                    if (!backSpaceChar) {
+                                                        String dataNPWP = s.toString();
+                                                        String formatNPWP = "";
+                                                        if (dataNPWP.length() == 2 || dataNPWP.length() == 6 || dataNPWP.length() == 10 || dataNPWP.length() == 16) {
+                                                            formatNPWP = ".";
+                                                        } else if (dataNPWP.length() == 12) {
+                                                            formatNPWP = "-";
                                                         }
+                                                        String cekBuilder = new StringBuilder(dataNPWP).insert(dataNPWP.length(), formatNPWP).toString();
+                                                        ed.setText(cekBuilder);
+                                                        ed.setSelection(cekBuilder.length());
+                                                    }
+                                                    ed.addTextChangedListener(this);
+                                                } else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                                    String dataVal = s.toString();
+                                                    destAccount = dataVal;
+                                                    if (dataVal.contains("\n")) {
+                                                        String[] strings = dataVal.split("\\r?\\n");
+                                                        String titleAcc = strings[0] + "\n";
+                                                        String acc = strings[1] + "\n";
+                                                        if (acc.contains("-")) {
+                                                            String[] sp = acc.split("-");
+                                                            String norekPenerima = sp[0].trim();
+                                                            ed.setText(norekPenerima);
+                                                        }
+                                                    }
 
-                                                        results = results.replaceAll("\n"," / ");
+                                                    if (destAccount.length() > 3 && !noRekSource.isEmpty()) {
+                                                        handlerTimer.removeCallbacks(myHandlerTimer);
+                                                        handlerTimer.postDelayed(myHandlerTimer,3000);
+                                                    }
+                                                } else if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                    String dataVal = s.toString();
+                                                    FormSpin dataSpin = (FormSpin) s;
+                                                }
+                                            }
+                                        });
+                                        objEl.put(nameDataEl, "");
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
+                                        objEl.put(nameDataEl, "");
+
+                                        RadioGroup rg = (RadioGroup) llFormBuild.getChildAt(i);
+                                        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                                                if (flagData != 2) {
+                                                    int selectedId = rg.getCheckedRadioButtonId();
+                                                    if (selectedId > 0 || selectedId < -1) {
+                                                        RadioButton rb = rg.findViewById(selectedId);
+                                                        String results = rb.getText().toString();
+                                                        processEnableComp(results);
                                                         try {
                                                             objEl.put(nameDataEl, results);
-                                                        } catch (JSONException e) {
-                                                            throw new RuntimeException(e);
-                                                        }
-                                                    } else {
-                                                        if (tvAlertRek != null) {
-                                                            tvAlertRek.setVisibility(View.GONE);
-                                                        }
 
-                                                        FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
-                                                        int idData = dataSpin.getId();
-                                                        String results = dataSpin.getName();
-                                                        try {
-                                                            if (flagHitAPIForm) {
-                                                                JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
-                                                                JSONObject dataParse = dataTrx.getJSONObject("data");
-                                                                if (dataParse.has(nameDataEl)) {
-                                                                    String valEl = dataParse.getString(nameDataEl);
-                                                                    if (!valEl.isEmpty()) {
-                                                                        results = valEl;
-                                                                        for (int ch = 0; ch < spin.getCount(); ch++) {
-                                                                            if (spin.getItemAtPosition(ch).toString().equals(results)) {
-                                                                                spin.setSelection(ch);
-                                                                                objEl.put(nameDataEl, results);
-                                                                                break;
+                                                            if (!flagHitAPIForm) {
+                                                                JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                                JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                                getObjTrx.put("data", reqFormMirroring);
+                                                                dataTrxArr.put(selected_position, getObjTrx);
+                                                                if (isSessionZoom) {
+                                                                    dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                                    mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                                    mirrObj.put("activeIndex", selected_position);
+                                                                    ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                                }
+                                                                if (nameDataEl.contains("tipe") && nameDataEl.contains("layanan")) {
+                                                                    if (results.toLowerCase().contains("proxy") && formId != 55) {
+                                                                        formId = 55;
+                                                                        if (!results.isEmpty()) {
+                                                                            reCheck = true;
+                                                                            if (isSessionZoom) {
+                                                                                BaseMeetingActivity.showProgress(true);
+                                                                            } else {
+                                                                                DipsSwafoto.showProgress(true);
                                                                             }
+                                                                            processGetForm(formId);
+                                                                        }
+
+                                                                    }
+                                                                    else if (formId != 54) {
+                                                                        formId = 54;
+
+                                                                        if (!results.isEmpty()) {
+                                                                            reCheck = true;
+                                                                            if (isSessionZoom) {
+                                                                                BaseMeetingActivity.showProgress(true);
+                                                                            } else {
+                                                                                DipsSwafoto.showProgress(true);
+                                                                            }
+                                                                            getObjTrx.put("idGenerateForm", formId);
+                                                                            dataTrxArr.put(selected_position, getObjTrx);
+                                                                            llFormBuild.removeAllViewsInLayout();
+                                                                            processGetForm(formId);
                                                                         }
                                                                     }
                                                                 }
-                                                            } else {
-                                                                objEl.put(nameDataEl, results);
-                                                            }
-                                                            if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                                                String newNameDataEl = nameDataEl;
-                                                                if (nameDataEl.contains("(")) {
-                                                                    int indxProv = nameDataEl.indexOf("(");
-                                                                    newNameDataEl = nameDataEl.substring(0,indxProv).trim();
-                                                                }
-                                                                valSpinProv.put(newNameDataEl, idData);
-                                                                if (nameDataEl.contains("provinsi")) {
-                                                                    provinsi = results;
-                                                                    kodepos = "";
-                                                                } else if (nameDataEl.contains("kabupaten") || nameDataEl.contains("kota")) {
-                                                                    kota_kabupaten = results;
-                                                                    kodepos = "";
-                                                                } else if (nameDataEl.contains("kecamatan")) {
-                                                                    kecamatan = results;
-                                                                    kodepos = "";
-                                                                } else if (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa")) {
-                                                                    desa_kelurahan = results;
-                                                                    kodepos = "";
-                                                                }
-                                                            } else if (nameDataEl.contains("jenis") && nameDataEl.contains("layanan")) {
-                                                                jenislayanan = results;
-                                                                labelTypeServ = CompoLabel;
-                                                                if (jenislayanan.equalsIgnoreCase("online")) {
-                                                                    edNamePenerima.setEnabled(false);
-                                                                    edNamePenerima.setBackground(mContext.getResources().getDrawable(R.drawable.bg_textinput_disable));
-                                                                    edNamePenerima.setTextColor(mContext.getResources().getColor(R.color.zm_text));
-                                                                } else {
-                                                                    edNamePenerima.setEnabled(true);
-                                                                    edNamePenerima.setBackground(mContext.getResources().getDrawable(R.drawable.bg_textinput));
-                                                                    edNamePenerima.setTextColor(mContext.getResources().getColor(R.color.zm_text));
-                                                                }
-                                                            }
-                                                            else if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                beneficiaryCode = idData;
-                                                                String valCode = dataSpin.getCode();
-                                                                if (valCode.contains("|")) {
-                                                                    String[] sp = valCode.split("\\|");
-                                                                    swiftCode = sp[0].trim();
-                                                                    cityCode = sp[1].trim();
-                                                                }
-                                                            }  else {
-                                                                valSpin.put(nameDataEl, idData);
-                                                            }
-                                                            if (flagStuckSpin) {
-                                                                processGetSpinChild(nameDataEl);
                                                             }
                                                         } catch (JSONException e) {
                                                             e.printStackTrace();
                                                         }
                                                     }
+                                                }
+                                            }
+                                        });
 
-                                                    if (!flagHitAPIForm) {
-                                                        JSONObject reqFormMirroring = dataReqFormMirroring();
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
+                                        objEl.put(nameDataEl, false);
+
+                                        CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
+                                        chk.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                if (flagData != 2) {
+                                                    boolean isChk = chk.isChecked();
+                                                    if (isChk) {
                                                         try {
-                                                            JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                            getObjTrx.put("data", reqFormMirroring);
-                                                            if (nameDataEl.contains("sumberdana")) {
-                                                                getObjTrx.put("accountType", accountType);
-                                                            }
-                                                            if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                getObjTrx.put("beneficiaryCode", beneficiaryCode);
-                                                                getObjTrx.put("swiftCode", swiftCode);
-                                                                getObjTrx.put("cityCode", cityCode);
-                                                            }
-                                                            dataTrxArr.put(selected_position, getObjTrx);
+                                                            objEl.put(nameDataEl, isChk);
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    } else {
+                                                        try {
+                                                            objEl.put(nameDataEl, isChk);
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                    try {
+                                                        JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                        getObjTrx.put("data", reqFormMirroring);
+                                                        dataTrxArr.put(selected_position, getObjTrx);
 
-                                                            if (isSessionZoom) {
-                                                                dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                                mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                                mirrObj.put("activeIndex", selected_position);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                        if (isSessionZoom) {
+                                                            dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                            mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                            mirrObj.put("activeIndex",selected_position);
+                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        throw new RuntimeException(e);
+                                                    }
+                                                }
+                                            }
+                                        });
+
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof Spinner) {
+                                        objEl.put(nameDataEl, "");
+                                        Spinner spin = (Spinner) llFormBuild.getChildAt(i);
+                                        spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                            @Override
+                                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                                if (flagData != 2) {
+                                                    String results = spin.getSelectedItem().toString();
+                                                    try {
+                                                        objEl.put(nameDataEl, results);
+                                                        JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                        JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                        getObjTrx.put("data", reqFormMirroring);
+                                                        dataTrxArr.put(selected_position, getObjTrx);
+                                                        if (isSessionZoom) {
+                                                            dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                            mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                            mirrObj.put("activeIndex",selected_position);
+                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                            }
+                                        });
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+
+                                        RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                        if (rl.getChildAt(0) instanceof Spinner) {
+                                            objEl.put(nameDataEl, "");
+                                            Spinner spin = (Spinner) rl.getChildAt(0);
+
+                                            boolean flagDot = false;
+                                            if (!urlPath.isEmpty()) {
+                                                String[] spUrl = urlPath.split("/");
+                                                int indexs = spUrl.length - 1;
+                                                String check = spUrl[indexs];
+                                                if (check.isEmpty()) {
+                                                    indexs = spUrl.length - 2;
+                                                    check = spUrl[indexs];
+                                                }
+                                                if (check.contains(":")) {
+                                                    flagDot = true;
+                                                }
+
+
+                                                if (!flagDot) {
+
+                                                    if (nameDataEl.contains("sumberdana") || (nameDataEl.contains("rekeningpenerima"))) {
+                                                        btnAddForm.setEnabled(false);
+                                                        processGetDynamicURLSumberDana(spin,urlPath,nameDataEl);
+                                                    } else {
+                                                        processGetDynamicURL(spin, urlPath, nameDataEl);
+                                                    }
+                                                }
+                                            }
+
+                                            spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                                @Override
+                                                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                                    if (flagData != 2) {
+                                                        String accountType = "";
+                                                        int beneficiaryCode = 0;
+                                                        String swiftCode = "";
+                                                        String cityCode = "";
+                                                        if (nameDataEl.contains("sumberdana")) {
+                                                            tvAlertNominal.setVisibility(View.GONE);
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            String results = dataSpin.getName();
+                                                            accountType = dataSpin.getCode();
+
+                                                            if (results.indexOf("\n") > 0) {
+                                                                String[] sp = results.split("\n");
+                                                                String typeAccount = sp[0].trim();
+                                                                String no_nama_Rek = sp[1].trim();
+                                                                if (no_nama_Rek.indexOf("-") > 0) {
+                                                                    String[] sp2 = no_nama_Rek.split("-");
+                                                                    noRekSource = sp2[0].trim();
+                                                                }
+                                                                String valueNominalRek = sp[2].trim();
+                                                                String getNominalRek = valueNominalRek.replaceAll("\\D+","");
+                                                                nominalRek = Long.valueOf(getNominalRek) / 100;
+
+                                                                if (!dataNominal.isEmpty()) {
+                                                                    if (longNumCurrent > nominalRek) {
+                                                                        String contexAlert = "";
+                                                                        if (idService.equals("191")) {
+                                                                            contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
+                                                                        } else {
+                                                                            contexAlert = mContext.getResources().getString(R.string.alert_nominal);
+                                                                        }
+                                                                        tvAlertNominal.setText(contexAlert);
+                                                                        tvAlertNominal.setVisibility(View.VISIBLE);
+                                                                        btnContinue.setEnabled(false);
+                                                                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                                                    } else {
+                                                                        tvAlertNominal.setVisibility(View.GONE);
+                                                                        btnContinue.setEnabled(true);
+                                                                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                                                                    }
+                                                                }
+
+                                                            } else {
+                                                                btnContinue.setEnabled(false);
+                                                                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
                                                             }
 
-                                                            if (nameDataEl.contains("jenis") && nameDataEl.contains("layanan")) {
-                                                                if (!jenislayanan.isEmpty()) {
+                                                            results = results.replaceAll("\n"," / ");
+                                                            try {
+                                                                objEl.put(nameDataEl, results);
+                                                            } catch (JSONException e) {
+                                                                throw new RuntimeException(e);
+                                                            }
+                                                        } else {
+                                                            if (tvAlertRek != null) {
+                                                                tvAlertRek.setVisibility(View.GONE);
+                                                            }
+
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            int idData = dataSpin.getId();
+                                                            String results = dataSpin.getName();
+                                                            try {
+                                                                if (flagHitAPIForm) {
+                                                                    JSONObject dataTrx = dataTrxArr.getJSONObject(selected_position);
+                                                                    JSONObject dataParse = dataTrx.getJSONObject("data");
+                                                                    if (dataParse.has(nameDataEl)) {
+                                                                        String valEl = dataParse.getString(nameDataEl);
+                                                                        if (!valEl.isEmpty()) {
+                                                                            results = valEl;
+                                                                            for (int ch = 0; ch < spin.getCount(); ch++) {
+                                                                                if (spin.getItemAtPosition(ch).toString().equals(results)) {
+                                                                                    spin.setSelection(ch);
+                                                                                    objEl.put(nameDataEl, results);
+                                                                                    break;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    objEl.put(nameDataEl, results);
+                                                                }
+                                                                if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
+                                                                    String newNameDataEl = nameDataEl;
+                                                                    if (nameDataEl.contains("(")) {
+                                                                        int indxProv = nameDataEl.indexOf("(");
+                                                                        newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                                                    }
+                                                                    valSpinProv.put(newNameDataEl, idData);
+                                                                    if (nameDataEl.contains("provinsi")) {
+                                                                        provinsi = results;
+                                                                        kodepos = "";
+                                                                    } else if (nameDataEl.contains("kabupaten") || nameDataEl.contains("kota")) {
+                                                                        kota_kabupaten = results;
+                                                                        kodepos = "";
+                                                                    } else if (nameDataEl.contains("kecamatan")) {
+                                                                        kecamatan = results;
+                                                                        kodepos = "";
+                                                                    } else if (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa")) {
+                                                                        desa_kelurahan = results;
+                                                                        kodepos = "";
+                                                                    }
+                                                                } else if (nameDataEl.contains("jenis") && nameDataEl.contains("layanan")) {
+                                                                    jenislayanan = results;
+                                                                    labelTypeServ = CompoLabel;
+                                                                    if (jenislayanan.equalsIgnoreCase("online")) {
+                                                                        edNamePenerima.setEnabled(false);
+                                                                        edNamePenerima.setBackground(mContext.getResources().getDrawable(R.drawable.bg_textinput_disable));
+                                                                        edNamePenerima.setTextColor(mContext.getResources().getColor(R.color.zm_text));
+                                                                    } else {
+                                                                        edNamePenerima.setEnabled(true);
+                                                                        edNamePenerima.setBackground(mContext.getResources().getDrawable(R.drawable.bg_textinput));
+                                                                        edNamePenerima.setTextColor(mContext.getResources().getColor(R.color.zm_text));
+                                                                    }
+                                                                }
+                                                                else if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                    beneficiaryCode = idData;
+                                                                    String valCode = dataSpin.getCode();
+                                                                    if (valCode.contains("|")) {
+                                                                        String[] sp = valCode.split("\\|");
+                                                                        swiftCode = sp[0].trim();
+                                                                        cityCode = sp[1].trim();
+                                                                    }
+                                                                }  else {
+                                                                    valSpin.put(nameDataEl, idData);
+                                                                }
+                                                                if (flagStuckSpin) {
+                                                                    processGetSpinChild(nameDataEl);
+                                                                }
+                                                            } catch (JSONException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+
+                                                        if (!flagHitAPIForm) {
+                                                            JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                            try {
+                                                                JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                                getObjTrx.put("data", reqFormMirroring);
+                                                                if (nameDataEl.contains("sumberdana")) {
+                                                                    getObjTrx.put("accountType", accountType);
+                                                                }
+                                                                if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                    getObjTrx.put("beneficiaryCode", beneficiaryCode);
+                                                                    getObjTrx.put("swiftCode", swiftCode);
+                                                                    getObjTrx.put("cityCode", cityCode);
+                                                                }
+                                                                dataTrxArr.put(selected_position, getObjTrx);
+
+                                                                if (isSessionZoom) {
+                                                                    dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                                    mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                                    mirrObj.put("activeIndex", selected_position);
+                                                                    ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                                }
+
+                                                                if (nameDataEl.contains("jenis") && nameDataEl.contains("layanan")) {
+                                                                    if (!jenislayanan.isEmpty()) {
 //                                                                    if (jenislayanan.toLowerCase().contains("fast") && !flagHitAPIForm) {
 //                                                                        formId = 54;
 //                                                                        reCheck = true;
@@ -2335,268 +2403,146 @@ public class frag_service_antarbank extends Fragment {
 //
 //                                                                    }
 
-                                                                    GetLimitTransaction(selected_position);
-                                                                }
-                                                            }
-
-                                                            if (destAccount.length() > 3 && !noRekSource.isEmpty()) {
-                                                                if (destAccount.equals(noRekSource) && idService.equals("16")) {
-                                                                    if (tvAlertRek != null) {
-                                                                        String alertNotSame = mContext.getResources().getString(R.string.alert_norek_notmatch);
-                                                                        tvAlertRek.setVisibility(View.VISIBLE);
-                                                                        tvAlertRek.setText(alertNotSame);
+                                                                        GetLimitTransaction(selected_position);
                                                                     }
-                                                                    edNamePenerima.setText("");
-                                                                    btnContinue.setEnabled(false);
-                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
-                                                                } else {
-                                                                    if (tvAlertRek != null) {
-                                                                        tvAlertRek.setVisibility(View.GONE);
-                                                                    }
-                                                                    handlerTimer.removeCallbacks(myHandlerTimer);
-                                                                    handlerTimer.postDelayed(myHandlerTimer, 3000);
                                                                 }
-                                                            }
-                                                        } catch (JSONException e) {
-                                                            throw new RuntimeException(e);
-                                                        }
-                                                    }
-                                                }
-                                            }
 
-                                            @Override
-                                            public void onNothingSelected(AdapterView<?> adapterView) {
-
-                                            }
-                                        });
-                                        break;
-                                    }
-                                    else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
-
-                                        objEl.put(nameDataEl, "");
-                                        AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
-
-                                        autoText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                            @Override
-                                            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                                                if (flagData != 2) {
-                                                    int beneficiaryCode = 0;
-                                                    String swiftCode = "";
-                                                    String cityCode = "";
-
-                                                    Object item = adapterView.getItemAtPosition(position);
-                                                    if (item instanceof FormSpin) {
-                                                        FormSpin dataSpin = (FormSpin) item;
-                                                        int idData = dataSpin.getId();
-                                                        String results = dataSpin.getName();
-                                                        String valCode = dataSpin.getCode();
-                                                        try {
-                                                            if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                objEl.put(nameDataEl, results);
-                                                                beneficiaryCode = idData;
-                                                                if (valCode.contains("|")) {
-                                                                    String[] sp = valCode.split("\\|");
-                                                                    swiftCode = sp[0].trim();
-                                                                    cityCode = sp[1].trim();
-                                                                }
-                                                            }
-                                                            else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                                                if (results.contains("\n")) {
-                                                                    String[] sp = results.split("\n");
-
-                                                                    String noRek = sp[1].trim();
-                                                                    objEl.put(nameDataEl, noRek);
-                                                                    destAccount = noRek;
-
-                                                                    if (destAccount.length() > 3 && !noRekSource.isEmpty()) {
+                                                                if (destAccount.length() > 3 && !noRekSource.isEmpty()) {
+                                                                    if (destAccount.equals(noRekSource) && idService.equals("16")) {
+                                                                        if (tvAlertRek != null) {
+                                                                            String alertNotSame = mContext.getResources().getString(R.string.alert_norek_notmatch);
+                                                                            tvAlertRek.setVisibility(View.VISIBLE);
+                                                                            tvAlertRek.setText(alertNotSame);
+                                                                        }
                                                                         edNamePenerima.setText("");
-                                                                        if (destAccount.equals(noRekSource) && idService.equals("16")) {
-                                                                            if (tvAlertRek != null) {
-                                                                                String alertNotSame = mContext.getResources().getString(R.string.alert_norek_notmatch);
-                                                                                tvAlertRek.setVisibility(View.VISIBLE);
-                                                                                tvAlertRek.setText(alertNotSame);
-                                                                            }
-                                                                            btnContinue.setEnabled(false);
-                                                                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
-                                                                        } else {
-                                                                            if (tvAlertRek != null) {
-                                                                                tvAlertRek.setVisibility(View.GONE);
-                                                                            }
-                                                                            handlerTimer.removeCallbacks(myHandlerTimer);
-                                                                            handlerTimer.postDelayed(myHandlerTimer, 3000);
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-
-                                                        } catch (JSONException e) {
-                                                            throw new RuntimeException(e);
-                                                        }
-
-                                                    }
-
-                                                    if (!flagHitAPIForm) {
-                                                        JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                        try {
-                                                            JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                            getObjTrx.put("data", reqFormMirroring);
-
-                                                            if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                                                getObjTrx.put("beneficiaryCode", beneficiaryCode);
-                                                                getObjTrx.put("swiftCode", swiftCode);
-                                                                getObjTrx.put("cityCode", cityCode);
-                                                            }
-
-                                                            dataTrxArr.put(selected_position, getObjTrx);
-                                                            if (isSessionZoom) {
-                                                                dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                                mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                                mirrObj.put("activeIndex", selected_position);
-                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                            }
-
-                                                        } catch (JSONException e) {
-                                                            throw new RuntimeException(e);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
-                                    objEl.put(nameDataEl, "");
-
-                                    AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
-                                    autoText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                        @Override
-                                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                                            if (flagData != 2) {
-                                                String results = autoText.getText().toString();
-                                                try {
-                                                    objEl.put(nameDataEl, results);
-                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                    getObjTrx.put("data", reqFormMirroring);
-                                                    dataTrxArr.put(selected_position, getObjTrx);
-                                                    if (isSessionZoom) {
-                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                        mirrObj.put("activeIndex",selected_position);
-                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-                                    });
-                                    autoText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                                        @Override
-                                        public void onFocusChange(View view, boolean b) {
-                                            if (flagData != 2) {
-                                                String results = autoText.getText().toString();
-                                                try {
-                                                    objEl.put(nameDataEl, results);
-                                                    JSONObject reqFormMirroring = dataReqFormMirroring();
-                                                    JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
-                                                    getObjTrx.put("data", reqFormMirroring);
-                                                    dataTrxArr.put(selected_position, getObjTrx);
-                                                    if (isSessionZoom) {
-                                                        dataTrxArrMirror.put(selected_position, reqFormMirroring);
-                                                        mirrObj.put(labelTrx, dataTrxArrMirror);
-                                                        mirrObj.put("activeIndex",selected_position);
-                                                        ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                    }
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }
-                                    });
-
-                                    break;
-                                }
-                                else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
-                                    LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
-                                    if (ll.findViewById(R.id.llCurrency) != null) {
-                                        EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
-                                        try {
-                                            objEl.put(nameDataEl, "");
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        tvContentCurr.addTextChangedListener(new TextWatcher() {
-                                            @Override
-                                            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                                            }
-
-                                            @Override
-                                            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                                if (flagData != 2) {
-                                                    try {
-                                                        objEl.put(nameDataEl, s);
-                                                        dataNominal = s.toString();
-                                                        if (!dataNominal.isEmpty()) {
-                                                            String number = dataNominal.replaceAll("\\D+", "");
-                                                            if (!maxNominal.equals("0")) {
-                                                                if (number.length() > maxNominal.length()) {
-                                                                    return;
-                                                                }
-                                                            }
-                                                            longNumCurrent = Long.valueOf(number);
-
-                                                            if (longNumCurrent > nominalRek) {
-                                                                String contexAlert = "";
-                                                                if (idService.equals("191")) {
-                                                                    contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
-                                                                } else {
-                                                                    contexAlert = mContext.getResources().getString(R.string.alert_nominal);
-                                                                }
-                                                                tvAlertNominal.setText(contexAlert);
-                                                                tvAlertNominal.setVisibility(View.VISIBLE);
-                                                                btnContinue.setEnabled(false);
-                                                                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
-                                                            } else {
-                                                                long longMinNom = Long.valueOf(minNominal);
-                                                                long longMaxNom = Long.valueOf(maxNominal);
-                                                                if (longMinNom > 0 && longMaxNom > 0) {
-                                                                    if (longNumCurrent < longMinNom || longNumCurrent > longMaxNom) {
-                                                                        NumberFormat formatter = null;
-                                                                        if (sessions.getLANG().equals("id")) {
-                                                                            formatter = NumberFormat.getInstance(new Locale("id", "ID"));
-                                                                        } else {
-                                                                            formatter = NumberFormat.getInstance(new Locale("en", "US"));
-                                                                        }
-                                                                        formatter.setMinimumFractionDigits(2);
-                                                                        String minFormat = formatter.format(longMinNom);
-                                                                        String maxFormat = formatter.format(longMaxNom);
-                                                                        String contexAlert = "";
-                                                                        if (sessions.getLANG().equals("id")) {
-                                                                            contexAlert = "Minimal transaksi Rp " + minFormat + " dan Maksimal Rp " + maxFormat;
-                                                                        } else {
-                                                                            contexAlert = "Minimum transaction is Rp " + minFormat + " and maximum is Rp " + maxFormat;
-                                                                        }
-                                                                        tvAlertNominal.setText(contexAlert);
-                                                                        tvAlertNominal.setVisibility(View.VISIBLE);
-
                                                                         btnContinue.setEnabled(false);
                                                                         btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
                                                                     } else {
-                                                                        tvAlertNominal.setVisibility(View.GONE);
-                                                                        btnContinue.setEnabled(true);
-                                                                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                                                                        if (tvAlertRek != null) {
+                                                                            tvAlertRek.setVisibility(View.GONE);
+                                                                        }
+                                                                        handlerTimer.removeCallbacks(myHandlerTimer);
+                                                                        handlerTimer.postDelayed(myHandlerTimer, 3000);
                                                                     }
-                                                                } else {
-                                                                    tvAlertNominal.setVisibility(View.GONE);
-                                                                    btnContinue.setEnabled(true);
-                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                                                                 }
+                                                            } catch (JSONException e) {
+                                                                throw new RuntimeException(e);
                                                             }
                                                         }
+                                                    }
+                                                }
 
+                                                @Override
+                                                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                                                }
+                                            });
+                                            break;
+                                        }
+                                        else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+
+                                            objEl.put(nameDataEl, "");
+                                            AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
+
+                                            autoText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                @Override
+                                                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                                                    if (flagData != 2) {
+                                                        int beneficiaryCode = 0;
+                                                        String swiftCode = "";
+                                                        String cityCode = "";
+
+                                                        Object item = adapterView.getItemAtPosition(position);
+                                                        if (item instanceof FormSpin) {
+                                                            FormSpin dataSpin = (FormSpin) item;
+                                                            int idData = dataSpin.getId();
+                                                            String results = dataSpin.getName();
+                                                            String valCode = dataSpin.getCode();
+                                                            try {
+                                                                if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                    objEl.put(nameDataEl, results);
+                                                                    beneficiaryCode = idData;
+                                                                    if (valCode.contains("|")) {
+                                                                        String[] sp = valCode.split("\\|");
+                                                                        swiftCode = sp[0].trim();
+                                                                        cityCode = sp[1].trim();
+                                                                    }
+                                                                }
+                                                                else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                                                    if (results.contains("\n")) {
+                                                                        String[] sp = results.split("\n");
+
+                                                                        String noRek = sp[1].trim();
+                                                                        objEl.put(nameDataEl, noRek);
+                                                                        destAccount = noRek;
+
+                                                                        if (destAccount.length() > 3 && !noRekSource.isEmpty()) {
+                                                                            edNamePenerima.setText("");
+                                                                            if (destAccount.equals(noRekSource) && idService.equals("16")) {
+                                                                                if (tvAlertRek != null) {
+                                                                                    String alertNotSame = mContext.getResources().getString(R.string.alert_norek_notmatch);
+                                                                                    tvAlertRek.setVisibility(View.VISIBLE);
+                                                                                    tvAlertRek.setText(alertNotSame);
+                                                                                }
+                                                                                btnContinue.setEnabled(false);
+                                                                                btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                                                            } else {
+                                                                                if (tvAlertRek != null) {
+                                                                                    tvAlertRek.setVisibility(View.GONE);
+                                                                                }
+                                                                                handlerTimer.removeCallbacks(myHandlerTimer);
+                                                                                handlerTimer.postDelayed(myHandlerTimer, 3000);
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+
+                                                            } catch (JSONException e) {
+                                                                throw new RuntimeException(e);
+                                                            }
+
+                                                        }
+
+                                                        if (!flagHitAPIForm) {
+                                                            JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                            try {
+                                                                JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                                getObjTrx.put("data", reqFormMirroring);
+
+                                                                if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                                                    getObjTrx.put("beneficiaryCode", beneficiaryCode);
+                                                                    getObjTrx.put("swiftCode", swiftCode);
+                                                                    getObjTrx.put("cityCode", cityCode);
+                                                                }
+
+                                                                dataTrxArr.put(selected_position, getObjTrx);
+                                                                if (isSessionZoom) {
+                                                                    dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                                    mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                                    mirrObj.put("activeIndex", selected_position);
+                                                                    ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                                }
+
+                                                            } catch (JSONException e) {
+                                                                throw new RuntimeException(e);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
+                                        objEl.put(nameDataEl, "");
+
+                                        AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
+                                        autoText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                            @Override
+                                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                                if (flagData != 2) {
+                                                    String results = autoText.getText().toString();
+                                                    try {
+                                                        objEl.put(nameDataEl, results);
                                                         JSONObject reqFormMirroring = dataReqFormMirroring();
                                                         JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
                                                         getObjTrx.put("data", reqFormMirroring);
@@ -2612,56 +2558,182 @@ public class frag_service_antarbank extends Fragment {
                                                     }
                                                 }
                                             }
-
+                                        });
+                                        autoText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                                             @Override
-                                            public void afterTextChanged(Editable s) {
+                                            public void onFocusChange(View view, boolean b) {
+                                                if (flagData != 2) {
+                                                    String results = autoText.getText().toString();
+                                                    try {
+                                                        objEl.put(nameDataEl, results);
+                                                        JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                        JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                        getObjTrx.put("data", reqFormMirroring);
+                                                        dataTrxArr.put(selected_position, getObjTrx);
+                                                        if (isSessionZoom) {
+                                                            dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                            mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                            mirrObj.put("activeIndex",selected_position);
+                                                            ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
                                             }
                                         });
 
-                                    } else {
-                                        if (ll.getChildCount() > 1) {
-                                            if (ll.getChildAt(0) instanceof LinearLayout) {
-                                                LinearLayout ll2 = (LinearLayout) ll.getChildAt(0);
+                                        break;
+                                    }
+                                    else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
+                                        LinearLayout ll = (LinearLayout) llFormBuild.getChildAt(i);
+                                        if (ll.findViewById(R.id.llCurrency) != null) {
+                                            EditText tvContentCurr = ll.findViewById(R.id.tvContentCurr);
+                                            try {
+                                                objEl.put(nameDataEl, "");
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
 
-                                                TextView tvll = (TextView) ll2.getChildAt(1);
-                                                String txt = tvll.getText().toString();
-                                                if (txt.toLowerCase().indexOf("gambar") > 0 || txt.toLowerCase().indexOf("image") > 0) {
-                                                    tvSavedImg = (TextView) ll.getChildAt(1);
-                                                    ll2.setOnClickListener(new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            REQUESTCODE_GALLERY = 201;
-                                                            sessions.saveMedia(2);
-                                                            chooseFromSD();
-                                                        }
-                                                    });
-                                                } else {
-                                                    tvSavedFile = (TextView) ll.getChildAt(1);
-                                                    ll2.setOnClickListener(new View.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(View view) {
-                                                            Intent intent = new Intent();
-                                                            intent.setType("*/*");
-                                                            intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                                                            intent.addCategory(Intent.CATEGORY_OPENABLE);
-                                                            String[] mimetypes = { "application/pdf", "application/doc", "text/*" };
+                                            tvContentCurr.addTextChangedListener(new TextWatcher() {
+                                                @Override
+                                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                                                            intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
-                                                            startActivityForResult(intent, REQUESTCODE_FILE);
+                                                }
+
+                                                @Override
+                                                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                                    if (flagData != 2) {
+                                                        try {
+                                                            objEl.put(nameDataEl, s);
+                                                            dataNominal = s.toString();
+                                                            if (!dataNominal.isEmpty()) {
+                                                                String number = dataNominal.replaceAll("\\D+", "");
+                                                                if (!maxNominal.equals("0")) {
+                                                                    if (number.length() > maxNominal.length()) {
+                                                                        return;
+                                                                    }
+                                                                }
+                                                                longNumCurrent = Long.valueOf(number);
+
+                                                                if (longNumCurrent > nominalRek) {
+                                                                    String contexAlert = "";
+                                                                    if (idService.equals("191")) {
+                                                                        contexAlert = mContext.getResources().getString(R.string.balance_insufficient);
+                                                                    } else {
+                                                                        contexAlert = mContext.getResources().getString(R.string.alert_nominal);
+                                                                    }
+                                                                    tvAlertNominal.setText(contexAlert);
+                                                                    tvAlertNominal.setVisibility(View.VISIBLE);
+                                                                    btnContinue.setEnabled(false);
+                                                                    btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                                                } else {
+                                                                    long longMinNom = Long.valueOf(minNominal);
+                                                                    long longMaxNom = Long.valueOf(maxNominal);
+                                                                    if (longMinNom > 0 && longMaxNom > 0) {
+                                                                        if (longNumCurrent < longMinNom || longNumCurrent > longMaxNom) {
+                                                                            NumberFormat formatter = null;
+                                                                            if (sessions.getLANG().equals("id")) {
+                                                                                formatter = NumberFormat.getInstance(new Locale("id", "ID"));
+                                                                            } else {
+                                                                                formatter = NumberFormat.getInstance(new Locale("en", "US"));
+                                                                            }
+                                                                            formatter.setMinimumFractionDigits(2);
+                                                                            String minFormat = formatter.format(longMinNom);
+                                                                            String maxFormat = formatter.format(longMaxNom);
+                                                                            String contexAlert = "";
+                                                                            if (sessions.getLANG().equals("id")) {
+                                                                                contexAlert = "Minimal transaksi Rp " + minFormat + " dan Maksimal Rp " + maxFormat;
+                                                                            } else {
+                                                                                contexAlert = "Minimum transaction is Rp " + minFormat + " and maximum is Rp " + maxFormat;
+                                                                            }
+                                                                            tvAlertNominal.setText(contexAlert);
+                                                                            tvAlertNominal.setVisibility(View.VISIBLE);
+
+                                                                            btnContinue.setEnabled(false);
+                                                                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_text_grey));
+                                                                        } else {
+                                                                            tvAlertNominal.setVisibility(View.GONE);
+                                                                            btnContinue.setEnabled(true);
+                                                                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                                                                        }
+                                                                    } else {
+                                                                        tvAlertNominal.setVisibility(View.GONE);
+                                                                        btnContinue.setEnabled(true);
+                                                                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            JSONObject reqFormMirroring = dataReqFormMirroring();
+                                                            JSONObject getObjTrx = dataTrxArr.getJSONObject(selected_position);
+                                                            getObjTrx.put("data", reqFormMirroring);
+                                                            dataTrxArr.put(selected_position, getObjTrx);
+                                                            if (isSessionZoom) {
+                                                                dataTrxArrMirror.put(selected_position, reqFormMirroring);
+                                                                mirrObj.put(labelTrx, dataTrxArrMirror);
+                                                                mirrObj.put("activeIndex",selected_position);
+                                                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+                                                            }
+                                                        } catch (JSONException e) {
+                                                            e.printStackTrace();
                                                         }
-                                                    });
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void afterTextChanged(Editable s) {
+                                                }
+                                            });
+
+                                        } else {
+                                            if (ll.getChildCount() > 1) {
+                                                if (ll.getChildAt(0) instanceof LinearLayout) {
+                                                    LinearLayout ll2 = (LinearLayout) ll.getChildAt(0);
+
+                                                    TextView tvll = (TextView) ll2.getChildAt(1);
+                                                    String txt = tvll.getText().toString();
+                                                    if (txt.toLowerCase().indexOf("gambar") > 0 || txt.toLowerCase().indexOf("image") > 0) {
+                                                        tvSavedImg = (TextView) ll.getChildAt(1);
+                                                        ll2.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View view) {
+                                                                REQUESTCODE_GALLERY = 201;
+                                                                sessions.saveMedia(2);
+                                                                chooseFromSD();
+                                                            }
+                                                        });
+                                                    } else {
+                                                        tvSavedFile = (TextView) ll.getChildAt(1);
+                                                        ll2.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View view) {
+                                                                Intent intent = new Intent();
+                                                                intent.setType("*/*");
+                                                                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                                                                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                                                String[] mimetypes = { "application/pdf", "application/doc", "text/*" };
+
+                                                                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+                                                                startActivityForResult(intent, REQUESTCODE_FILE);
+                                                            }
+                                                        });
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
                     }
                 }
             }
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
@@ -2671,51 +2743,57 @@ public class frag_service_antarbank extends Fragment {
             dataFormObj = new JSONObject(objEl.toString());
             dataFormObj.put("noForm",tvNoFormulir.getText());
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
 
         return dataFormObj;
     }
 
     private void processEnableComp(String results) {
-        int child = llFormBuild.getChildCount();
+        try {
+            int child = llFormBuild.getChildCount();
 
-        if (child > 0 && idElement.length() > 0) {
-            for (int i = 0; i < child; i++) {
-                int idEl = llFormBuild.getChildAt(i).getId();
-                if (idEl > 0 || idEl < -1) {
-                    for (int j = 0; j < idElement.length(); j++) {
-                        try {
-                            int idDataEl = idElement.getJSONObject(j).getInt("id");
-                            String nameDataEl = idElement.getJSONObject(j).getString("name");
-                            String nameDataElGab = "";
-                            if (idElement.getJSONObject(j).has("nameGab")) {
-                                nameDataElGab = idElement.getJSONObject(j).getString("nameGab");
-                            }
-                            if (idEl == idDataEl) {
-                                if (llFormBuild.getChildAt(i) instanceof EditText) {
-                                    EditText ed = (EditText) llFormBuild.getChildAt(i);
-                                    if (!nameDataElGab.isEmpty()) {
-                                        if (nameDataElGab.equals(nameDataEl)) {
-                                            if (results.toLowerCase().contains("lain") || results.toLowerCase().contains("other")) {
-                                                ed.setEnabled(true);
-                                                ed.setFocusableInTouchMode(true);
-                                            } else {
-                                                ed.setEnabled(false);
-                                                ed.setFocusable(false);
+            if (child > 0 && idElement.length() > 0) {
+                for (int i = 0; i < child; i++) {
+                    int idEl = llFormBuild.getChildAt(i).getId();
+                    if (idEl > 0 || idEl < -1) {
+                        for (int j = 0; j < idElement.length(); j++) {
+                            try {
+                                int idDataEl = idElement.getJSONObject(j).getInt("id");
+                                String nameDataEl = idElement.getJSONObject(j).getString("name");
+                                String nameDataElGab = "";
+                                if (idElement.getJSONObject(j).has("nameGab")) {
+                                    nameDataElGab = idElement.getJSONObject(j).getString("nameGab");
+                                }
+                                if (idEl == idDataEl) {
+                                    if (llFormBuild.getChildAt(i) instanceof EditText) {
+                                        EditText ed = (EditText) llFormBuild.getChildAt(i);
+                                        if (!nameDataElGab.isEmpty()) {
+                                            if (nameDataElGab.equals(nameDataEl)) {
+                                                if (results.toLowerCase().contains("lain") || results.toLowerCase().contains("other")) {
+                                                    ed.setEnabled(true);
+                                                    ed.setFocusableInTouchMode(true);
+                                                } else {
+                                                    ed.setEnabled(false);
+                                                    ed.setFocusable(false);
+                                                }
                                             }
                                         }
                                     }
                                 }
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
                             }
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
                         }
                     }
                 }
             }
         }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void GetLimitTransaction(int loopInq) {
@@ -2802,362 +2880,381 @@ public class frag_service_antarbank extends Fragment {
                 }
             });
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
     private void processGetDynamicURLSumberDana(Spinner spinner, String urlPath, String nameDataEl) {
-        JSONObject jsons = new JSONObject();
         try {
-            jsons.put("noCif",sessions.getNoCIF());
-            jsons.put("bahasa",sessions.getLANG());
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
-        String authAccess = "Bearer "+sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
-        Server.getAPIService().getDynamicUrlPost(urlPath,requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(false);
-                } else {
-                    DipsSwafoto.showProgress(false);
-                }
-                btnAddForm.setEnabled(true);
-                if (response.isSuccessful()) {
-                    String dataS = response.body().toString();
-                    try {
-                        JSONObject dataObj = new JSONObject(dataS);
-                        if (dataObj.has("token")) {
-                            String accessToken = dataObj.getString("token");
-                            String exchangeToken = dataObj.getString("exchange");
-                            sessions.saveAuthToken(accessToken);
-                            sessions.saveExchangeToken(exchangeToken);
-                        }
-                        JSONObject objData = dataObj.getJSONObject("data");
-                        JSONArray dataArr = objData.getJSONArray("portotabungan");
-                        dataDropDownSource = new ArrayList<>();
-                        int len = dataArr.length() + 1;
-                        String[] sourceAcc = new String[len];
-
-                        String textSelect = getString(R.string.choose_source_fund);
-                        sourceAcc[0] = textSelect;
-                        dataDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
-                        int loopSource = 1;
-                        for (int i = 0; i < dataArr.length(); i++) {
-                            int idData = i + 1;
-
-                            String prodName = dataArr.getJSONObject(i).getString("prodName").replace("R/K","").trim();
-                            String prodCode = dataArr.getJSONObject(i).getString("prodCode");
-                            if (prodCode.equals("T21")) {
-                                continue;
-                            }
-
-
-                            if (dataArr.getJSONObject(i).has("acctStatus")) {
-                                String acctStatus = dataArr.getJSONObject(i).getString("acctStatus");
-                                if (!acctStatus.equals("A")) {
-                                    continue;
-                                }
-                            }
-                            String accountNo = dataArr.getJSONObject(i).getString("accountNo");
-                            String accountName = dataArr.getJSONObject(i).getString("accountName");
-                            String acctCur = dataArr.getJSONObject(i).getString("acctCur");
-                            String availBalance = dataArr.getJSONObject(i).getString("availBalance");
-                            String accountType = dataArr.getJSONObject(i).getString("accountType");
-                            availBalance = availBalance.substring(0,availBalance.length() - 2);
-
-                            if (acctCur.equals("IDR")) {
-                                acctCur = "Rp.";
-                            }
-
-                            Double d = Double.valueOf(availBalance);
-                            NumberFormat formatter = null;
-                            if (sessions.getLANG().equals("id")) {
-                                formatter = NumberFormat.getInstance(new Locale("id", "ID"));
-                            } else {
-                                formatter = NumberFormat.getInstance(new Locale("en", "US"));
-                            }
-                            formatter.setMinimumFractionDigits(2);
-                            String formattedNumber = formatter.format(d);
-                            String labelIdn = "";
-                            if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                labelIdn = prodName + "\n" + accountNo + " - " + accountName;
-                            } else {
-                                labelIdn = prodName + "\n" + accountNo + " - " + accountName + "\n" + acctCur + " " + formattedNumber;
-                            }
-                            sourceAcc[loopSource] = labelIdn;
-                            loopSource++;
-
-                            dataDropDownSource.add(new FormSpin(idData,accountType,labelIdn,labelIdn));
-                        }
-                        AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext,R.layout.dropdown_multiline, dataDropDownSource);
-                        spinner.setAdapter(adapterSourceAcc);
-
-                        SelectedPagerMatch();
-                        ReCheckMatch();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+            JSONObject jsons = new JSONObject();
+            try {
+                jsons.put("noCif",sessions.getNoCIF());
+                jsons.put("bahasa",sessions.getLANG());
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsons.toString());
+            String authAccess = "Bearer "+sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
+            Server.getAPIService().getDynamicUrlPost(urlPath,requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
                     }
-                } else {
-                    Toast.makeText(mContext,R.string.msg_error,Toast.LENGTH_SHORT).show();
-                    String msg = "";
-                    if (response.errorBody().toString().isEmpty()) {
-                        String dataS = response.errorBody().toString();
+                    btnAddForm.setEnabled(true);
+                    if (response.isSuccessful()) {
+                        String dataS = response.body().toString();
                         try {
                             JSONObject dataObj = new JSONObject(dataS);
-                            if (dataObj.has("message")) {
-                                msg = dataObj.getString("message");
+                            if (dataObj.has("token")) {
+                                String accessToken = dataObj.getString("token");
+                                String exchangeToken = dataObj.getString("exchange");
+                                sessions.saveAuthToken(accessToken);
+                                sessions.saveExchangeToken(exchangeToken);
                             }
+                            JSONObject objData = dataObj.getJSONObject("data");
+                            JSONArray dataArr = objData.getJSONArray("portotabungan");
+                            dataDropDownSource = new ArrayList<>();
+                            int len = dataArr.length() + 1;
+                            String[] sourceAcc = new String[len];
+
+                            String textSelect = getString(R.string.choose_source_fund);
+                            sourceAcc[0] = textSelect;
+                            dataDropDownSource.add(new FormSpin(0,"0",textSelect,textSelect));
+                            int loopSource = 1;
+                            for (int i = 0; i < dataArr.length(); i++) {
+                                int idData = i + 1;
+
+                                String prodName = dataArr.getJSONObject(i).getString("prodName").replace("R/K","").trim();
+                                String prodCode = dataArr.getJSONObject(i).getString("prodCode");
+                                if (prodCode.equals("T21")) {
+                                    continue;
+                                }
+
+
+                                if (dataArr.getJSONObject(i).has("acctStatus")) {
+                                    String acctStatus = dataArr.getJSONObject(i).getString("acctStatus");
+                                    if (!acctStatus.equals("A")) {
+                                        continue;
+                                    }
+                                }
+                                String accountNo = dataArr.getJSONObject(i).getString("accountNo");
+                                String accountName = dataArr.getJSONObject(i).getString("accountName");
+                                String acctCur = dataArr.getJSONObject(i).getString("acctCur");
+                                String availBalance = dataArr.getJSONObject(i).getString("availBalance");
+                                String accountType = dataArr.getJSONObject(i).getString("accountType");
+                                availBalance = availBalance.substring(0,availBalance.length() - 2);
+
+                                if (acctCur.equals("IDR")) {
+                                    acctCur = "Rp.";
+                                }
+
+                                Double d = Double.valueOf(availBalance);
+                                NumberFormat formatter = null;
+                                if (sessions.getLANG().equals("id")) {
+                                    formatter = NumberFormat.getInstance(new Locale("id", "ID"));
+                                } else {
+                                    formatter = NumberFormat.getInstance(new Locale("en", "US"));
+                                }
+                                formatter.setMinimumFractionDigits(2);
+                                String formattedNumber = formatter.format(d);
+                                String labelIdn = "";
+                                if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                    labelIdn = prodName + "\n" + accountNo + " - " + accountName;
+                                } else {
+                                    labelIdn = prodName + "\n" + accountNo + " - " + accountName + "\n" + acctCur + " " + formattedNumber;
+                                }
+                                sourceAcc[loopSource] = labelIdn;
+                                loopSource++;
+
+                                dataDropDownSource.add(new FormSpin(idData,accountType,labelIdn,labelIdn));
+                            }
+                            AdapterSourceAccount adapterSourceAcc = new AdapterSourceAccount(mContext,R.layout.dropdown_multiline, dataDropDownSource);
+                            spinner.setAdapter(adapterSourceAcc);
+
+                            SelectedPagerMatch();
+                            ReCheckMatch();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                    }
-                    else {
-                        String dataS = null;
-                        try {
-                            dataS = response.errorBody().string();
-                            JSONObject dataObj = new JSONObject(dataS);
-                            if (dataObj.has("message")) {
-                                msg = dataObj.getString("message");
+                    } else {
+                        Toast.makeText(mContext,R.string.msg_error,Toast.LENGTH_SHORT).show();
+                        String msg = "";
+                        if (response.errorBody().toString().isEmpty()) {
+                            String dataS = response.errorBody().toString();
+                            try {
+                                JSONObject dataObj = new JSONObject(dataS);
+                                if (dataObj.has("message")) {
+                                    msg = dataObj.getString("message");
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                        } catch (IOException | JSONException e) {
-                            e.printStackTrace();
+                        }
+                        else {
+                            String dataS = null;
+                            try {
+                                dataS = response.errorBody().string();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                if (dataObj.has("message")) {
+                                    msg = dataObj.getString("message");
+                                }
+                            } catch (IOException | JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(false);
-                } else {
-                    DipsSwafoto.showProgress(false);
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
                 }
-                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
-            }
-        });
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
     private void processGetDynamicURL(Spinner spin, String urlPath, String nameDataEl) {
-        flagStuckSpin = false;
-        String authAccess = "Bearer "+sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
-        Server.getAPIService().getDynamicUrl(urlPath,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful()) {
-                    String dataS = response.body().toString();
-                    try {
-                        JSONObject dataObj = new JSONObject(dataS);
-                        if (dataObj.has("token")) {
-                            String accessToken = dataObj.getString("token");
-                            String exchangeToken = dataObj.getString("exchange");
-                            sessions.saveAuthToken(accessToken);
-                            sessions.saveExchangeToken(exchangeToken);
-                        }
-                        JSONArray dataArr = dataObj.getJSONArray("data");
-                        ArrayList<FormSpin> dataDropDown = new ArrayList<>();
-                        for (int i = 0; i < dataArr.length(); i++) {
-                            int idData = 0;
-                            String idSData = "";
-                            String valueCode = "";
+        try {
+            flagStuckSpin = false;
+            String authAccess = "Bearer "+sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
+            Server.getAPIService().getDynamicUrl(urlPath,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful()) {
+                        String dataS = response.body().toString();
+                        try {
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("token")) {
+                                String accessToken = dataObj.getString("token");
+                                String exchangeToken = dataObj.getString("exchange");
+                                sessions.saveAuthToken(accessToken);
+                                sessions.saveExchangeToken(exchangeToken);
+                            }
+                            JSONArray dataArr = dataObj.getJSONArray("data");
+                            ArrayList<FormSpin> dataDropDown = new ArrayList<>();
+                            for (int i = 0; i < dataArr.length(); i++) {
+                                int idData = 0;
+                                String idSData = "";
+                                String valueCode = "";
 
-                            if (dataArr.getJSONObject(i).has("ids")) {
-                                idSData = dataArr.getJSONObject(i).getString("ids").trim();
-                                idData = Integer.parseInt(idSData);
-                            } else if (dataArr.getJSONObject(i).has("id")) {
-                                idData = dataArr.getJSONObject(i).getInt("id");
+                                if (dataArr.getJSONObject(i).has("ids")) {
+                                    idSData = dataArr.getJSONObject(i).getString("ids").trim();
+                                    idData = Integer.parseInt(idSData);
+                                } else if (dataArr.getJSONObject(i).has("id")) {
+                                    idData = dataArr.getJSONObject(i).getInt("id");
 
-                            }
+                                }
 
-                            String labelIdn = dataArr.getJSONObject(i).getString("labelIdn");
-                            String labelEng = dataArr.getJSONObject(i).getString("labelEng");
-                            if (sessions.getLANG().equals("en")) {
-                                labelIdn = labelEng;
-                            }
-                            valueCode = labelIdn;
-                            if (dataArr.getJSONObject(i).has("beneficiaryCode")) {
-                                String beneficiaryCode = dataArr.getJSONObject(i).getString("beneficiaryCode");
-                                idData = Integer.parseInt(beneficiaryCode);
-                            }
-                            if (dataArr.getJSONObject(i).has("swiftCode") && dataArr.getJSONObject(i).has("cityCode")) {
-                                String swiftCode = dataArr.getJSONObject(i).getString("swiftCode");
-                                String cityCode = dataArr.getJSONObject(i).getString("cityCode");
-                                valueCode = swiftCode+" | "+cityCode;
-                            }
-                            dataDropDown.add(new FormSpin(idData,valueCode,labelIdn,labelEng));
-                            if (i == 0) {
-                                if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                    String newNameDataEl = nameDataEl;
-                                    if (nameDataEl.contains("(")) {
-                                        int indxProv = nameDataEl.indexOf("(");
-                                        newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                String labelIdn = dataArr.getJSONObject(i).getString("labelIdn");
+                                String labelEng = dataArr.getJSONObject(i).getString("labelEng");
+                                if (sessions.getLANG().equals("en")) {
+                                    labelIdn = labelEng;
+                                }
+                                valueCode = labelIdn;
+                                if (dataArr.getJSONObject(i).has("beneficiaryCode")) {
+                                    String beneficiaryCode = dataArr.getJSONObject(i).getString("beneficiaryCode");
+                                    idData = Integer.parseInt(beneficiaryCode);
+                                }
+                                if (dataArr.getJSONObject(i).has("swiftCode") && dataArr.getJSONObject(i).has("cityCode")) {
+                                    String swiftCode = dataArr.getJSONObject(i).getString("swiftCode");
+                                    String cityCode = dataArr.getJSONObject(i).getString("cityCode");
+                                    valueCode = swiftCode+" | "+cityCode;
+                                }
+                                dataDropDown.add(new FormSpin(idData,valueCode,labelIdn,labelEng));
+                                if (i == 0) {
+                                    if (nameDataEl.contains("provinsi") || nameDataEl.contains("kabupaten") || nameDataEl.contains("kota") || nameDataEl.contains("kecamatan") || (nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
+                                        String newNameDataEl = nameDataEl;
+                                        if (nameDataEl.contains("(")) {
+                                            int indxProv = nameDataEl.indexOf("(");
+                                            newNameDataEl = nameDataEl.substring(0,indxProv).trim();
+                                        }
+                                        valSpinProv.put(newNameDataEl,idData);
+                                    } else {
+                                        valSpin.put(nameDataEl, idData);
                                     }
-                                    valSpinProv.put(newNameDataEl,idData);
-                                } else {
-                                    valSpin.put(nameDataEl, idData);
-                                }
-                                processGetSpinChild(nameDataEl);
-                                if ((nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
-                                    flagStuckSpin = true;
+                                    processGetSpinChild(nameDataEl);
+                                    if ((nameDataEl.contains("kelurahan") || nameDataEl.contains("desa"))) {
+                                        flagStuckSpin = true;
+                                    }
                                 }
                             }
+                            ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
+                            spin.setAdapter(adapter2);
+
+
+                            SelectedPagerMatch();
+                            ReCheckMatch();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                        ArrayAdapter<FormSpin> adapter2 = new ArrayAdapter<FormSpin>(mContext, R.layout.simple_spinner_dropdown_customitem, dataDropDown);
-                        spin.setAdapter(adapter2);
-
-
-                        SelectedPagerMatch();
-                        ReCheckMatch();
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } else {
+                        Toast.makeText(mContext,R.string.msg_error,Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(mContext,R.string.msg_error,Toast.LENGTH_SHORT).show();
                 }
-            }
 
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void processGetSpinChild(String nameDataEl) {
-        int child = llFormBuild.getChildCount();
-        for (int i = 0; i < child; i++) {
-            int idEl = llFormBuild.getChildAt(i).getId();
-            for (int j = 0; j < idElement.length(); j++) {
-                try {
-                    int idDataEl = idElement.getJSONObject(j).getInt("id");
-                    String getnameDataEl = idElement.getJSONObject(j).getString("name");
-                    String urlPath = "";
-                    if (idElement.getJSONObject(j).has("url")) {
-                        urlPath = idElement.getJSONObject(j).getString("url");
-                    }
+        try {
+            int child = llFormBuild.getChildCount();
+            for (int i = 0; i < child; i++) {
+                int idEl = llFormBuild.getChildAt(i).getId();
+                for (int j = 0; j < idElement.length(); j++) {
+                    try {
+                        int idDataEl = idElement.getJSONObject(j).getInt("id");
+                        String getnameDataEl = idElement.getJSONObject(j).getString("name");
+                        String urlPath = "";
+                        if (idElement.getJSONObject(j).has("url")) {
+                            urlPath = idElement.getJSONObject(j).getString("url");
+                        }
 
-                    if (idEl == idDataEl) {
-                        if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
-                            if ((nameDataEl.contains("provinsi") || nameDataEl.contains("province")) && (getnameDataEl.contains("kabupaten") || getnameDataEl.contains("district") || getnameDataEl.contains("kota") || getnameDataEl.contains("city"))) {
-                                if (!urlPath.isEmpty()) {
-                                    int idProv = 0;
-                                    if (valSpinProv.has("provinsi")) {
-                                        idProv = valSpinProv.getInt("provinsi");
-                                    } else if (valSpinProv.has("province")) {
-                                        idProv = valSpinProv.getInt("province");
-                                    }
-                                    String idSpin = String.valueOf(idProv);
-                                    if (idProv != 0) {
-                                        String urlNew = urlPath.replace(":id_provinsi", idSpin);
+                        if (idEl == idDataEl) {
+                            if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
+                                if ((nameDataEl.contains("provinsi") || nameDataEl.contains("province")) && (getnameDataEl.contains("kabupaten") || getnameDataEl.contains("district") || getnameDataEl.contains("kota") || getnameDataEl.contains("city"))) {
+                                    if (!urlPath.isEmpty()) {
+                                        int idProv = 0;
+                                        if (valSpinProv.has("provinsi")) {
+                                            idProv = valSpinProv.getInt("provinsi");
+                                        } else if (valSpinProv.has("province")) {
+                                            idProv = valSpinProv.getInt("province");
+                                        }
+                                        String idSpin = String.valueOf(idProv);
+                                        if (idProv != 0) {
+                                            String urlNew = urlPath.replace(":id_provinsi", idSpin);
 
-                                        RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                        if (rl.getChildAt(0) instanceof Spinner) {
-                                            Spinner spin = (Spinner) rl.getChildAt(0);
-                                            processGetDynamicURL(spin, urlNew, getnameDataEl);
+                                            RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                            if (rl.getChildAt(0) instanceof Spinner) {
+                                                Spinner spin = (Spinner) rl.getChildAt(0);
+                                                processGetDynamicURL(spin, urlNew, getnameDataEl);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            else if ((nameDataEl.contains("kabupaten") || nameDataEl.contains("district") || nameDataEl.contains("kota") || nameDataEl.contains("city")) && (getnameDataEl.contains("kecamatan") || getnameDataEl.contains("subdistrict"))) {
-                                if (!urlPath.isEmpty()) {
-                                    int idProv = 0;
-                                    if (valSpinProv.has("provinsi")) {
-                                        idProv = valSpinProv.getInt("provinsi");
-                                    } else if (valSpinProv.has("province")) {
-                                        idProv = valSpinProv.getInt("province");
-                                    }
-                                    int idKabKot = 0;
-                                    if (valSpinProv.has("kabupaten")) {
-                                        idKabKot = valSpinProv.getInt("kabupaten");
-                                    } else if (valSpinProv.has("district")) {
-                                        idKabKot = valSpinProv.getInt("district");
-                                    } else if (valSpinProv.has("kota")) {
-                                        idKabKot = valSpinProv.getInt("kota");
-                                    } else if (valSpinProv.has("city")) {
-                                        idKabKot = valSpinProv.getInt("city");
-                                    } else if (valSpinProv.has("kabupatenkota")) {
-                                        idKabKot = valSpinProv.getInt("kabupatenkota");
-                                    } else if (valSpinProv.has("kotakabupaten")) {
-                                        idKabKot = valSpinProv.getInt("kotakabupaten");
-                                    } else if (valSpinProv.has("districtcity")) {
-                                        idKabKot = valSpinProv.getInt("districtcity");
-                                    } else if (valSpinProv.has("citydistrict")) {
-                                        idKabKot = valSpinProv.getInt("citydistrict");
-                                    }
-                                    String idSpin = String.valueOf(idProv);
-                                    String idSpin2 = String.valueOf(idKabKot);
-                                    String urlNew = urlPath.replace(":id_provinsi",idSpin).replace(":id_kabupaten",idSpin2);
-                                    if (idKabKot != 0) {
-                                        RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                        if (rl.getChildAt(0) instanceof Spinner) {
-                                            Spinner spin = (Spinner) rl.getChildAt(0);
-                                            processGetDynamicURL(spin, urlNew, getnameDataEl);
+                                else if ((nameDataEl.contains("kabupaten") || nameDataEl.contains("district") || nameDataEl.contains("kota") || nameDataEl.contains("city")) && (getnameDataEl.contains("kecamatan") || getnameDataEl.contains("subdistrict"))) {
+                                    if (!urlPath.isEmpty()) {
+                                        int idProv = 0;
+                                        if (valSpinProv.has("provinsi")) {
+                                            idProv = valSpinProv.getInt("provinsi");
+                                        } else if (valSpinProv.has("province")) {
+                                            idProv = valSpinProv.getInt("province");
+                                        }
+                                        int idKabKot = 0;
+                                        if (valSpinProv.has("kabupaten")) {
+                                            idKabKot = valSpinProv.getInt("kabupaten");
+                                        } else if (valSpinProv.has("district")) {
+                                            idKabKot = valSpinProv.getInt("district");
+                                        } else if (valSpinProv.has("kota")) {
+                                            idKabKot = valSpinProv.getInt("kota");
+                                        } else if (valSpinProv.has("city")) {
+                                            idKabKot = valSpinProv.getInt("city");
+                                        } else if (valSpinProv.has("kabupatenkota")) {
+                                            idKabKot = valSpinProv.getInt("kabupatenkota");
+                                        } else if (valSpinProv.has("kotakabupaten")) {
+                                            idKabKot = valSpinProv.getInt("kotakabupaten");
+                                        } else if (valSpinProv.has("districtcity")) {
+                                            idKabKot = valSpinProv.getInt("districtcity");
+                                        } else if (valSpinProv.has("citydistrict")) {
+                                            idKabKot = valSpinProv.getInt("citydistrict");
+                                        }
+                                        String idSpin = String.valueOf(idProv);
+                                        String idSpin2 = String.valueOf(idKabKot);
+                                        String urlNew = urlPath.replace(":id_provinsi",idSpin).replace(":id_kabupaten",idSpin2);
+                                        if (idKabKot != 0) {
+                                            RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                            if (rl.getChildAt(0) instanceof Spinner) {
+                                                Spinner spin = (Spinner) rl.getChildAt(0);
+                                                processGetDynamicURL(spin, urlNew, getnameDataEl);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            else if ((nameDataEl.contains("kecamatan") || nameDataEl.contains("subdistrict")) && (getnameDataEl.contains("kelurahan") || getnameDataEl.contains("urbanvillage") || getnameDataEl.contains("desa") || getnameDataEl.contains("village"))) {
-                                if (!urlPath.isEmpty()) {
-                                    int idProv = 0;
-                                    if (valSpinProv.has("provinsi")) {
-                                        idProv = valSpinProv.getInt("provinsi");
-                                    } else if (valSpinProv.has("province")) {
-                                        idProv = valSpinProv.getInt("province");
-                                    }
-                                    int idKabKot = 0;
-                                    if (valSpinProv.has("kabupaten")) {
-                                        idKabKot = valSpinProv.getInt("kabupaten");
-                                    } else if (valSpinProv.has("district")) {
-                                        idKabKot = valSpinProv.getInt("district");
-                                    } else if (valSpinProv.has("kota")) {
-                                        idKabKot = valSpinProv.getInt("kota");
-                                    } else if (valSpinProv.has("city")) {
-                                        idKabKot = valSpinProv.getInt("city");
-                                    } else if (valSpinProv.has("kabupatenkota")) {
-                                        idKabKot = valSpinProv.getInt("kabupatenkota");
-                                    } else if (valSpinProv.has("kotakabupaten")) {
-                                        idKabKot = valSpinProv.getInt("kotakabupaten");
-                                    } else if (valSpinProv.has("districtcity")) {
-                                        idKabKot = valSpinProv.getInt("districtcity");
-                                    } else if (valSpinProv.has("citydistrict")) {
-                                        idKabKot = valSpinProv.getInt("citydistrict");
-                                    }
-                                    int idKec = 0;
-                                    if (valSpinProv.has("kecamatan")) {
-                                        idKec = valSpinProv.getInt("kecamatan");
-                                    } else if (valSpinProv.has("subdistrict")) {
-                                        idKec = valSpinProv.getInt("subdistrict");
-                                    }
-                                    String idSpin = String.valueOf(idProv);
-                                    String idSpin2 = String.valueOf(idKabKot);
-                                    String idSpin3 = String.valueOf(idKec);
-                                    String urlNew = urlPath.replace(":id_provinsi",idSpin).replace(":id_kabupaten",idSpin2).replace(":id_kecamatan",idSpin3);
+                                else if ((nameDataEl.contains("kecamatan") || nameDataEl.contains("subdistrict")) && (getnameDataEl.contains("kelurahan") || getnameDataEl.contains("urbanvillage") || getnameDataEl.contains("desa") || getnameDataEl.contains("village"))) {
+                                    if (!urlPath.isEmpty()) {
+                                        int idProv = 0;
+                                        if (valSpinProv.has("provinsi")) {
+                                            idProv = valSpinProv.getInt("provinsi");
+                                        } else if (valSpinProv.has("province")) {
+                                            idProv = valSpinProv.getInt("province");
+                                        }
+                                        int idKabKot = 0;
+                                        if (valSpinProv.has("kabupaten")) {
+                                            idKabKot = valSpinProv.getInt("kabupaten");
+                                        } else if (valSpinProv.has("district")) {
+                                            idKabKot = valSpinProv.getInt("district");
+                                        } else if (valSpinProv.has("kota")) {
+                                            idKabKot = valSpinProv.getInt("kota");
+                                        } else if (valSpinProv.has("city")) {
+                                            idKabKot = valSpinProv.getInt("city");
+                                        } else if (valSpinProv.has("kabupatenkota")) {
+                                            idKabKot = valSpinProv.getInt("kabupatenkota");
+                                        } else if (valSpinProv.has("kotakabupaten")) {
+                                            idKabKot = valSpinProv.getInt("kotakabupaten");
+                                        } else if (valSpinProv.has("districtcity")) {
+                                            idKabKot = valSpinProv.getInt("districtcity");
+                                        } else if (valSpinProv.has("citydistrict")) {
+                                            idKabKot = valSpinProv.getInt("citydistrict");
+                                        }
+                                        int idKec = 0;
+                                        if (valSpinProv.has("kecamatan")) {
+                                            idKec = valSpinProv.getInt("kecamatan");
+                                        } else if (valSpinProv.has("subdistrict")) {
+                                            idKec = valSpinProv.getInt("subdistrict");
+                                        }
+                                        String idSpin = String.valueOf(idProv);
+                                        String idSpin2 = String.valueOf(idKabKot);
+                                        String idSpin3 = String.valueOf(idKec);
+                                        String urlNew = urlPath.replace(":id_provinsi",idSpin).replace(":id_kabupaten",idSpin2).replace(":id_kecamatan",idSpin3);
 
-                                    if (idKec != 0) {
-                                        RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
-                                        if (rl.getChildAt(0) instanceof Spinner) {
-                                            Spinner spin = (Spinner) rl.getChildAt(0);
-                                            processGetDynamicURL(spin, urlNew, getnameDataEl);
+                                        if (idKec != 0) {
+                                            RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
+                                            if (rl.getChildAt(0) instanceof Spinner) {
+                                                Spinner spin = (Spinner) rl.getChildAt(0);
+                                                processGetDynamicURL(spin, urlNew, getnameDataEl);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            else {
-                                flagStuckSpin = false;
+                                else {
+                                    flagStuckSpin = false;
+                                }
                             }
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
         }
+        catch (Exception e) {
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void chooseFromSD() {
@@ -3193,9 +3290,9 @@ public class frag_service_antarbank extends Fragment {
             }
 
             GetBarcodeData(results);
-        } catch (FileNotFoundException | NotFoundException e) {
+        } catch (Exception e) {
             messageBarcodeFailed();
-            e.printStackTrace();
+            GlobalExceptionHandler.getLog(e);
         }
     }
 
@@ -3212,202 +3309,208 @@ public class frag_service_antarbank extends Fragment {
     }
 
     private void getBarcodeDataByURL(Result results) {
-        flagHitAPIForm = false;
-        String urlPath = results.getText();
-        String authAccess = "Bearer "+sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
+        try {
+            flagHitAPIForm = false;
+            String urlPath = results.getText();
+            String authAccess = "Bearer "+sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
 
-        Server.getAPIService().getDynamicUrl(urlPath,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(false);
-                } else {
-                    DipsSwafoto.showProgress(false);
-                }
-                if (response.isSuccessful()) {
-                    flagData = 1;
-                    String dataS = response.body().toString();
-                    dataObjTrx = new JSONObject();
-                    try {
-                        JSONObject dataObjBody = new JSONObject(dataS);
-                        JSONObject dataBody1 = dataObjBody.getJSONObject("data");
-                        if (dataBody1.has("jenisTransaksi")){
-                                String jenisTransaksi = dataBody1.getString("jenisTransaksi").toLowerCase().trim();
-                            if (formId == 48 && (jenisTransaksi.equals("rekening-sendiri") || jenisTransaksi.equals("antar-rekening"))){
-                                messageBarcodeFailed();
-                                if (dataItems.size() > 0) {
-                                    nameItemQR.remove(dataItems.size() - 1);
-                                    dataItems.remove(dataItems.size() - 1);
-                                    recyclerViewAdapter.notifyDataSetChanged();
-                                    if (dataItems.size() == 0) {
-                                        addData();
-                                        setRecyler();
-                                    }
-                                }
-                                return;
-                            }
-
-                            if (formId == 49 && !jenisTransaksi.equals("antar-rekening")){
-                                messageBarcodeFailed();
-                                if (dataItems.size() > 0) {
-
-                                    nameItemQR.remove(dataItems.size() - 1);
-                                    dataItems.remove(dataItems.size() - 1);
-                                    recyclerViewAdapter.notifyDataSetChanged();
-                                    if (dataItems.size() == 0) {
-                                        addData();
-                                        setRecyler();
-                                    }
-                                }
-                                return;
-                            }
-
-
-                            if (formId == 56 && !jenisTransaksi.equals("rekening-sendiri")){
-                                messageBarcodeFailed();
-                                if (dataItems.size() > 0) {
-
-                                    nameItemQR.remove(dataItems.size() - 1);
-                                    dataItems.remove(dataItems.size() - 1);
-                                    recyclerViewAdapter.notifyDataSetChanged();
-                                    if (dataItems.size() == 0) {
-                                        addData();
-                                        setRecyler();
-                                    }
-                                }
-                                return;
-                            }
-                        }
-                        String retrievalReferenceNumber = dataBody1.getString("retrievalReferenceNumber");
-                        String systemTraceAuditNumber = dataBody1.getString("systemTraceAuditNumber");
-                        JSONObject dataBank = dataBody1.getJSONObject("data");
-                        String noForm = dataBody1.getString("noForm");
-
-                        String bankpenerima = "";
-                        String rekeningpenerima = "";
-                        String nominaltransaksi = "";
-                        String jenis_layanan = "";
-                        String tujuantransaksi = "";
-                        String berita = "";
-                        destAccount = "";
-                        noRekSource = "";
-
-                        if (dataBank.has("bankpenerima")) {
-                            bankpenerima = dataBank.getString("bankpenerima");
-                        }
-                        if (dataBank.has("rekeningpenerima")) {
-                            rekeningpenerima = dataBank.getString("rekeningpenerima");
-                        }
-                        if (dataBank.has("nominaltransaksi")) {
-                            nominaltransaksi = dataBank.getString("nominaltransaksi");
-                        }
-                        if (dataBank.has("jenislayanan")) {
-                            jenis_layanan = dataBank.getString("jenislayanan");
-                        }
-                        if (dataBank.has("tujuantransaksi")) {
-                            tujuantransaksi = dataBank.getString("tujuantransaksi");
-                        }
-                        if (dataBank.has("berita")) {
-                            berita = dataBank.getString("berita");
-                        }
-                        //String jenispenduduk = dataBank.getString("jenispenduduk");
-
-                        JSONObject dataObjEl = new JSONObject();
-                        for (int j = 0; j < idElement.length(); j++) {
-                            String nameDataEl = idElement.getJSONObject(j).getString("name");
-                            if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
-                                dataObjEl.put(nameDataEl,bankpenerima);
-                            }
-                            else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
-                                dataObjEl.put(nameDataEl,rekeningpenerima);
-                            }
-                            else if (nameDataEl.contains("nama") && nameDataEl.contains("penerima")) {
-                                //dataObjEl.put(nameDataEl,namapenerima);
-                            }
-                            else if (nameDataEl.contains("nominal") && nameDataEl.contains("transaksi")) {
-                                dataObjEl.put(nameDataEl,nominaltransaksi);
-                            }
-                            else if (nameDataEl.contains("jenis") && nameDataEl.contains("layanan")) {
-                                dataObjEl.put(nameDataEl,jenis_layanan);
-                            }
-                            else if (nameDataEl.contains("tujuan") && nameDataEl.contains("transaksi")) {
-                                dataObjEl.put(nameDataEl,tujuantransaksi);
-                            }
-                            else if (nameDataEl.contains("jenis") && nameDataEl.contains("penduduk")) {
-                                //dataObjEl.put(nameDataEl,jenispenduduk);
-                            }
-                            else if (nameDataEl.contains("berita")) {
-                                dataObjEl.put(nameDataEl,berita);
-                            }
-                        }
-
-
-                        dataObjTrx.put("label","qr");
-                        dataObjTrx.put("idGenerateForm",formId);
-                        dataObjTrx.put("noForm",noForm);
-                        dataObjTrx.put("systemTraceAuditNumber",systemTraceAuditNumber);
-                        dataObjTrx.put("retrievalReferenceNumber",retrievalReferenceNumber);
-                        dataObjTrx.put("data",dataObjEl);
-                        dataTrxArr.put(dataObjTrx);
-
-                        noFormQR.add(noForm);
-
-                        setRecylerPager();
-                        if (llLayout.getVisibility() != View.VISIBLE) {
-                            llLayout.setVisibility(View.VISIBLE);
-                        }
-                        selected_position = dataTrxArr.length() - 1;
-                        processNihilDataForm();
-                        recyclerViewAdapterPager.notifyItemChanged(selected_position);
-                        edNamePenerima.setText("");
+            Server.getAPIService().getDynamicUrl(urlPath,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    if (response.isSuccessful()) {
+                        flagData = 1;
+                        String dataS = response.body().toString();
+                        dataObjTrx = new JSONObject();
                         try {
-                            idElementMulti.put(selected_position,idElement);
+                            JSONObject dataObjBody = new JSONObject(dataS);
+                            JSONObject dataBody1 = dataObjBody.getJSONObject("data");
+                            if (dataBody1.has("jenisTransaksi")){
+                                String jenisTransaksi = dataBody1.getString("jenisTransaksi").toLowerCase().trim();
+                                if (formId == 48 && (jenisTransaksi.equals("rekening-sendiri") || jenisTransaksi.equals("antar-rekening"))){
+                                    messageBarcodeFailed();
+                                    if (dataItems.size() > 0) {
+                                        nameItemQR.remove(dataItems.size() - 1);
+                                        dataItems.remove(dataItems.size() - 1);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                        if (dataItems.size() == 0) {
+                                            addData();
+                                            setRecyler();
+                                        }
+                                    }
+                                    return;
+                                }
+
+                                if (formId == 49 && !jenisTransaksi.equals("antar-rekening")){
+                                    messageBarcodeFailed();
+                                    if (dataItems.size() > 0) {
+
+                                        nameItemQR.remove(dataItems.size() - 1);
+                                        dataItems.remove(dataItems.size() - 1);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                        if (dataItems.size() == 0) {
+                                            addData();
+                                            setRecyler();
+                                        }
+                                    }
+                                    return;
+                                }
+
+
+                                if (formId == 56 && !jenisTransaksi.equals("rekening-sendiri")){
+                                    messageBarcodeFailed();
+                                    if (dataItems.size() > 0) {
+
+                                        nameItemQR.remove(dataItems.size() - 1);
+                                        dataItems.remove(dataItems.size() - 1);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                        if (dataItems.size() == 0) {
+                                            addData();
+                                            setRecyler();
+                                        }
+                                    }
+                                    return;
+                                }
+                            }
+                            String retrievalReferenceNumber = dataBody1.getString("retrievalReferenceNumber");
+                            String systemTraceAuditNumber = dataBody1.getString("systemTraceAuditNumber");
+                            JSONObject dataBank = dataBody1.getJSONObject("data");
+                            String noForm = dataBody1.getString("noForm");
+
+                            String bankpenerima = "";
+                            String rekeningpenerima = "";
+                            String nominaltransaksi = "";
+                            String jenis_layanan = "";
+                            String tujuantransaksi = "";
+                            String berita = "";
+                            destAccount = "";
+                            noRekSource = "";
+
+                            if (dataBank.has("bankpenerima")) {
+                                bankpenerima = dataBank.getString("bankpenerima");
+                            }
+                            if (dataBank.has("rekeningpenerima")) {
+                                rekeningpenerima = dataBank.getString("rekeningpenerima");
+                            }
+                            if (dataBank.has("nominaltransaksi")) {
+                                nominaltransaksi = dataBank.getString("nominaltransaksi");
+                            }
+                            if (dataBank.has("jenislayanan")) {
+                                jenis_layanan = dataBank.getString("jenislayanan");
+                            }
+                            if (dataBank.has("tujuantransaksi")) {
+                                tujuantransaksi = dataBank.getString("tujuantransaksi");
+                            }
+                            if (dataBank.has("berita")) {
+                                berita = dataBank.getString("berita");
+                            }
+                            //String jenispenduduk = dataBank.getString("jenispenduduk");
+
+                            JSONObject dataObjEl = new JSONObject();
+                            for (int j = 0; j < idElement.length(); j++) {
+                                String nameDataEl = idElement.getJSONObject(j).getString("name");
+                                if (nameDataEl.contains("bank") && nameDataEl.contains("penerima")) {
+                                    dataObjEl.put(nameDataEl,bankpenerima);
+                                }
+                                else if (nameDataEl.contains("rekening") && nameDataEl.contains("penerima")) {
+                                    dataObjEl.put(nameDataEl,rekeningpenerima);
+                                }
+                                else if (nameDataEl.contains("nama") && nameDataEl.contains("penerima")) {
+                                    //dataObjEl.put(nameDataEl,namapenerima);
+                                }
+                                else if (nameDataEl.contains("nominal") && nameDataEl.contains("transaksi")) {
+                                    dataObjEl.put(nameDataEl,nominaltransaksi);
+                                }
+                                else if (nameDataEl.contains("jenis") && nameDataEl.contains("layanan")) {
+                                    dataObjEl.put(nameDataEl,jenis_layanan);
+                                }
+                                else if (nameDataEl.contains("tujuan") && nameDataEl.contains("transaksi")) {
+                                    dataObjEl.put(nameDataEl,tujuantransaksi);
+                                }
+                                else if (nameDataEl.contains("jenis") && nameDataEl.contains("penduduk")) {
+                                    //dataObjEl.put(nameDataEl,jenispenduduk);
+                                }
+                                else if (nameDataEl.contains("berita")) {
+                                    dataObjEl.put(nameDataEl,berita);
+                                }
+                            }
+
+
+                            dataObjTrx.put("label","qr");
+                            dataObjTrx.put("idGenerateForm",formId);
+                            dataObjTrx.put("noForm",noForm);
+                            dataObjTrx.put("systemTraceAuditNumber",systemTraceAuditNumber);
+                            dataObjTrx.put("retrievalReferenceNumber",retrievalReferenceNumber);
+                            dataObjTrx.put("data",dataObjEl);
+                            dataTrxArr.put(dataObjTrx);
+
+                            noFormQR.add(noForm);
+
+                            setRecylerPager();
+                            if (llLayout.getVisibility() != View.VISIBLE) {
+                                llLayout.setVisibility(View.VISIBLE);
+                            }
+                            selected_position = dataTrxArr.length() - 1;
+                            processNihilDataForm();
+                            recyclerViewAdapterPager.notifyItemChanged(selected_position);
+                            edNamePenerima.setText("");
+                            try {
+                                idElementMulti.put(selected_position,idElement);
+                            } catch (JSONException e) {
+                                throw new RuntimeException(e);
+                            }
+                            if (isSessionZoom) {
+                                JSONObject reqFormMirroring = dataReqFormMirroring();
+                                dataTrxArrMirror.put(selected_position,reqFormMirroring);
+                                mirrObj.put(labelTrx,dataTrxArrMirror);
+                                mirrObj.put("activeIndex",selected_position);
+                                ConnectionRabbitHttp.mirroringKey(mirrObj);
+                            }
+                            btnContinue.setEnabled(true);
+                            btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
-                        if (isSessionZoom) {
-                            JSONObject reqFormMirroring = dataReqFormMirroring();
-                            dataTrxArrMirror.put(selected_position,reqFormMirroring);
-                            mirrObj.put(labelTrx,dataTrxArrMirror);
-                            mirrObj.put("activeIndex",selected_position);
-                            ConnectionRabbitHttp.mirroringKey(mirrObj);
-                        }
-                        btnContinue.setEnabled(true);
-                        btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
                     }
-                }
-                else {
-                    if (response.code() == 500) {
-                        Toast.makeText(mContext,getString(R.string.qrcode_expired),Toast.LENGTH_LONG).show();
-                        if (dataItems.size() > 0) {
-                            if (noFormQR.size() > 0) {
-                                noFormQR.remove(dataItems.size() - 1);
-                            }
-                            nameItemQR.remove(dataItems.size() - 1);
-                            dataItems.remove(dataItems.size() - 1);
-                            recyclerViewAdapter.notifyDataSetChanged();
-                            if (dataItems.size() == 0) {
-                                addData();
-                                setRecyler();
+                    else {
+                        if (response.code() == 500) {
+                            Toast.makeText(mContext,getString(R.string.qrcode_expired),Toast.LENGTH_LONG).show();
+                            if (dataItems.size() > 0) {
+                                if (noFormQR.size() > 0) {
+                                    noFormQR.remove(dataItems.size() - 1);
+                                }
+                                nameItemQR.remove(dataItems.size() - 1);
+                                dataItems.remove(dataItems.size() - 1);
+                                recyclerViewAdapter.notifyDataSetChanged();
+                                if (dataItems.size() == 0) {
+                                    addData();
+                                    setRecyler();
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Toast.makeText(mContext, ""+t.getMessage(), Toast.LENGTH_SHORT).show();
-                if (isSessionZoom) {
-                    BaseMeetingActivity.showProgress(false);
-                } else {
-                    DipsSwafoto.showProgress(false);
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Toast.makeText(mContext, ""+t.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
                 }
-            }
-        });
+            });
+        }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
+
     }
 
     private void messageBarcodeFailed() {
