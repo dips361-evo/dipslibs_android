@@ -345,7 +345,7 @@ public interface ApiService {
                                    @Header("Authorization") String authHeader,
                                    @Header("exchangeToken") String exchangeToken);
 
-    @GET("form-generator-v2/ebilyet/mobile/{noDepo}/{idDips}")
+    @GET("form-generator-v2/ebilyet/web/{noDepo}/{idDips}")
     Call<JsonObject> getResiEBilyet(@Path("noDepo") String noDepo,
                                         @Path("idDips") String idDips,
                                         @Header("Authorization") String authHeader,

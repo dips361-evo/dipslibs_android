@@ -3265,8 +3265,9 @@ public class frag_service_antarbank extends Fragment {
     }
 
     private void barcodeDecoder(Uri selectedImage) {
+        InputStream inputStream = null;
         try {
-            InputStream inputStream = getActivity().getContentResolver().openInputStream(selectedImage);
+            inputStream = getActivity().getContentResolver().openInputStream(selectedImage);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             if (bitmap == null)
             {
@@ -3290,9 +3291,23 @@ public class frag_service_antarbank extends Fragment {
             }
 
             GetBarcodeData(results);
-        } catch (Exception e) {
+        }
+        catch (NotFoundException e) {
             messageBarcodeFailed();
             GlobalExceptionHandler.getLog(e);
+        }
+        catch (Exception e) {
+            messageBarcodeFailed();
+            GlobalExceptionHandler.getLog(e);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // Tangani kesalahan saat menutup InputStream
+                    GlobalExceptionHandler.getLog(e);
+                }
+            }
         }
     }
 
