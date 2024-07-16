@@ -25,9 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +70,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
@@ -83,6 +80,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -3267,7 +3265,7 @@ public class frag_service_antarbank extends Fragment {
     private void barcodeDecoder(Uri selectedImage) {
         InputStream inputStream = null;
         try {
-            inputStream = getActivity().getContentResolver().openInputStream(selectedImage);
+          inputStream = requireActivity().getContentResolver().openInputStream(selectedImage);
             Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
             if (bitmap == null)
             {
@@ -3286,17 +3284,13 @@ public class frag_service_antarbank extends Fragment {
             if (uploadImageListener != null) {
                 uploadImageListener.onClickUpload(selectedImage,rv_item.findViewHolderForAdapterPosition(intPos));
                 RecyclerView.ViewHolder viewHolderForAdapterPosition = rv_item.findViewHolderForAdapterPosition(intPos);
+                assert viewHolderForAdapterPosition != null;
                 TextView tvContent = (TextView) viewHolderForAdapterPosition.itemView.findViewById(R.id.tvContentQr);
                 nameItemQR.set(intPos,tvContent.getText().toString());
             }
 
             GetBarcodeData(results);
-        }
-        catch (NotFoundException e) {
-            messageBarcodeFailed();
-            GlobalExceptionHandler.getLog(e);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             messageBarcodeFailed();
             GlobalExceptionHandler.getLog(e);
         } finally {

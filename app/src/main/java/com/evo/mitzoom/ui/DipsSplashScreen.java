@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import com.evo.mitzoom.R;
+import com.evo.mitzoom.Session.SessionManager;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -30,6 +31,7 @@ public class DipsSplashScreen extends AppCompatActivity {
     private static final String TAG = "CEK_DipsSplashScreen";
     private TextView tvVersion;
     private RelativeLayout rlBGTransparant;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +42,13 @@ public class DipsSplashScreen extends AppCompatActivity {
         tvVersion = findViewById(R.id.tvVersion);
         rlBGTransparant = findViewById(R.id.rlBGTransparant);
 
+        sessionManager = new SessionManager(DipsSplashScreen.this);
+        sessionManager.clearData();
 
         //Untuk mengambil version dari Apps
         try {
             PackageInfo info = getApplication().getPackageManager().getPackageInfo(getPackageName(),0);
-            String version = "1.0.41";
+            String version = "1.0.42";
             version = "V "+version;
             tvVersion.setText(version);
         }

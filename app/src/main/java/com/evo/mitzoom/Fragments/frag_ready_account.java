@@ -532,6 +532,9 @@ public class frag_ready_account extends Fragment {
                                                 Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                 checkEmpty = true;
                                             }
+                                            else {
+                                                checkEmpty = false;
+                                            }
                                             objEl.put(nameDataEl, results);
                                             break;
                                         } else if (llFormBuild.getChildAt(i) instanceof RadioGroup) {
@@ -542,6 +545,9 @@ public class frag_ready_account extends Fragment {
                                                 String results = rb.getText().toString();
                                                 if (requiredDataEl && results.isEmpty()) {
                                                     Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+                                                    checkEmpty = true;
+                                                }
+                                                else{
                                                     checkEmpty = true;
                                                 }
                                                 objEl.put(nameDataEl, results);
@@ -567,6 +573,9 @@ public class frag_ready_account extends Fragment {
                                                     Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                     checkEmpty = true;
                                                 }
+                                                else {
+                                                    checkEmpty = false;
+                                                }
                                                 objEl.put(nameDataEl, results);
                                             }
                                             break;
@@ -577,6 +586,9 @@ public class frag_ready_account extends Fragment {
                                                     Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                     checkEmpty = true;
                                                 }
+                                                else {
+                                                    checkEmpty = false;
+                                                }
                                                 break;
                                             } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
                                                 AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
@@ -585,6 +597,9 @@ public class frag_ready_account extends Fragment {
                                                     Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                     checkEmpty = true;
                                                     break;
+                                                }
+                                                else {
+                                                    checkEmpty = false;
                                                 }
                                                 objEl.put(nameDataEl, results);
                                             }
@@ -596,6 +611,9 @@ public class frag_ready_account extends Fragment {
                                                 checkEmpty = true;
                                                 break;
                                             }
+                                            else {
+                                                checkEmpty = false;
+                                            }
                                             objEl.put(nameDataEl, results);
                                             break;
                                         } else if (llFormBuild.getChildAt(i) instanceof LinearLayout) {
@@ -606,6 +624,9 @@ public class frag_ready_account extends Fragment {
                                                 if (requiredDataEl && results.isEmpty()) {
                                                     Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
                                                     checkEmpty = true;
+                                                }
+                                                else {
+                                                    checkEmpty = false;
                                                 }
                                                 objEl.put(nameDataEl, results);
                                                 break;
@@ -625,7 +646,6 @@ public class frag_ready_account extends Fragment {
                             }
                         }
                     }
-
                     if (flagNext) {
                         processNext();
                     }
@@ -654,13 +674,13 @@ public class frag_ready_account extends Fragment {
                                 if (llFormBuild.getChildAt(i) instanceof EditText) {
                                     EditText ed = (EditText) llFormBuild.getChildAt(i);
                                     String results = ed.getText().toString();
-                                    if (requiredDataEl && results.isEmpty()) {
-                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                        checkEmpty = true;
-                                    } else if (nameDataEl.contains("noponsel") && results.isEmpty()) {
-                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                        checkEmpty = true;
-                                    }
+//                                    if (requiredDataEl && results.isEmpty()) {
+//                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                        checkEmpty = true;
+//                                    } else if (nameDataEl.contains("noponsel") && results.isEmpty()) {
+//                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                        checkEmpty = true;
+//                                    }
                                     if (!results.isEmpty()) {
                                         objEl.put(nameDataEl, results);
                                     }
@@ -671,15 +691,16 @@ public class frag_ready_account extends Fragment {
                                     if (selectedId > 0 || selectedId < -1) {
                                         RadioButton rb = rg.findViewById(selectedId);
                                         String results = rb.getText().toString();
-                                        if (requiredDataEl && results.isEmpty()) {
-                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                            checkEmpty = true;
-                                        }
+//                                        if (requiredDataEl && results.isEmpty()) {
+//                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                            checkEmpty = true;
+//                                        }
                                         objEl.put(nameDataEl, results);
-                                    } else if (requiredDataEl){
-                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                        checkEmpty = true;
                                     }
+//                                    else if (requiredDataEl){
+//                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                        checkEmpty = true;
+//                                    }
                                     break;
                                 } else if (llFormBuild.getChildAt(i) instanceof CheckBox) {
                                     CheckBox chk = (CheckBox) llFormBuild.getChildAt(i);
@@ -694,29 +715,29 @@ public class frag_ready_account extends Fragment {
                                     Spinner spin = (Spinner) llFormBuild.getChildAt(i);
                                     if (spin.isSelected()) {
                                         String results = spin.getSelectedItem().toString();
-                                        if (requiredDataEl && results.isEmpty()) {
-                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                            checkEmpty = true;
-                                        }
+//                                        if (requiredDataEl && results.isEmpty()) {
+//                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                            checkEmpty = true;
+//                                        }
                                         objEl.put(nameDataEl, results);
                                     }
                                     break;
                                 } else if (llFormBuild.getChildAt(i) instanceof RelativeLayout) {
                                     RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                     if (rl.getChildAt(0) instanceof Spinner) {
-                                        if (objEl.getString(nameDataEl).toLowerCase().contains("pilih") || objEl.getString(nameDataEl).toLowerCase().contains("select") || objEl.getString(nameDataEl).toLowerCase().contains("choose")) {
-                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                            checkEmpty = true;
-                                        }
+//                                        if (objEl.getString(nameDataEl).toLowerCase().contains("pilih") || objEl.getString(nameDataEl).toLowerCase().contains("select") || objEl.getString(nameDataEl).toLowerCase().contains("choose")) {
+//                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                            checkEmpty = true;
+//                                        }
                                         break;
                                     } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
                                         AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
                                         String results = autoText.getText().toString();
-                                        if (requiredDataEl && results.isEmpty()) {
-                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                            checkEmpty = true;
-                                            break;
-                                        }
+//                                        if (requiredDataEl && results.isEmpty()) {
+//                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                            checkEmpty = true;
+//                                            break;
+//                                        }
                                         if (!results.isEmpty()) {
                                             objEl.put(nameDataEl, results);
                                         }
@@ -724,11 +745,11 @@ public class frag_ready_account extends Fragment {
                                 } else if (llFormBuild.getChildAt(i) instanceof AutoCompleteTextView) {
                                     AutoCompleteTextView autoText = (AutoCompleteTextView) llFormBuild.getChildAt(i);
                                     String results = autoText.getText().toString();
-                                    if (requiredDataEl && results.isEmpty()) {
-                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                        checkEmpty = true;
-                                        break;
-                                    }
+//                                    if (requiredDataEl && results.isEmpty()) {
+//                                        Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                        checkEmpty = true;
+//                                        break;
+//                                    }
                                     if (!results.isEmpty()) {
                                         objEl.put(nameDataEl, results);
                                     }
@@ -738,13 +759,13 @@ public class frag_ready_account extends Fragment {
                                     if (ll.findViewById(R.id.llCurrency) != null) {
                                         EditText tvContentCurr = (EditText) ll.findViewById(R.id.tvContentCurr);
                                         String results = tvContentCurr.getText().toString();
-                                        if (requiredDataEl && results.isEmpty()) {
-                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                            checkEmpty = true;
-                                        } else if (results.isEmpty()) {
-                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
-                                            checkEmpty = true;
-                                        }
+//                                        if (requiredDataEl && results.isEmpty()) {
+//                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                            checkEmpty = true;
+//                                        } else if (results.isEmpty()) {
+//                                            Toast.makeText(mContext, labelDataEl + " "+getString(R.string.alertRTGS), Toast.LENGTH_SHORT).show();
+//                                            checkEmpty = true;
+//                                        }
                                         if (!results.isEmpty()) {
                                             objEl.put(nameDataEl, results);
                                         }
