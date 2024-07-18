@@ -165,7 +165,6 @@
             android:name=".Helper.OutboundServiceNew"
             android:enabled="true"
             android:exported="true"
-            android:foregroundServiceType="specialUse"
             android:stopWithTask="false"/>
 
         <receiver

@@ -48,7 +48,7 @@ public class DipsSplashScreen extends AppCompatActivity {
         //Untuk mengambil version dari Apps
         try {
             PackageInfo info = getApplication().getPackageManager().getPackageInfo(getPackageName(),0);
-            String version = "1.0.43";
+            String version = "1.0.44";
             version = "V "+version;
             tvVersion.setText(version);
         }
