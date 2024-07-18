@@ -2663,7 +2663,6 @@ public class frag_update_data extends Fragment {
     }
 
     private void processMatchDataFromeSession() {
-        Log.e("TAG Masuk","processMatchDataFromeSession");
         try {
             JSONObject objDataSession = null;
             if (formId == 109) {

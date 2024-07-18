@@ -46,6 +46,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.work.Constraints;
 import androidx.work.Data;
@@ -305,7 +306,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()  {
         if (inPreview) {
             camera.stopPreview();
         }
@@ -1512,6 +1513,9 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                 String csId = sessions.getCSID();
                 sweetAlertDialog.dismiss();
                 startWaiting = false;
+                if (csId != null && !csId.isEmpty()) {
+                    publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
+                }
                 OutApps();
             }
         });

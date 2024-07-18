@@ -513,7 +513,7 @@ public class DipsTransactionsCreate extends AppCompatActivity {
                                             }
                                             if (!flagDot) {
                                                 if (CompoName.contains("sumberdana") || (nameDataEl.contains("rekening") && nameDataEl.contains("penerima"))) {
-                                                    processGetDynamicURLSumberDana(spin,urlPath);
+                                                    processGetDynamicURLSumberDana(spin,urlPath,nameDataEl);
                                                 } else {
                                                     processGetDynamicURL(spin, urlPath, nameDataEl);
                                                 }
@@ -770,7 +770,7 @@ public class DipsTransactionsCreate extends AppCompatActivity {
         }
     }
 
-    private void processGetDynamicURLSumberDana(Spinner spinner, String urlPath) {
+    private void processGetDynamicURLSumberDana(Spinner spinner, String urlPath,String nameDataEl) {
         JSONObject jsons = new JSONObject();
         try {
             jsons.put("noCif",sessions.getNoCIF());
@@ -796,7 +796,14 @@ public class DipsTransactionsCreate extends AppCompatActivity {
                         }
                         JSONObject objData = dataObj.getJSONObject("data");
                         JSONArray dataArr = objData.getJSONArray("portotabungan");
-                        String textSelect = getString(R.string.choose_source_fund);
+                        String textSelect = "";
+                        if ((nameDataEl.contains("rekeningpenerima"))){
+                            textSelect = getString(R.string.choose_source_fund_receive);
+                        }
+                        else{
+                            textSelect = getString(R.string.choose_source_fund);
+                        }
+
                         ArrayList<FormSpin> dataDropDown = new ArrayList<>();
                         String[] sourceAcc = new String[dataArr.length()+1];
                         sourceAcc[0] = textSelect;

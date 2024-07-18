@@ -55,6 +55,7 @@
         <include
             android:id="@+id/incNavBottom"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             layout="@layout/layout_bottom_action_bar_swafoto"
             android:layout_alignParentBottom="true"/>

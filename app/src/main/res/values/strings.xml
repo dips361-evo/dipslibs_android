@@ -375,6 +375,7 @@
     <string name="qrcode_expired" translatable="false">QRCode Sudah Tidak Berlaku</string>
     <string name="rejected_transaksi" translatable="false">Transaksi Gagal</string>
     <string name="wording_gagal" translatable="false">Gagal!</string>
+    <string name="qr_code_sudah_diupload" translatable="false">QRCode Sudah Diunggah</string>
     <string name="minimum_deposito_alert" translatable="false">Minimal Deposito</string>
     <string name="storage_permission_not_allowed" translatable="false">Silahkan izinkan penyimpanan file</string>
     <string name="wording_melebihi_sumber_dana" translatable="false">Terdapat transaksi yang melebihi sumber dana!</string>

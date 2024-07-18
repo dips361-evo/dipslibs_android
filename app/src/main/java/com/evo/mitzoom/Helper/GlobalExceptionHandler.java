@@ -24,7 +24,6 @@ public class GlobalExceptionHandler {
 
     public static void getLog(Exception e){
         try{
-            Log.e("TAG","LOG = "+Log.getStackTraceString(e));
             JSONObject objReq = new JSONObject();
             String logInfo = Log.getStackTraceString(e);
             objReq.put("log",logInfo);
@@ -42,7 +41,7 @@ public class GlobalExceptionHandler {
         Server.getAPIServiceLogger().LoggerAndroid(requestBody).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("TAG","Response = "+response);
+
 
             }
 

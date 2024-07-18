@@ -58,20 +58,21 @@
 
             <ImageView
                 android:id="@+id/takePicture"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/ic_capture"
-                android:paddingBottom="5dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_centerInParent="true"
-                android:backgroundTint="@color/red_btn_bg_pressed_color"/>
+                android:background="@drawable/ic_camera_click"
+                android:backgroundTint="@color/red_btn_bg_color"
+                android:paddingBottom="5dp" />
 
             <ImageView
                 android:id="@+id/imgSwitch"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:background="@drawable/ic_switch"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/ic_camera_switch"
                 android:backgroundTintMode="multiply"
-                android:backgroundTint="@color/colorUtama"
+
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true" />
 

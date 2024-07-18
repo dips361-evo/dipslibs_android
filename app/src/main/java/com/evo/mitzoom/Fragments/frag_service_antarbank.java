@@ -328,8 +328,27 @@ public class frag_service_antarbank extends Fragment {
             btnContinue.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (labelTrx.equals("antarbank")) {
-                        if (!jenislayanan.isEmpty()) {
+                    if (checkNamaPenerima()){
+                        if (labelTrx.equals("antarbank")) {
+                            if (!jenislayanan.isEmpty()) {
+                                int loopInq = 0 ;
+                                if (isSessionZoom) {
+                                    BaseMeetingActivity.showProgress(true);
+                                } else {
+                                    DipsSwafoto.showProgress(true);
+                                }
+
+                                biayaLayanan = 0;
+
+                                processGetFeeCharge(loopInq);
+
+
+                            } else {
+                                Toast.makeText(mContext,labelTypeServ+" "+getString(R.string.alertRTGS),Toast.LENGTH_LONG).show();
+                            }
+                        }
+                        else {
+                            jenislayanan = "interbank";
                             int loopInq = 0 ;
                             if (isSessionZoom) {
                                 BaseMeetingActivity.showProgress(true);
@@ -338,26 +357,14 @@ public class frag_service_antarbank extends Fragment {
                             }
 
                             biayaLayanan = 0;
-
                             processGetFeeCharge(loopInq);
-
-
-                        } else {
-                            Toast.makeText(mContext,labelTypeServ+" "+getString(R.string.alertRTGS),Toast.LENGTH_LONG).show();
                         }
+
                     }
                     else {
-                        jenislayanan = "interbank";
-                        int loopInq = 0 ;
-                        if (isSessionZoom) {
-                            BaseMeetingActivity.showProgress(true);
-                        } else {
-                            DipsSwafoto.showProgress(true);
-                        }
-
-                        biayaLayanan = 0;
-                        processGetFeeCharge(loopInq);
+                        Toast.makeText(mContext, getText(R.string.error_field), Toast.LENGTH_SHORT).show();
                     }
+
                 /*else {
                     processInquiryOnline(loopInq);
                 }*/
@@ -414,6 +421,24 @@ public class frag_service_antarbank extends Fragment {
         } catch (Exception e) {
             GlobalExceptionHandler.getLog(e);
         }
+    }
+
+    private boolean checkNamaPenerima(){
+        boolean isCheck = true;
+        try {
+            for(int i=0;i<dataTrxArr.length();i++){
+                JSONObject getObj = dataTrxArr.getJSONObject(i).getJSONObject("data");
+                if (getObj.has("namapenerima")){
+                    if (getObj.getString("namapenerima").isEmpty()){
+                        isCheck =   false;
+                    }
+                }
+            }
+        }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
+        return isCheck;
     }
 
     private void addData() {
@@ -657,10 +682,16 @@ public class frag_service_antarbank extends Fragment {
 
             @Override
             public void onClick(View v) {
-                if (getBindingAdapterPosition() == RecyclerView.NO_POSITION) return;
-                notifyItemChanged(selected_position);
-                selected_position = getBindingAdapterPosition();
-                notifyItemChanged(selected_position);
+                try {
+                    if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+                    notifyItemChanged(selected_position);
+                    selected_position = getAdapterPosition();
+                    notifyItemChanged(selected_position);
+                }
+                catch (Exception e) {
+                    GlobalExceptionHandler.getLog(e);
+                }
+
             }
         }
     }
@@ -1485,9 +1516,12 @@ public class frag_service_antarbank extends Fragment {
                                 JSONObject dataTrx = dataTrxArr.getJSONObject(loopInq).getJSONObject("data");
                                 dataTrx.put("namapenerima",destCustomerName);
                                 dataTrx.put("rekeningpenerima", noRekBaru);
+
                                 JSONObject getObjTrx = dataTrxArr.getJSONObject(loopInq);
                                 getObjTrx.put("data", dataTrx);
                                 dataTrxArr.put(selected_position, getObjTrx);
+
+
                                 ///
 
                             } catch (JSONException e) {
@@ -3391,6 +3425,22 @@ public class frag_service_antarbank extends Fragment {
                             JSONObject dataBank = dataBody1.getJSONObject("data");
                             String noForm = dataBody1.getString("noForm");
 
+                            for (String item : noFormQR) {
+                                if (item.trim().equalsIgnoreCase(noForm.trim())){
+                                    Toast.makeText(mContext, getString(R.string.qr_code_sudah_diupload), Toast.LENGTH_SHORT).show();
+                                    if (dataItems.size() > 0) {
+                                        nameItemQR.remove(dataItems.size() - 1);
+                                        dataItems.remove(dataItems.size() - 1);
+                                        recyclerViewAdapter.notifyDataSetChanged();
+                                        if (dataItems.size() == 0) {
+                                            addData();
+                                            setRecyler();
+                                        }
+                                    }
+                                    return;
+                                }
+                            }
+
                             String bankpenerima = "";
                             String rekeningpenerima = "";
                             String nominaltransaksi = "";
@@ -3490,9 +3540,7 @@ public class frag_service_antarbank extends Fragment {
                         if (response.code() == 500) {
                             Toast.makeText(mContext,getString(R.string.qrcode_expired),Toast.LENGTH_LONG).show();
                             if (dataItems.size() > 0) {
-                                if (noFormQR.size() > 0) {
-                                    noFormQR.remove(dataItems.size() - 1);
-                                }
+//                           \
                                 nameItemQR.remove(dataItems.size() - 1);
                                 dataItems.remove(dataItems.size() - 1);
                                 recyclerViewAdapter.notifyDataSetChanged();

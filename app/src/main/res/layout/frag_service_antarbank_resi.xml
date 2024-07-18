@@ -89,13 +89,6 @@
                     android:layout_margin="@dimen/dp_10"
                     android:visibility="gone">
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Transaksi Gagal"
-                        android:textColor="@color/zm_text"
-                        android:textAlignment="center"/>
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_item_notyet"
                         android:layout_width="match_parent"

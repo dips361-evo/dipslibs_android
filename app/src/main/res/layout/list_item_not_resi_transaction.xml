@@ -8,13 +8,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="1. Antar Bank - BI-Fast"
-            android:textColor="@color/zm_text"/>
 
         <TextView
             android:id="@+id/tvMessages"
@@ -22,7 +15,6 @@
             android:layout_height="wrap_content"
             android:textColor="@color/zm_button"
             tools:text="Informasi yang diberikan tidak sesuai"
-            android:layout_below="@id/tvTitle"
             android:paddingStart="@dimen/dp_10"/>
     </RelativeLayout>
 
