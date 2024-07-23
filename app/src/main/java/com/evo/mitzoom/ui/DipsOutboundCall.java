@@ -59,6 +59,7 @@ import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Constants.AuthConstants;
 import com.evo.mitzoom.Fragments.frag_berita;
+import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
 import com.evo.mitzoom.Helper.MyWorker;
 import com.evo.mitzoom.Helper.OutboundServiceNew;
 import com.evo.mitzoom.R;
@@ -159,6 +160,7 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
     private DatePickerDialog dpd;
     private JSONArray tanggalPenuh;
     private JSONArray periodePenuh;
+    private String urlGambar = "https://diops.victoriabank.co.id/aset/digiops.png";
 
     //RabitMQ
     ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -241,14 +243,14 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         imageAgent = OutboundServiceNew.getImagesAgent();
         nameAgent = OutboundServiceNew.getNameAgent();
         sessionId = OutboundServiceNew.getSessionID_Zoom();
-        nama_agen.setText(nameAgent);
+        nama_agen.setText("DigiOps");
 
         setupConnectionFactory(); //RabbitMQ
 
         previewHolder();
 
         if (!imageAgent.isEmpty()) {
-            String imageAgentnew = imageAgent.replace("https://dips.grit.id:6503/", Server.BASE_URL_API);
+            String imageAgentnew = urlGambar;
             new DownloadImageTask().execute(imageAgentnew);
         } else {
             imgCS.setImageDrawable(getDrawable(R.drawable.agen_profile));
@@ -772,7 +774,7 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
                     }
 
                     //doWorkMyWorker();
-                    OutApps();
+                    PopUpEndSchedule();
                     serviceOutbound();
                 }
             }
@@ -784,6 +786,41 @@ public class DipsOutboundCall extends AppCompatActivity implements DatePickerDia
         });
 
     }
+
+    private void PopUpEndSchedule() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.layout_dialog_sweet, null);
+
+        ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
+        TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);
+        TextView tvBodyDialog = dialogView.findViewById(R.id.tvBodyDialog);
+        Button btnCancelDialog = dialogView.findViewById(R.id.btnCancelDialog);
+        Button btnConfirmDialog = dialogView.findViewById(R.id.btnConfirmDialog);
+
+        tvTitleDialog.setVisibility(View.GONE);
+
+        imgDialog.setImageDrawable(getDrawable(R.drawable.v_dialog_success));
+        tvBodyDialog.setText(getString(R.string.content_after_schedule));
+        btnConfirmDialog.setText(getString(R.string.done));
+
+        SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(mContext, SweetAlertDialog.NORMAL_TYPE);
+        sweetAlertDialog.setCustomView(dialogView);
+        sweetAlertDialog.hideConfirmButton();
+        sweetAlertDialog.setCancelable(false);
+        sweetAlertDialog.show();
+
+        btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String csId = sessions.getCSID();
+                sweetAlertDialog.dismiss();
+                ConnectionRabbitHttp.mirroringEndpoint(99);
+                OutApps();
+            }
+        });
+    }
+
+
 
     private void doWorkMyWorker() {
         workManager = WorkManager.getInstance(mContext);

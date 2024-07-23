@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -317,11 +318,32 @@ public class frag_service_antarbank extends Fragment {
             btnAddForm.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    formId = formIdAwal;
-                    longNumCurrent = 0;
-                    minNominal = "0";
-                    maxNominal = "0";
-                    addItemsPager();
+                    try{
+                        Log.e("TAG","dataTrxArr ="+dataTrxArr);
+                        if (dataTrxArr.length() > 0){
+                            JSONObject getObj = dataTrxArr.getJSONObject(selected_position).getJSONObject("data");
+                            if (getObj.has("namapenerima") && getObj.getString("namapenerima").trim().isEmpty()){
+                                Toast.makeText(mContext, getString(R.string.error_field), Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                formId = formIdAwal;
+                                longNumCurrent = 0;
+                                minNominal = "0";
+                                maxNominal = "0";
+                                addItemsPager();
+                            }
+                        }
+                        else {
+                            formId = formIdAwal;
+                            longNumCurrent = 0;
+                            minNominal = "0";
+                            maxNominal = "0";
+                            addItemsPager();
+                        }
+                    }
+                    catch (Exception e){
+                        GlobalExceptionHandler.getLog(e);
+                    }
                 }
             });
 
@@ -682,7 +704,17 @@ public class frag_service_antarbank extends Fragment {
 
             @Override
             public void onClick(View v) {
+
+
                 try {
+                    JSONObject getObj = dataTrxArr.getJSONObject(selected_position).getJSONObject("data");
+                    if (getObj.has("namapenerima")){
+                        if (getObj.getString("namapenerima").trim().isEmpty()){
+                            Toast.makeText(mContext, getString(R.string.error_field), Toast.LENGTH_SHORT).show();
+                           return;
+                        }
+                    }
+
                     if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
                     notifyItemChanged(selected_position);
                     selected_position = getAdapterPosition();
@@ -1503,13 +1535,14 @@ public class frag_service_antarbank extends Fragment {
                         if (response.isSuccessful()) {
                             String dataS = response.body().toString();
                             try {
+                                tvAlertRek.setText("");
+                                tvAlertRek.setVisibility(View.GONE);
                                 JSONObject dataObj = new JSONObject(dataS);
                                 JSONObject dataBody = dataObj.getJSONObject("data");
                                 JSONObject dataBody1 = dataBody.getJSONObject("data");
                                 String destCustomerName = dataBody1.getString("destCustomerName");
                                 btnContinue.setEnabled(true);
                                 btnContinue.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.zm_button));
-
                                 edNamePenerima.setText(destCustomerName);
                                 messageError = "";
                                 ///fixing nama penerima & nomor penerima
@@ -3603,8 +3636,26 @@ public class frag_service_antarbank extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUESTCODE_GALLERY_QRCODE) {
             if (resultCode == RESULT_OK && data != null) {
-                Uri selectedImage = data.getData();
-                barcodeDecoder(selectedImage);
+                try{
+                    if (dataTrxArr.length() > 0){
+                        JSONObject getObj = dataTrxArr.getJSONObject(selected_position).getJSONObject("data");
+                        if (getObj.has("namapenerima")){
+                            if (getObj.getString("namapenerima").trim().isEmpty()){
+                                Toast.makeText(mContext, getString(R.string.error_field), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                    }
+
+
+                    Uri selectedImage = data.getData();
+                    barcodeDecoder(selectedImage);
+                }
+                catch (Exception e) {
+                    messageBarcodeFailed();
+                    GlobalExceptionHandler.getLog(e);
+                }
+
             }
         }
         else if (requestCode == REQUESTCODE_GALLERY){

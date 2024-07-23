@@ -68,6 +68,7 @@ import com.evo.mitzoom.Helper.MyWorker;
 import com.evo.mitzoom.Helper.OutboundServiceNew;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
+import com.evo.mitzoom.ui.Alternative.DipsSwafoto;
 import com.evo.mitzoom.util.ErrorMsgUtil;
 import com.evo.mitzoom.util.NetworkUtil;
 import com.evo.mitzoom.view.CircularSurfaceView;
@@ -190,6 +191,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     private CardView cvFormTrx;
     private SweetAlertDialog dialogWaiting;
     private boolean flagCall = false;
+    private String csId_ = "";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -251,12 +253,18 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         btnSchedule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (time.size() > 0) {
-                    PopUpSchedule();
+                if (myTicket.getText().toString().isEmpty() || csId_.isEmpty()){
+                    Toast.makeText(mContext, getString(R.string.wait_antrian), Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    Toast.makeText(mContext,getString(R.string.please_wait),Toast.LENGTH_SHORT).show();
+                    if (time.size() > 0) {
+                        PopUpSchedule();
+                    }
+                    else {
+                        Toast.makeText(mContext,getString(R.string.please_wait),Toast.LENGTH_SHORT).show();
+                    }
                 }
+
             }
         });
 
@@ -306,7 +314,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     @Override
-    protected void onPause()  {
+    protected void onPause() {
         if (inPreview) {
             camera.stopPreview();
         }
@@ -377,6 +385,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                 ConnectionRabbitHttp.getMyTicket(new ConnectionRabbitHttp.getTicketInfoCallbacks() {
                     @Override
                     public void onSuccess(@NonNull String myticketContent) {
+                        Log.e("TAG","myticketContent "+myticketContent);
                         myTicketNumber = myticketContent;
                         myTicket.setText(myticketContent);
                         ConnectionHttpListenCall();
@@ -401,6 +410,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     private void ConnectionHttpListenCall() {
+        Log.e("TAG","ConnectionHttpListenCall");
         ConnectionRabbitHttp.listenCall(new ConnectionRabbitHttp.getTicketInfoCallbacks() {
             @Override
             public void onSuccess(@NonNull String dataS) {
@@ -408,9 +418,10 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                     JSONObject bodyObj = new JSONObject(dataS);
                     String getTicket = bodyObj.getString("ticket");
                     String actionCall = bodyObj.getString("action");
-
+                    Log.e("TAG","listenCall = "+bodyObj);
                     if (actionCall.equals("info")) {
                         String csId = bodyObj.getString("csId");
+                        csId_ = csId;
                         sessions.saveCSID(csId);
                     } else {
                         int getTicketInt = Integer.parseInt(getTicket);
@@ -432,7 +443,8 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
 
                             NameSession = sessionId;
                             SessionPass = password;
-                            sessions.saveCSID(csId);
+//                            csId_ = csId;
+//                            sessions.saveCSID(csId);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -461,7 +473,8 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
 
             @Override
             public void onError(@NonNull Throwable throwable) {
-
+                Log.e("TAG","ConnectionHttpListenCall error = "+throwable.getMessage());
+                ConnectionHttpListenCall();
             }
         });
     }
@@ -716,61 +729,6 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         }
     }
 
-    void subscribeReqTicket() {
-        if (connection != null) {
-            subscribeReqTicketThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        channelSubscribeReqTicket = connection.createChannel();
-                        channelSubscribeReqTicket.basicQos(1);
-                        AMQP.Queue.DeclareOk q = channelSubscribeReqTicket.queueDeclare();
-                        channelSubscribeReqTicket.exchangeDeclare("dips361-cust-req-ticket", "direct", true);
-                        channelSubscribeReqTicket.queueBind(q.getQueue(), "dips361-cust-req-ticket", "dips.direct.cust." + idDips + ".req.ticket");
-                        channelSubscribeReqTicket.basicConsume(q.getQueue(), true, new DeliverCallback() {
-                            @Override
-                            public void handle(String consumerTag, Delivery message) throws IOException {
-                                String getMessage = new String(message.getBody());
-                                try {
-                                    JSONObject dataObj = new JSONObject(getMessage);
-                                    String ticketLast = dataObj.getJSONObject("transaction").getString("ticket");
-                                    int ticketLastInt = Integer.parseInt(ticketLast);
-                                    String lastQueue = String.format("%03d", ticketLastInt);
-                                    String lastTicketContent = lastQueue;
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            lastTicket.setText(lastTicketContent);
-                                        }
-                                    });
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                                subscribeCall(); //RabbitMQ
-                                subscribe(); //RabbitMQ
-                            }
-                        }, new CancelCallback() {
-                            @Override
-                            public void handle(String consumerTag) throws IOException {
-
-                            }
-                        });
-
-                        publishQSReqTicket();
-                    } catch (Exception e1) {
-                        try {
-                            Thread.sleep(4000); //sleep and then try again
-                            subscribeReqTicket();
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                }
-            });
-            subscribeReqTicketThread.start();
-        }
-    }
-
     void subscribeCall() {
         if (connection != null) {
             subscribeThreadCall = new Thread(new Runnable() {
@@ -788,12 +746,14 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                                 String getMessage = new String(message.getBody());
                                 try {
                                     JSONObject dataObj = new JSONObject(getMessage);
+                                    Log.e("TAG","subscribeCall = "+dataObj);
                                     String actionCall = "";
                                     if (dataObj.getJSONObject("transaction").has("action")) {
                                         actionCall = dataObj.getJSONObject("transaction").getString("action");
                                     }
                                     if (actionCall.equals("info")) {
                                         String csId = dataObj.getJSONObject("transaction").getString("csId");
+                                        csId_ = csId;
                                         sessions.saveCSID(csId);
                                     } else {
                                         int getTicket = dataObj.getJSONObject("transaction").getInt("ticket");
@@ -815,7 +775,8 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
 
                                             NameSession = sessionId;
                                             SessionPass = password;
-                                            sessions.saveCSID(csId);
+//                                            csId_ = csId;
+//                                            sessions.saveCSID(csId);
                                             runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
@@ -864,6 +825,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     public static void publishCallAcceptHttp(String csId, String labelAction) {
+        Log.e("TAG","publishCallAcceptHttp = "+labelAction+" | csId = "+csId);
         JSONObject dataObj = new JSONObject();
         try {
             dataObj.put("custId", idDips);
@@ -873,6 +835,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.e("TAG","publishCallAcceptHttp dataObj = "+dataObj);
         ConnectionRabbitHttp.acceptCall(dataObj);
     }
 
@@ -1204,8 +1167,14 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
             btnCancelDialog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    dialogWaiting.dismissWithAnimation();
-                    PopUpSchedule();
+                    if (myTicket.getText().toString().isEmpty() || csId_.isEmpty()){
+                        Toast.makeText(mContext, getString(R.string.wait_antrian), Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        dialogWaiting.dismissWithAnimation();
+                        PopUpSchedule();
+                    }
+
                 }
             });
         }
@@ -1334,14 +1303,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                     }
                     //Toast.makeText(context.getApplicationContext(), getResources().getString(R.string.schedule) + tanggal + " & " + getResources().getString(R.string.jam) + waktu, Toast.LENGTH_LONG).show();
                     sweetAlertDialog.dismiss();
-                    String csId = sessions.getCSID();
-                    if (csId != null && !csId.isEmpty()) {
-                        publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
-                        if (flagCall) {
-                            ConnectionRabbitHttp.mirroringEndpoint(99);
-                            flagCall = false;
-                        }
-                    }
+                    publishCallAcceptHttp(csId_, "cancel");
                     sessions.saveIDSchedule(0);
                     showProgress(true);
                     saveSchedule();
@@ -1352,6 +1314,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     private void saveSchedule(){
+        publishCallAcceptHttp(csId_, "cancel");
         int periodeId = dataPeriodeId.get(waktu);
         JSONObject jsons = new JSONObject();
         try {
@@ -1513,10 +1476,16 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                 String csId = sessions.getCSID();
                 sweetAlertDialog.dismiss();
                 startWaiting = false;
-                if (csId != null && !csId.isEmpty()) {
-                    publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
-                }
-                OutApps();
+
+                publishCallAcceptHttp(csId_, "cancel");
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        OutApps();
+                    }
+                },1000);
+
             }
         });
     }
@@ -1561,7 +1530,6 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                     dialogSuccess.dismissWithAnimation();
                     publishCallAcceptHttp(csId,"accept"); //RabbitMQ
                     processJoinVideo();
-                    //Popup();
                 } else {
                     Toast.makeText(mContext,"Password Conference belum ada",Toast.LENGTH_LONG).show();
                 }
@@ -1573,7 +1541,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
             public void onClick(View view) {
                 dialogSuccess.cancel();
                 dialogSuccess.dismissWithAnimation();
-                publishCallAcceptHttp(csId,"cancel"); //RabbitMQ
+                publishCallAcceptHttp(csId_,"cancel"); //RabbitMQ
                 EndCallAccept();
             }
         });
@@ -1603,8 +1571,14 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopUpSchedule();
-                sweetAlertDialog.dismissWithAnimation();
+                if (myTicket.getText().toString().isEmpty() || csId_.isEmpty()){
+                    Toast.makeText(mContext, getString(R.string.wait_antrian), Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    PopUpSchedule();
+                    sweetAlertDialog.dismissWithAnimation();
+                }
+
             }
         });
     }
@@ -1639,15 +1613,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
             public void onClick(View view) {
                 startWaiting = false;
                 sweetAlertDialog.dismissWithAnimation();
-                String csId = sessions.getCSID();
-                if (csId != null && !csId.isEmpty()) {
-                    publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
-                    if (flagCall) {
-                        ConnectionRabbitHttp.mirroringEndpoint(99);
-                        flagCall = false;
-                    }
-                }
-                //Toast.makeText(context,getResources().getString(R.string.end_call2), Toast.LENGTH_LONG).show();
+                publishCallAcceptHttp(csId_, "cancel");
                 OutApps();
             }
         });
@@ -1871,11 +1837,14 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
             @Override
             public void onClick(View v) {
                 dialogFailCall.dismiss();
-                String csId = sessions.getCSID();
-                if (csId != null && !csId.isEmpty()) {
-                    publishCallAcceptHttp(csId, "cancel"); //RabbitMQ
-                }
-                OutApps();
+                publishCallAcceptHttp(csId_, "cancel");
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        OutApps();
+                    }
+                },1000);
+
             }
         });
     }

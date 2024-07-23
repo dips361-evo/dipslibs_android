@@ -21,6 +21,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.evo.mitzoom.Helper.NotificationMgr;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
 
@@ -45,10 +46,12 @@ public class DipsSplashScreen extends AppCompatActivity {
         sessionManager = new SessionManager(DipsSplashScreen.this);
         sessionManager.clearData();
 
+
+
         //Untuk mengambil version dari Apps
         try {
             PackageInfo info = getApplication().getPackageManager().getPackageInfo(getPackageName(),0);
-            String version = "1.0.44";
+            String version = "1.0.45";
             version = "V "+version;
             tvVersion.setText(version);
         }

@@ -83,6 +83,15 @@ public class OutboundServiceNew extends Service {
         //setupConnectionFactory(); //RabbitMQ
         ConnectionRabbitHttp.init(mContext);
         //subscribeCall();
+        listenCall_();
+
+        final PowerManager pm = ContextCompat.getSystemService(mContext, PowerManager.class);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Outbound:Service");
+
+        sessionId = idDips;
+    }
+
+    private void listenCall_(){
         ConnectionRabbitHttp.listenCall(new ConnectionRabbitHttp.getTicketInfoCallbacks() {
             @Override
             public void onSuccess(@NonNull String dataS) {
@@ -112,30 +121,36 @@ public class OutboundServiceNew extends Service {
                             namaAgen = bodyObj.getString("namaAgen");
                         }
 
-                        password_session = password;
-                        customerName = sessions.getNasabahName();
-                        imagesAgent = agentImage;
-                        nameAgent = namaAgen;
-                        sessions.saveCSID(csId);
+                        if (!agentImage.isEmpty()){
+                            password_session = password;
+                            customerName = sessions.getNasabahName();
+                            imagesAgent = agentImage;
+                            nameAgent = namaAgen;
+                            sessions.saveCSID(csId);
 
-                        Intent intent = new Intent(getApplicationContext(), MyBroadcastReceiver.class);
-                        intent.setAction("calloutbound");
+                            Intent intent = new Intent(getApplicationContext(), MyBroadcastReceiver.class);
+                            intent.setAction("calloutbound");
 
-                        PendingIntent pendingIntent = null;
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                            pendingIntent = PendingIntent.getBroadcast
-                                    (mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-                        } else {
-                            pendingIntent = PendingIntent.getBroadcast
-                                    (mContext, 0, intent, 0);
+                            PendingIntent pendingIntent = null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                                pendingIntent = PendingIntent.getBroadcast
+                                        (mContext, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+                            } else {
+                                pendingIntent = PendingIntent.getBroadcast
+                                        (mContext, 0, intent, 0);
+                            }
+
+                            long addTimes = System.currentTimeMillis() + 1000;
+
+                            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, addTimes, pendingIntent);
+
+                            showNotificationOutbound();
+                        }
+                        else {
+                            listenCall_();
                         }
 
-                        long addTimes = System.currentTimeMillis() + 1000;
-
-                        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, addTimes, pendingIntent);
-
-                        showNotificationOutbound();
                     }
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
@@ -147,10 +162,6 @@ public class OutboundServiceNew extends Service {
 
             }
         });
-        final PowerManager pm = ContextCompat.getSystemService(mContext, PowerManager.class);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Outbound:Service");
-
-        sessionId = idDips;
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.evo.mitzoom.Model.ItemModel;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
 
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -64,6 +65,8 @@ public class AdapterQR extends RecyclerView.Adapter<AdapterQR.ItemHolder> implem
         holder.cvImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 intPos = pos;
                 sessions.saveMedia(2);
                 chooseFromSD();

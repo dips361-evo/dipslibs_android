@@ -105,6 +105,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 
         holder.ads.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
+            Log.e("TAG","dataList.get(position).getId() "+dataList.get(position).getId());
             switch (dataList.get(position).getId()){
                 case "0" :
                     ConnectionRabbitHttp.mirroringEndpoint(201);

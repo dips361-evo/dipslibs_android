@@ -4732,7 +4732,6 @@ public class frag_cif_new extends Fragment {
                             sessions.saveAuthToken(accessToken);
                             sessions.saveExchangeToken(exchangeToken);
                         }
-                        Log.e("TAG","processDukcapil = "+dataS);
                         String status = dataObj.getString("status");
                         String msg = dataObj.getString("message");
                         if (status.equals("oke")){
@@ -4811,7 +4810,6 @@ public class frag_cif_new extends Fragment {
         });
     }
     private void dialogFailedValidation(String kasus) {
-        Log.e("TAG","KASUS = "+kasus);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.layout_dialog_sweet, null);
 

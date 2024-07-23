@@ -637,7 +637,7 @@ public class frag_service_confirm_antarbank extends Fragment {
                         String idForm = dataObj.getJSONObject("data").getString("idForm");
                         JSONObject idFormObj = new JSONObject();
                         idFormObj.put("idForm",idForm);
-
+                        Log.e("TAG","idForm = "+idForm+" | Urutan ke = "+loopSave);
                         String timeStamp = new SimpleDateFormat("yyyy-MM-dd",
                                 Locale.getDefault()).format(new Date());
 

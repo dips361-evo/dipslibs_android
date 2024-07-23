@@ -368,6 +368,7 @@
     <string name="sort_by">Sort By :</string>
     <string name="filter_berdasarkan">Filter by :</string>
     <string name="lewati">Skip</string>
+    <string name="wait_antrian" translatable="false">Please wait a while</string>
     <string name="qr_code_sudah_diupload" translatable="false">QRCode was uploaded</string>
     <string name="qrcode_expired" translatable="false">QRCode Expired</string>
     <string name="foto_diri_ektp" translatable="false">*Photo of yourself with eKTP to update data</string>
