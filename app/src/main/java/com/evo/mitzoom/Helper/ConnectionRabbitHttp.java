@@ -18,16 +18,19 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import us.zoom.sdk.ZoomVideoSDK;
 
 public class ConnectionRabbitHttp {
 
     private static final String TAG = "ConnectionRabbitHttp";
     private static SessionManager sessions;
     private static String idDips;
+    private static boolean isSessionZoom = false;
 
     public static void init(Context mContext) {
         sessions = new SessionManager(mContext);
         idDips = sessions.getKEY_IdDips();
+        isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
     }
 
     public interface getTicketInfoCallbacks {
@@ -109,51 +112,46 @@ public class ConnectionRabbitHttp {
     }
 
     public static void listenCall(@Nullable getTicketInfoCallbacks callbacks) {
-        JSONObject dataObj = new JSONObject();
-        try {
-            dataObj.put("custId", idDips);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.e("TAG","listenCall = "+dataObj);
-
-        String authAccess = "Bearer "+sessions.getAuthToken();
-        String exchangeToken = sessions.getExchangeToken();
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataObj.toString());
-
-        Server.getAPIServiceRabbitHttp().RabbHttpListenCall(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("TAG","response listenCall = "+response);
-                if (response.isSuccessful()) {
-                    String dataS = response.body().toString();
-                    Log.e("TAG","isSuccessful listenCall = "+dataS);
-                    callbacks.onSuccess(dataS);
-                    try {
-                        JSONObject bodyObj = new JSONObject(dataS);
-                        String actionCall = bodyObj.getString("action");
-                        if (actionCall.equals("info")) {
-                            listenCall(callbacks);
-                        } else {
-                            listenCall(callbacks);
+        if (!isSessionZoom){
+            JSONObject dataObj = new JSONObject();
+            try {
+                dataObj.put("custId", idDips);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String authAccess = "Bearer "+sessions.getAuthToken();
+            String exchangeToken = sessions.getExchangeToken();
+            RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataObj.toString());
+            Server.getAPIServiceRabbitHttp().RabbHttpListenCall(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+                @Override
+                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    if (response.isSuccessful()) {
+                        String dataS = response.body().toString();
+                        callbacks.onSuccess(dataS);
+                        try {
+                            JSONObject bodyObj = new JSONObject(dataS);
+                            String actionCall = bodyObj.getString("action");
+                            if (actionCall.equals("info")) {
+                                listenCall(callbacks);
+                            } else {
+                                listenCall(callbacks);
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
+                    }
+                    else if (response.code() == 408) {
+                        listenCall(callbacks);
                     }
                 }
-                else if (response.code() == 408) {
-                    Log.e("TAG","response listenCall 408 = "+response);
+
+                @Override
+                public void onFailure(Call<JsonObject> call, Throwable t) {
+                    callbacks.onError(t);
                     listenCall(callbacks);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-                Log.e("TAG","onFailure listenCall = "+t.getMessage());
-                callbacks.onError(t);
-                listenCall(callbacks);
-            }
-        });
+            });
+        }
     }
 
     public static void acceptCall(JSONObject dataObj) {
