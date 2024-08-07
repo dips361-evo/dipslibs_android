@@ -304,6 +304,7 @@
     <string name="alert_nominal" translatable="false">*Nominal melebihi saldo sumber dana</string>
     <string name="balance_insufficient" translatable="false">Saldo Anda tidak mencukupi</string>
     <string name="konfirmasi" translatable="false">Konfirmasi</string>
+    <string name="konfirmasi_perubahan" translatable="false">Konfirmasi Perubahan</string>
     <string name="cari_produk" translatable="false">Cari Produk</string>
     <string name="saya_setuju" translatable="false">Saya Setuju</string>
     <string name="informasi_data_diri" translatable="false">Informasi Data Diri</string>
@@ -357,6 +358,7 @@
     <string name="mpin_not_match" translatable="false">Konfirmasi MPIN tidak sesuai</string>
     <string name="penjualan" translatable="false">Penjualan</string>
     <string name="transaksi_anda_gagal" translatable="false">Transaksi Anda Gagal</string>
+
     <string name="please_tryagain_later" translatable="false">Silakan coba kembali beberapa saat lagi.</string>
     <string name="tambah_rekening" translatable="false">Tambah Rekening</string>
     <string name="product_wm_not_avail" translatable="false">Produk belum tersedia.\nSilakan coba lagi nanti.</string>
@@ -371,6 +373,8 @@
     <string name="blokir_saldo" translatable="false">Blokir Saldo</string>
     <string name="wording_otp" translatable="false">Silakan menunggu waktu tunggu</string>
     <string name="permintaan_anda_sedang_diproses" translatable="false">Permintaan Anda sedang diproses.</string>
+    <string name="permintaan_anda_ditolak" translatable="false">Permintaan Anda ditolak</string>
+    <string name="wording_reject_update" translatable="false">Tidak ada data yang diubah.</string>
     <string name="manajemen_investasi" translatable="false">Manajemen Investasi</string>
     <string name="qrcode_expired" translatable="false">QRCode Sudah Tidak Berlaku</string>
     <string name="rejected_transaksi" translatable="false">Transaksi Gagal</string>

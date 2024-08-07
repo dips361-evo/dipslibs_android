@@ -119,14 +119,19 @@ public class ConnectionRabbitHttp {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            Log.e("TAG","listenCall = "+dataObj);
+
             String authAccess = "Bearer "+sessions.getAuthToken();
             String exchangeToken = sessions.getExchangeToken();
             RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), dataObj.toString());
+
             Server.getAPIServiceRabbitHttp().RabbHttpListenCall(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
                 @Override
                 public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                    Log.e("TAG","response listenCall = "+response);
                     if (response.isSuccessful()) {
                         String dataS = response.body().toString();
+                        Log.e("TAG","isSuccessful listenCall = "+dataS);
                         callbacks.onSuccess(dataS);
                         try {
                             JSONObject bodyObj = new JSONObject(dataS);
@@ -134,19 +139,21 @@ public class ConnectionRabbitHttp {
                             if (actionCall.equals("info")) {
                                 listenCall(callbacks);
                             } else {
-                                listenCall(callbacks);
+//                                listenCall(callbacks);
                             }
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
                     }
                     else if (response.code() == 408) {
+                        Log.e("TAG","response listenCall 408 = "+response);
                         listenCall(callbacks);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<JsonObject> call, Throwable t) {
+                    Log.e("TAG","onFailure listenCall = "+t.getMessage());
                     callbacks.onError(t);
                     listenCall(callbacks);
                 }

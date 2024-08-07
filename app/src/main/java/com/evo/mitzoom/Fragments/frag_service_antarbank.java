@@ -319,6 +319,7 @@ public class frag_service_antarbank extends Fragment {
                 @Override
                 public void onClick(View v) {
                     try{
+                        Log.e("TAG","dataTrxArr ="+dataTrxArr);
                         if (dataTrxArr.length() > 0){
                             JSONObject getObj = dataTrxArr.getJSONObject(selected_position).getJSONObject("data");
                             if (getObj.has("namapenerima") && getObj.getString("namapenerima").trim().isEmpty()){

@@ -305,6 +305,7 @@
     <string name="alert_nominal">*The nominal value exceeds the balance of the source of funds</string>
     <string name="balance_insufficient">Your balance is insufficient</string>
     <string name="konfirmasi">Confirmation</string>
+    <string name="konfirmasi_perubahan" translatable="false">Changes Confirmation</string>
     <string name="cari_produk">Product Search</string>
     <string name="saya_setuju">I Agree</string>
     <string name="informasi_data_diri">Personal Data Information</string>
@@ -360,6 +361,8 @@
     <string name="transaksi_anda_gagal">Your transaction failed</string>
     <string name="please_tryagain_later">Please try again later.</string>
     <string name="tambah_rekening">Add Account</string>
+    <string name="permintaan_anda_ditolak" translatable="false">Request denied</string>
+    <string name="wording_reject_update" translatable="false">No changed data.</string>
     <string name="product_wm_not_avail">Product are not yet available.\nPlease try again later.</string>
     <string name="unit_wm_not_avail">Mutual Fund unit are not yet available.\nPlease try again later.</string>
     <string name="nab">NAV</string>

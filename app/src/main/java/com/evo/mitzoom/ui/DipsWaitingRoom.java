@@ -385,6 +385,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                 ConnectionRabbitHttp.getMyTicket(new ConnectionRabbitHttp.getTicketInfoCallbacks() {
                     @Override
                     public void onSuccess(@NonNull String myticketContent) {
+                        Log.e("TAG","myticketContent "+myticketContent);
                         myTicketNumber = myticketContent;
                         myTicket.setText(myticketContent);
                         ConnectionHttpListenCall();
@@ -409,6 +410,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     private void ConnectionHttpListenCall() {
+        Log.e("TAG","ConnectionHttpListenCall");
         ConnectionRabbitHttp.listenCall(new ConnectionRabbitHttp.getTicketInfoCallbacks() {
             @Override
             public void onSuccess(@NonNull String dataS) {
@@ -416,6 +418,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                     JSONObject bodyObj = new JSONObject(dataS);
                     String getTicket = bodyObj.getString("ticket");
                     String actionCall = bodyObj.getString("action");
+                    Log.e("TAG","listenCall onSuccess = "+bodyObj);
                     if (actionCall.equals("info")) {
                         String csId = bodyObj.getString("csId");
                         csId_ = csId;
@@ -470,6 +473,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
 
             @Override
             public void onError(@NonNull Throwable throwable) {
+                Log.e("TAG","ConnectionHttpListenCall error = "+throwable.getMessage());
                 ConnectionHttpListenCall();
             }
         });
@@ -742,6 +746,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
                                 String getMessage = new String(message.getBody());
                                 try {
                                     JSONObject dataObj = new JSONObject(getMessage);
+                                    Log.e("TAG","subscribeCall = "+dataObj);
                                     String actionCall = "";
                                     if (dataObj.getJSONObject("transaction").has("action")) {
                                         actionCall = dataObj.getJSONObject("transaction").getString("action");
@@ -820,6 +825,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
     }
 
     public static void publishCallAcceptHttp(String csId, String labelAction) {
+        Log.e("TAG","publishCallAcceptHttp = "+labelAction+" | csId = "+csId);
         JSONObject dataObj = new JSONObject();
         try {
             dataObj.put("custId", idDips);
@@ -829,6 +835,7 @@ public class DipsWaitingRoom extends AppCompatActivity implements DatePickerDial
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.e("TAG","publishCallAcceptHttp dataObj = "+dataObj);
         ConnectionRabbitHttp.acceptCall(dataObj);
     }
 

@@ -22,6 +22,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
@@ -56,6 +58,7 @@ import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.Adapter.AdapterSourceAccount;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.Helper.MyParserFormBuilder;
 import com.evo.mitzoom.Model.FormSpin;
 import com.evo.mitzoom.R;
@@ -167,6 +170,14 @@ public class frag_update_data extends Fragment {
     private boolean actionSelected = false;
     private boolean isCreateCIF = false;
     private int countWrongOTP = 0;
+    private JSONArray arrayPerubahanElemen;
+    private JSONObject arrayValueBerubah;
+    private RelativeLayout mainPage,confirmPage;
+    private ImageView btnBackconfirmPage;
+    private RecyclerView rv_itemView;
+    private LinearLayoutManager recylerViewLayoutManager;
+    private AdapterItemView recyclerViewAdapter;
+    private Button btnContinueConfirmation;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -181,7 +192,8 @@ public class frag_update_data extends Fragment {
         sessions = new SessionManager(mContext);
         idDips = sessions.getKEY_IdDips();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
-
+        arrayValueBerubah = new JSONObject();
+        arrayPerubahanElemen = new JSONArray();
         if (getArguments() != null) {
             if (getArguments().containsKey("idGenerateForm")) {
                 formId = getArguments().getInt("idGenerateForm");
@@ -257,8 +269,16 @@ public class frag_update_data extends Fragment {
         Resend_Otp = (TextView) views.findViewById(R.id.btn_resend_otp);
         otp = (PinView) views.findViewById(R.id.otp);
 
+        //Konfirmasi Update KYC
+        mainPage = (RelativeLayout) views.findViewById(R.id.mainPage);
+        confirmPage = (RelativeLayout) views.findViewById(R.id.confirmPage);
+        btnBackconfirmPage = (ImageView) views.findViewById(R.id.btnBackconfirmPage);
+        rv_itemView = (RecyclerView) views.findViewById(R.id.rv_itemView);
+        btnContinueConfirmation = (Button) views.findViewById(R.id.btnContinueConfirmation);
+
         return views;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -271,7 +291,7 @@ public class frag_update_data extends Fragment {
         } else if (session == 3) {
             keyData = "keuangan";
         }
-
+        setRecyler();
         iconMainData.getBackground().setTint(getContext().getResources().getColor(R.color.bg_cif));
         iconWorks.getBackground().setTint(getContext().getResources().getColor(R.color.btnFalse));
         iconFinance.getBackground().setTint(getContext().getResources().getColor(R.color.btnFalse));
@@ -415,9 +435,31 @@ public class frag_update_data extends Fragment {
                                 processGetForm();
                             }
                             else if (session == 3) {
-                                ((Activity)mContext).runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
+                                if (arrayValueBerubah.length() == 0){
+                                    popUpReject();
+                                }
+                                else {
+                                    mainPage.setVisibility(View.GONE);
+                                    confirmPage.setVisibility(View.VISIBLE);
+                                }
+                                //processSendOTP();
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            }
+        });
+
+        btnContinueConfirmation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmPage.setVisibility(View.GONE);
+                mainPage.setVisibility(View.VISIBLE);
+                ((Activity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
                                         if (isSessionZoom) {
                                             BaseMeetingActivity.rlprogress.setBackgroundColor(getResources().getColor(R.color.white));
                                             BaseMeetingActivity.tvLoading.setVisibility(View.VISIBLE);
@@ -428,15 +470,16 @@ public class frag_update_data extends Fragment {
                                             DipsSwafoto.showProgress(true);
                                         }
                                     }
-                                });
-                                //processSendOTP();
-                                APISaveForm();
-                            }
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
+                });
+             APISaveForm();
+            }
+        });
+
+        btnBackconfirmPage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmPage.setVisibility(View.GONE);
+                mainPage.setVisibility(View.VISIBLE);
             }
         });
 
@@ -655,6 +698,66 @@ public class frag_update_data extends Fragment {
         });
     }
 
+    private void setRecyler() {
+        recylerViewLayoutManager = new LinearLayoutManager(getContext());
+        rv_itemView.setLayoutManager(recylerViewLayoutManager);
+
+        recyclerViewAdapter = new AdapterItemView();
+        rv_itemView.setAdapter(recyclerViewAdapter);
+        recyclerViewAdapter.notifyDataSetChanged();
+    }
+
+    private class AdapterItemView extends RecyclerView.Adapter<AdapterItemView.ViewHolder> {
+
+        @NonNull
+        @Override
+        public AdapterItemView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_confirmview, parent, false);
+            return new AdapterItemView.ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull AdapterItemView.ViewHolder holder, int position) {
+            try {
+                String nameDataEl = arrayPerubahanElemen.getJSONObject(position).getString("name");
+                Log.e("TAG","nameDataEl = "+nameDataEl);
+                Log.e("TAG","arrayPerubahanElemen = "+arrayPerubahanElemen);
+                Log.e("TAG","arrayValueBerubah = "+arrayValueBerubah);
+                if (arrayValueBerubah.has(nameDataEl)) {
+                    String labelEl = arrayPerubahanElemen.getJSONObject(position).getString("label").toLowerCase();
+                    String valEl = arrayValueBerubah.getString(nameDataEl);
+                    holder.tvLabelElement.setText(labelEl.replace("( Wajib diisi)",""));
+                    holder.tvContentElement.setText(valEl);
+//                    reqFormMirroring.put(nameDataEl,valEl);
+//                    mirrObj.put("deposito", reqFormMirroring);
+//                    ConnectionRabbitHttp.mirroringKey(mirrObj);
+                }
+                else {
+                    holder.tvLabelElement.setVisibility(View.GONE);
+                    holder.tvContentElement.setVisibility(View.GONE);
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return arrayPerubahanElemen.length();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            private final TextView tvLabelElement;
+            private final TextView tvContentElement;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                tvLabelElement = (TextView) itemView.findViewById(R.id.tvLabelElement);
+                tvContentElement = (TextView) itemView.findViewById(R.id.tvContentElement);
+            }
+        }
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -694,6 +797,36 @@ public class frag_update_data extends Fragment {
 //            }
 //        };
 //        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(smsReceiver,new IntentFilter("getotp"));
+    }
+
+    private void popUpReject() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.layout_dialog_sweet, null);
+
+        ImageView imgDialog = dialogView.findViewById(R.id.imgDialog);
+        TextView tvTitleDialog = dialogView.findViewById(R.id.tvTitleDialog);
+        TextView tvBodyDialog = dialogView.findViewById(R.id.tvBodyDialog);
+        Button btnCancelDialog = dialogView.findViewById(R.id.btnCancelDialog);
+        Button btnConfirmDialog = dialogView.findViewById(R.id.btnConfirmDialog);
+
+        tvTitleDialog.setVisibility(View.VISIBLE);
+
+        imgDialog.setImageDrawable(AppCompatResources.getDrawable(mContext,R.drawable.v_dialog_warning));
+        tvTitleDialog.setText(mContext.getResources().getString(R.string.permintaan_anda_ditolak));
+        tvBodyDialog.setText(mContext.getResources().getString(R.string.wording_reject_update));
+
+        SweetAlertDialog sweetAlertDialog = new SweetAlertDialog(mContext, SweetAlertDialog.NORMAL_TYPE);
+        sweetAlertDialog.setCustomView(dialogView);
+        sweetAlertDialog.hideConfirmButton();
+        sweetAlertDialog.setCancelable(false);
+        sweetAlertDialog.show();
+
+        btnConfirmDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sweetAlertDialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -929,7 +1062,7 @@ public class frag_update_data extends Fragment {
         Server.getAPIService().CustGetDataCore(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-
+                Log.e("TAG","Response1 = "+response);
                 if (response.isSuccessful()) {
                     flagDataCore = true;
                     try {
@@ -943,7 +1076,7 @@ public class frag_update_data extends Fragment {
                                 }
                             }
                         }
-
+                        Log.e("TAG","Response2 = "+dataNasabahObj);
                         sessions.saveNasabah(dataNasabahObj.toString());
 
                         processGetForm();
@@ -999,6 +1132,7 @@ public class frag_update_data extends Fragment {
 
             @Override
             public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e("TAG","ERR = "+t.getMessage());
                 if (isSessionZoom) {
                     BaseMeetingActivity.showProgress(false);
                 } else {
@@ -1044,6 +1178,10 @@ public class frag_update_data extends Fragment {
 
                         new MyParserFormBuilder(mContext, dataForm, llFormBuild);
                         idElement = MyParserFormBuilder.getForm();
+
+                        for (int i = 0; i < idElement.length(); i++) {
+                           arrayPerubahanElemen.put(idElement.getJSONObject(i));
+                        }
 
                         processValidationActionForm();
 
@@ -2190,7 +2328,8 @@ public class frag_update_data extends Fragment {
                                             }
                                             if(dataNasabah.has("rt")) {
                                                 valEl = dataNasabah.getString("rt");
-                                            } else if (dataNasabah.has(keyGetRT)) {
+                                            }
+                                            else if (dataNasabah.has(keyGetRT)) {
                                                 String address2 = dataNasabah.getString(keyGetRT);
                                                 if (address2.length() == 6) {
                                                     valEl = address2.substring(0, 3);
@@ -2212,7 +2351,9 @@ public class frag_update_data extends Fragment {
                                                     }
                                                 }
                                             }
-                                            ed.setText(valEl);
+
+
+                                            ed.setText(valEl.replace("/", ""));
                                             objEl.put(nameDataEl, valEl);
                                         }
                                         else if (newNameDataEl.equals("rw")) {
@@ -2235,7 +2376,7 @@ public class frag_update_data extends Fragment {
                                                     }
                                                 }
                                             }
-                                            ed.setText(valEl);
+                                            ed.setText(valEl.replace("RW", ""));
                                             objEl.put(nameDataEl, valEl);
                                         }
                                         else if (newNameDataEl.contains("kelurahan")) {
@@ -2596,7 +2737,8 @@ public class frag_update_data extends Fragment {
                                                 }
                                             }
 
-                                        } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                        }
+                                        else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
                                             AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
                                             if (newNameDataEl.contains("cabang")) {
                                                 String valEl = dataNasabah.getString("branchCode");
@@ -2822,6 +2964,8 @@ public class frag_update_data extends Fragment {
 
     private void processValidationActionForm() {
         int child = llFormBuild.getChildCount();
+        String getNasabah = sessions.getNasabah();
+
 
         if (child > 0 && idElement.length() > 0) {
             for (int i = 0; i < child; i++) {
@@ -2829,6 +2973,7 @@ public class frag_update_data extends Fragment {
                 if (idEl > 0 || idEl < -1) {
                     for (int j = 0; j < idElement.length(); j++) {
                         try {
+                           final JSONObject dataNasabah = new JSONObject(getNasabah);
                             int idDataEl = idElement.getJSONObject(j).getInt("id");
                             String nameDataEl = idElement.getJSONObject(j).getString("name");
                             String CompoName = idElement.getJSONObject(j).getString("CompoName");
@@ -2842,8 +2987,10 @@ public class frag_update_data extends Fragment {
                                 urlPath = idElement.getJSONObject(j).getString("url");
                             }
                             if (idEl == idDataEl) {
+
                                 String finalValKurung = valKurung;
                                 if (llFormBuild.getChildAt(i) instanceof EditText) {
+
                                     EditText ed = (EditText) llFormBuild.getChildAt(i);
                                     if (nameDataEl.contains("kode") && nameDataEl.contains("pos")){
                                         edKodePos = ed;
@@ -2872,6 +3019,601 @@ public class frag_update_data extends Fragment {
                                                 JSONObject reqFormMirroring = dataReqFormMirroring();
                                                 mirrObj.put(labelTrx, reqFormMirroring);
                                                 ConnectionRabbitHttp.mirroringKey(mirrObj);
+
+                                                if (nameDataEl.contains("nama") && nameDataEl.contains("identitas")) {
+                                                    String valEl = "";
+                                                    if(dataNasabah.has("namaCust")) {
+                                                        valEl = dataNasabah.getString("namaCust");
+                                                    } else if(dataNasabah.has("namaLengkap")) {
+                                                        valEl = dataNasabah.getString("namaLengkap");
+                                                    }
+
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if ((nameDataEl.contains("no") || nameDataEl.contains("nomor")) && nameDataEl.contains("identitas")) {
+                                                    if(dataNasabah.has("nomorId")) {
+                                                        String valEl = dataNasabah.getString("nomorId");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if ((nameDataEl.contains("no") || nameDataEl.contains("nomor")) && (nameDataEl.contains("ponsel") || nameDataEl.contains("handphone"))) {
+                                                    if(dataNasabah.has("noHandphone")) {
+                                                        String valEl = dataNasabah.getString("noHandphone");
+                                                        if (valEl.equals("null") || valEl == null) {
+                                                            valEl = "";
+                                                        }
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    } else if (dataNasabah.has("noHp")) {
+                                                        String valEl = dataNasabah.getString("noHp");
+                                                        if (valEl.equals("null") || valEl == null) {
+                                                            valEl = "";
+                                                        }
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if ((nameDataEl.contains("no") || nameDataEl.contains("nomor")) && nameDataEl.contains("telepon")) {
+                                                    if(dataNasabah.has("noPhone1")) {
+                                                        String valEl = dataNasabah.getString("noPhone1");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("tanggal") && nameDataEl.contains("lahir")) {
+                                                    if (dataNasabah.has("tglLahir")) {
+                                                        String gettglLahir = dataNasabah.getString("tglLahir");
+                                                        if (gettglLahir.contains("-")) {
+                                                            String[] sp = gettglLahir.split("-");
+                                                            if (sp[0].trim().length() == 2) {
+                                                                if (charSequence.toString().equalsIgnoreCase(gettglLahir)){
+                                                                    arrayValueBerubah.put(nameDataEl,null);
+                                                                }
+                                                                else {
+                                                                    arrayValueBerubah.put(nameDataEl,gettglLahir);
+                                                                }
+                                                            } else if (sp[0].trim().length() == 4) {
+                                                                String tahun = sp[0].trim();
+                                                                String bln = sp[1].trim();
+                                                                String tgl = sp[2].trim();
+                                                                String valEl = tgl+"-"+bln+"-"+tahun;
+                                                                if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                                    arrayValueBerubah.put(nameDataEl,null);
+                                                                }
+                                                                else {
+                                                                    arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                }
+                                                            }
+                                                        } else if (gettglLahir.charAt(0) != '0') {
+                                                            String tahun = gettglLahir.substring(0, 4);
+                                                            String bln = gettglLahir.substring(4, 6);
+                                                            String tgl = gettglLahir.substring(6, 8);
+                                                            String valEl = tgl+"-"+bln+"-"+tahun;
+                                                            if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            }
+                                                        } else {
+                                                            String tahun = gettglLahir.substring(6, 8);
+                                                            String bln = gettglLahir.substring(4, 6);
+                                                            String tgl = gettglLahir.substring(0, 4);
+                                                            String valEl = tgl+"-"+bln+"-"+tahun;
+                                                            if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("alamat") && nameDataEl.contains("usaha")) {
+                                                    String valEl = "";
+                                                    if (dataNasabah.has("empAddress1")) {
+                                                        String empAddress1 = dataNasabah.getString("empAddress1");
+                                                        valEl = empAddress1;
+                                                    }
+                                                    if (dataNasabah.has("empAddress2")) {
+                                                        String empAddress2 = dataNasabah.getString("empAddress2");
+                                                        valEl += " "+empAddress2;
+                                                    }
+                                                    valEl = valEl.trim();
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("alamat") && nameDataEl.contains("tinggal")) {
+                                                    String valEl = "";
+                                                    if (dataNasabah.has("domisili1")) {
+                                                        valEl = dataNasabah.getString("domisili1");
+                                                    }
+
+                                                    if(dataNasabah.has("domisili2")) {
+                                                        valEl = dataNasabah.getString("domisili2");
+                                                    }
+
+                                                    if(dataNasabah.has("domisili3")) {
+                                                        valEl = dataNasabah.getString("domisili3");
+                                                    }
+
+                                                    if(dataNasabah.has("domisili4")) {
+                                                        valEl = dataNasabah.getString("domisili4");
+                                                    }
+
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("domisili1")) {
+                                                    if (dataNasabah.has("domisili1")) {
+                                                        String valEl = dataNasabah.getString("domisili1");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("domisili2")) {
+                                                    if (dataNasabah.has("domisili2")) {
+                                                        String valEl = dataNasabah.getString("domisili2");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("domisili3")) {
+                                                    if (dataNasabah.has("domisili3")) {
+                                                        String valEl = dataNasabah.getString("domisili3");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("domisili4")) {
+                                                    if (dataNasabah.has("domisili4")) {
+                                                        String valEl = dataNasabah.getString("domisili4");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+
+                                                else if (nameDataEl.contains("alamat") && nameDataEl.contains("identitas")) {
+                                                    String valEl = "";
+                                                    if (dataNasabah.has("address1")) {
+                                                        valEl = dataNasabah.getString("address1");
+
+                                                        if(dataNasabah.has("address2")) {
+                                                            String address2 = dataNasabah.getString("address2");
+                                                            if (!address2.substring(0,2).equalsIgnoreCase("rt")) {
+                                                                if(address2.matches("\\d+(?:\\.\\d+)?")) {
+                                                                } else {
+                                                                    int indxRT = address2.toLowerCase().indexOf("rt");
+                                                                    if (indxRT > -1) {
+                                                                        String subaddress2 = address2.substring(0, indxRT).trim();
+                                                                        valEl += " " + subaddress2;
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+
+                                                    } else if(dataNasabah.has("alamat")) {
+                                                        valEl = dataNasabah.getString("alamat");
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.equals("rt")) {
+                                                    String valEl = "";
+                                                    String keyGetRT = "address2";
+                                                    if (formId == 109) {
+                                                        keyGetRT = "domisili2";
+                                                    }
+                                                    if(dataNasabah.has("rt")) {
+                                                        valEl = dataNasabah.getString("rt");
+                                                    } else if (dataNasabah.has(keyGetRT)) {
+                                                        String address2 = dataNasabah.getString(keyGetRT);
+                                                        if (address2.length() == 6) {
+                                                            valEl = address2.substring(0, 3);
+                                                        } else if (address2.length() > 6) {
+                                                            if (address2.toLowerCase().contains("rt")) {
+                                                                int indxRT = address2.toLowerCase().indexOf("rt");
+                                                                String getRT = "";
+                                                                if (indxRT > -1) {
+                                                                    if (address2.toLowerCase().contains("rw")) {
+                                                                        int indxRW = address2.toLowerCase().indexOf("rw");
+                                                                        getRT = address2.substring(indxRT + 2, indxRW);
+                                                                    } else {
+                                                                        getRT = address2.substring(indxRT + 2);
+                                                                    }
+                                                                    valEl = getRT.replace(".", "").replace(" ", "");
+                                                                } else {
+                                                                    valEl = getRT;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl.replace("/",""))){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.equals("rw")) {
+                                                    String valEl = "";
+                                                    String keyGetRW = "address2";
+                                                    if (formId == 109) {
+                                                        keyGetRW = "domisili2";
+                                                    }
+                                                    if(dataNasabah.has("rw")) {
+                                                        valEl = dataNasabah.getString("rw");
+                                                    } else if (dataNasabah.has(keyGetRW)) {
+                                                        String address2 = dataNasabah.getString(keyGetRW);
+                                                        if (address2.length() == 6) {
+                                                            valEl = address2.substring(3);
+                                                        } else if (address2.length() > 6) {
+                                                            if (address2.toLowerCase().contains("rw")) {
+                                                                int indxRW = address2.toLowerCase().indexOf("rw");
+                                                                String getRW = address2.substring(indxRW + 2);
+                                                                valEl = getRW.replace(".", "").replace(" ", "");
+                                                            }
+                                                        }
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl.replace("RW",""))){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kelurahan")) {
+                                                    String valEl = "";
+                                                    if(dataNasabah.has("kelurahan")) {
+                                                        valEl = dataNasabah.getString("kelurahan");
+                                                    } else if (dataNasabah.has("address3")) {
+                                                        valEl = dataNasabah.getString("address3");
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("tempat") && nameDataEl.contains("lahir")) {
+                                                    String valEl = dataNasabah.getString("tempatLahir");
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("email")) {
+                                                    String valEl = dataNasabah.getString("email");
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kecamatan")) {
+                                                    String valEl = "";
+                                                    if(dataNasabah.has("kecamatan")) {
+                                                        valEl = dataNasabah.getString("kecamatan");
+                                                    } else if (dataNasabah.has("address4")) {
+                                                        valEl = dataNasabah.getString("address4");
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kabupaten")) {
+                                                    String valEl = "";
+                                                    if(dataNasabah.has("kabupaten")) {
+                                                        valEl = dataNasabah.getString("kabupaten");
+                                                    } else if (dataNasabah.has("address5")) {
+                                                        valEl = dataNasabah.getString("address5");
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("provinsi")) {
+                                                    String valEl = "";
+                                                    if(dataNasabah.has("propinsi")) {
+                                                        valEl = dataNasabah.getString("propinsi");
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kodepos")) {
+                                                    String valEl = "";
+
+                                                    if (formId == 75){
+                                                        if (dataNasabah.has("zipCode1")) {
+                                                            valEl = dataNasabah.getString("zipCode1");
+                                                        }
+                                                    }
+                                                    else {
+                                                        if (dataNasabah.has("zipCode")) {
+                                                            valEl = dataNasabah.getString("zipCode");
+                                                        }
+                                                    }
+//                                            if(dataNasabah.has("kodePos")) {
+//                                                valEl = dataNasabah.getString("kodePos");
+//                                            } else if (dataNasabah.has("zipCode")) {
+//                                                valEl = dataNasabah.getString("zipCode");
+//                                            }
+
+                                                    if (!valEl.isEmpty()) {
+                                                        int intZipCode = Integer.parseInt(valEl);
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("jumlah") && nameDataEl.contains("anak")) {
+                                                    if(dataNasabah.has("jumAnak")) {
+                                                        String valEl = dataNasabah.getString("jumAnak");
+                                                        if (!valEl.isEmpty()) {
+                                                            int intvalEl = Integer.parseInt(valEl);
+                                                            if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("jumlah") && nameDataEl.contains("istri")) {
+                                                    if(dataNasabah.has("jumIstri")) {
+                                                        String valEl = dataNasabah.getString("jumIstri");
+                                                        if (!valEl.isEmpty()) {
+                                                            int intvalEl = Integer.parseInt(valEl);
+                                                            if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("jumlah") && nameDataEl.contains("tanggung")) {
+                                                    if(dataNasabah.has("jumTanggung")) {
+                                                        String valEl = dataNasabah.getString("jumTanggung");
+                                                        if (!valEl.isEmpty()) {
+                                                            int intvalEl = Integer.parseInt(valEl);
+                                                            if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kelamin")) {
+                                                    String valEl = "";
+                                                    if(dataNasabah.has("jenisKelamin")) {
+                                                        valEl = dataNasabah.getString("jenisKelamin");
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("agama")) {
+                                                    if (dataNasabah.has("agama")) {
+                                                        String valEl = dataNasabah.getString("agama");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kawin")) {
+                                                    if (dataNasabah.has("statusKawin")) {
+                                                        String valEl = dataNasabah.getString("statusKawin");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("npwp")) {
+                                                    if (dataNasabah.has("npwp")) {
+                                                        String valEl = dataNasabah.getString("npwp");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("nama") && nameDataEl.contains("ibu")) {
+                                                    if (dataNasabah.has("namaIbu")) {
+                                                        String valEl = dataNasabah.getString("namaIbu");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("nomor") && nameDataEl.contains("identitas")) {
+                                                    if (dataNasabah.has("nik")) {
+                                                        String valEl = dataNasabah.getString("nik");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("warganegara")) {
+                                                    if (dataNasabah.has("negaraAsal")) {
+                                                        String negaraAsal = dataNasabah.getString("negaraAsal").replace("+","");
+                                                        String warganegara = "WNI";
+                                                        if (!negaraAsal.equals("ID") && !negaraAsal.equals("62")) {
+                                                            warganegara = "WNA";
+                                                        }
+
+                                                        if (charSequence.toString().equalsIgnoreCase(warganegara)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,warganegara);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("negara")) {
+                                                    if (dataNasabah.has("negaraAsal")) {
+                                                        String negaraAsal = dataNasabah.getString("negaraAsal").replace("+","");
+                                                        String negara = "";
+                                                        if (negaraAsal.equals("ID") || negaraAsal.equals("62")) {
+                                                            negara = "Indonesia";
+                                                        } else if (negaraAsal.equals("US")) {
+                                                            negara = "United States of America";
+                                                        } else if (negaraAsal.equals("CN")) {
+                                                            negara = "China";
+                                                        } else {
+                                                            negara = "-";
+                                                        }
+
+                                                        if (charSequence.toString().equalsIgnoreCase(negara)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,negara);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("tanggalterbit")) {
+                                                    String valEl = dataNasabah.getString("tanggalTerbit");
+                                                    String getTgl = valEl;
+                                                    if (getTgl.contains("-")) {
+                                                        String[] sp = getTgl.split("-");
+                                                        if (sp[0].trim().length() == 2) {
+                                                            valEl = getTgl;
+                                                        } else if (sp[0].trim().length() == 4) {
+                                                            String tahun = sp[0].trim();
+                                                            String bln = sp[1].trim();
+                                                            String tgl = sp[2].trim();
+                                                            valEl = tgl+"-"+bln+"-"+tahun;
+                                                        }
+                                                    } else if (getTgl.charAt(0) != '0') {
+                                                        String tahun = getTgl.substring(0, 4);
+                                                        String bln = getTgl.substring(4, 6);
+                                                        String tgl = getTgl.substring(6, 8);
+                                                        valEl = tgl+"-"+bln+"-"+tahun;
+                                                    } else {
+                                                        String tahun = getTgl.substring(4, 8);
+                                                        String bln = getTgl.substring(2, 4);
+                                                        String tgl = getTgl.substring(0, 2);
+                                                        valEl = tgl+"-"+bln+"-"+tahun;
+                                                    }
+                                                    if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                        arrayValueBerubah.put(nameDataEl,null);
+                                                    }
+                                                    else {
+                                                        arrayValueBerubah.put(nameDataEl,charSequence);
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("nama") && nameDataEl.contains("perusahaan")) {
+                                                    if (dataNasabah.has("namaUsaha")) {
+                                                        String valEl = dataNasabah.getString("namaUsaha");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
+                                                else if (nameDataEl.contains("kode") && (nameDataEl.contains("telepon") || nameDataEl.contains("telp"))) {
+                                                    if (dataNasabah.has("areaPhone1")) {
+                                                        String valEl = dataNasabah.getString("areaPhone1");
+                                                        if (charSequence.toString().equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        }
+                                                    }
+                                                }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -2972,6 +3714,7 @@ public class frag_update_data extends Fragment {
                                                 JSONObject reqFormMirroring = dataReqFormMirroring();
                                                 mirrObj.put(labelTrx, reqFormMirroring);
                                                 ConnectionRabbitHttp.mirroringKey(mirrObj);
+
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
                                             }
@@ -2988,6 +3731,7 @@ public class frag_update_data extends Fragment {
                                     RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                     if (rl.getChildAt(0) instanceof Spinner) {
                                         objEl.put(nameDataEl, "");
+                                        Log.e("TAG","nameDataEl = "+nameDataEl);
                                         Spinner spin = (Spinner) rl.getChildAt(0);
 
                                         boolean flagDot = false;
@@ -3033,7 +3777,8 @@ public class frag_update_data extends Fragment {
                                                     } catch (JSONException e) {
                                                         throw new RuntimeException(e);
                                                     }
-                                                } else {
+                                                }
+                                                else {
                                                     FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
                                                     int idData = dataSpin.getId();
                                                     String results = dataSpin.getName();
@@ -3087,17 +3832,187 @@ public class frag_update_data extends Fragment {
                                                         if (flagStuckSpin) {
                                                             processGetSpinChild(nameDataEl);
                                                         }
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
+                                                    } catch (Exception e) {
+                                                        GlobalExceptionHandler.getLog(e);
                                                     }
                                                 }
+
+
 
                                                 try {
                                                     JSONObject reqFormMirroring = dataReqFormMirroring();
                                                     mirrObj.put(labelTrx, reqFormMirroring);
                                                     ConnectionRabbitHttp.mirroringKey(mirrObj);
-                                                } catch (JSONException e) {
-                                                    throw new RuntimeException(e);
+
+
+                                                    String valEl = "";
+                                                    String resultzz ="";
+                                                    if (dataNasabah.has(nameDataEl)) {
+                                                        valEl = dataNasabah.getString(nameDataEl);
+                                                        FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                        resultzz = dataSpin.getName();
+
+                                                        if (resultzz.equalsIgnoreCase(valEl)){
+                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                        }
+                                                        else {
+                                                            arrayValueBerubah.put(nameDataEl,resultzz);
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("kelamin")) {
+                                                        if (dataNasabah.has("jenisKelamin")){
+                                                            valEl = dataNasabah.getString("jenisKelamin");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getId());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("agama")) {
+                                                        if (dataNasabah.has("agama")) {
+                                                            valEl = dataNasabah.getString("agama");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getId());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("status") && nameDataEl.contains("menikah")) {
+                                                        if (dataNasabah.has("statusNikah")){
+                                                            valEl = dataNasabah.getString("statusNikah");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getCode());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("pendidikan")) {
+                                                        if (dataNasabah.has("pendAkhir")){
+                                                            valEl = dataNasabah.getString("pendAkhir");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getId());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("cabang")) {
+                                                        if (dataNasabah.has("branchCode")){
+                                                            valEl = dataNasabah.getString("branchCode");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getId());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("pekerjaan")) {
+                                                        if (dataNasabah.has("jenisKerja")){
+                                                            valEl = dataNasabah.getString("jenisKerja");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getId());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("bidang") && nameDataEl.contains("usaha")) {
+                                                        if (dataNasabah.has("badanUsaha")){
+                                                            valEl = dataNasabah.getString("badanUsaha");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getCode());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("jabatan")) {
+                                                        if (dataNasabah.has("jobPosition")){
+                                                            valEl = dataNasabah.getString("jobPosition");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = dataSpin.getName();
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("sumber") && nameDataEl.contains("dana")) {
+                                                        if (dataNasabah.has("sourceIncome")){
+                                                            valEl = dataNasabah.getString("sourceIncome");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = dataSpin.getName();
+                                                            accountType = dataSpin.getCode();
+                                                            resultzz = resultzz.replaceAll("\n", " / ");
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("tujuanpenggunaan")) {
+                                                        if (dataNasabah.has("sourceFund")){
+                                                            valEl = dataNasabah.getString("sourceFund");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = String.valueOf(dataSpin.getCode());
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+                                                    else if (nameDataEl.contains("penghasilan")) {
+                                                        if (dataNasabah.has("hasilBulan")){
+                                                            valEl = dataNasabah.getString("hasilBulan");
+                                                            FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+                                                            resultzz = dataSpin.getCode();
+                                                            if (resultzz.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                            }
+                                                        }
+                                                    }
+//                                                    else if (nameDataEl.contains("matauang")) {
+//
+//                                                        valEl = "IDR";
+//                                                        FormSpin dataSpin = (FormSpin) spin.getSelectedItem();
+//                                                        resultzz = dataSpin.getName();
+//                                                    }
+
+                                                } catch (Exception e) {
+                                                    GlobalExceptionHandler.getLog(e);
                                                 }
                                             }
 
@@ -3107,7 +4022,8 @@ public class frag_update_data extends Fragment {
                                             }
                                         });
                                         break;
-                                    } else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
+                                    }
+                                    else if (rl.getChildAt(0) instanceof AutoCompleteTextView) {
                                         objEl.put(nameDataEl, "");
 
                                         AutoCompleteTextView autoText = (AutoCompleteTextView) rl.getChildAt(0);
@@ -3126,6 +4042,19 @@ public class frag_update_data extends Fragment {
                                                         JSONObject reqFormMirroring = dataReqFormMirroring();
                                                         mirrObj.put(labelTrx, reqFormMirroring);
                                                         ConnectionRabbitHttp.mirroringKey(mirrObj);
+
+
+                                                        if (nameDataEl.contains("cabang")) {
+                                                            String valEl = dataNasabah.getString("branchCode");
+
+                                                            if (results.equalsIgnoreCase(valEl)){
+                                                                arrayValueBerubah.put(nameDataEl,null);
+                                                            }
+                                                            else {
+                                                                arrayValueBerubah.put(nameDataEl,results);
+                                                            }
+
+                                                        }
                                                     } catch (JSONException e) {
                                                         e.printStackTrace();
                                                     }
@@ -3241,13 +4170,15 @@ public class frag_update_data extends Fragment {
                                     }
                                 }
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        } catch (Exception e) {
+                            GlobalExceptionHandler.getLog(e);
                         }
                     }
                 }
             }
         }
+
+        Log.e("TAG","OBJ = "+arrayValueBerubah);
     }
 
     private JSONObject dataReqFormMirroring() {
