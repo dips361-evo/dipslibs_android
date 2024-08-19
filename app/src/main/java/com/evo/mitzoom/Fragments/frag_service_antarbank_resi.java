@@ -518,8 +518,7 @@ public class frag_service_antarbank_resi extends Fragment {
 
     private void ApiGetResi(int loopResi, String typeService, String idForm) {
         try {
-            Log.e("TAG","typeService = "+typeService);
-            Log.e("TAG","idForm = "+idForm);
+
             String authAccess = "Bearer " + sessions.getAuthToken();
             String exchangeToken = sessions.getExchangeToken();
 

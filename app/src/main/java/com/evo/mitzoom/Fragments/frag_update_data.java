@@ -178,6 +178,10 @@ public class frag_update_data extends Fragment {
     private LinearLayoutManager recylerViewLayoutManager;
     private AdapterItemView recyclerViewAdapter;
     private Button btnContinueConfirmation;
+    private JSONObject objMirrKonfirmasi;
+    private JSONObject objMirrDataDiri;
+    private JSONObject objMirrDataPekerjaan;
+    private JSONObject objMirrDataKeuangan;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -193,6 +197,10 @@ public class frag_update_data extends Fragment {
         idDips = sessions.getKEY_IdDips();
         isSessionZoom = ZoomVideoSDK.getInstance().isInSession();
         arrayValueBerubah = new JSONObject();
+        objMirrKonfirmasi = new JSONObject();
+        objMirrDataDiri = new JSONObject();
+        objMirrDataPekerjaan = new JSONObject();
+        objMirrDataKeuangan = new JSONObject();
         arrayPerubahanElemen = new JSONArray();
         if (getArguments() != null) {
             if (getArguments().containsKey("idGenerateForm")) {
@@ -441,6 +449,14 @@ public class frag_update_data extends Fragment {
                                 else {
                                     mainPage.setVisibility(View.GONE);
                                     confirmPage.setVisibility(View.VISIBLE);
+                                    ConnectionRabbitHttp.mirroringEndpoint(1063);
+                                    JSONObject objectKycUpdateKonfirmasi = new JSONObject();
+                                    JSONObject objectKycUpdateKonfirmasi2 = new JSONObject();
+
+                                    objectKycUpdateKonfirmasi2.put("konfirmasi",objMirrKonfirmasi);
+                                    objectKycUpdateKonfirmasi.put(labelTrx,objectKycUpdateKonfirmasi2);
+                                    ConnectionRabbitHttp.mirroringKey(objectKycUpdateKonfirmasi);
+
                                 }
                                 //processSendOTP();
                             }
@@ -480,6 +496,7 @@ public class frag_update_data extends Fragment {
             public void onClick(View v) {
                 confirmPage.setVisibility(View.GONE);
                 mainPage.setVisibility(View.VISIBLE);
+                ConnectionRabbitHttp.mirroringEndpoint(252);
             }
         });
 
@@ -720,9 +737,6 @@ public class frag_update_data extends Fragment {
         public void onBindViewHolder(@NonNull AdapterItemView.ViewHolder holder, int position) {
             try {
                 String nameDataEl = arrayPerubahanElemen.getJSONObject(position).getString("name");
-                Log.e("TAG","nameDataEl = "+nameDataEl);
-                Log.e("TAG","arrayPerubahanElemen = "+arrayPerubahanElemen);
-                Log.e("TAG","arrayValueBerubah = "+arrayValueBerubah);
                 if (arrayValueBerubah.has(nameDataEl)) {
                     String labelEl = arrayPerubahanElemen.getJSONObject(position).getString("label").toLowerCase();
                     String valEl = arrayValueBerubah.getString(nameDataEl);
@@ -1062,7 +1076,6 @@ public class frag_update_data extends Fragment {
         Server.getAPIService().CustGetDataCore(requestBody,authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                Log.e("TAG","Response1 = "+response);
                 if (response.isSuccessful()) {
                     flagDataCore = true;
                     try {
@@ -1076,7 +1089,6 @@ public class frag_update_data extends Fragment {
                                 }
                             }
                         }
-                        Log.e("TAG","Response2 = "+dataNasabahObj);
                         sessions.saveNasabah(dataNasabahObj.toString());
 
                         processGetForm();
@@ -2962,6 +2974,28 @@ public class frag_update_data extends Fragment {
 
     }
 
+    private void saveValueMirroringKonfirmasi(String nameElement,String value){
+        try {
+            if (session == 1){
+                objMirrDataDiri.put(nameElement,value);
+                objMirrKonfirmasi.put("datadiri",objMirrDataDiri);
+            }
+            else if (session == 2){
+                objMirrDataPekerjaan.put(nameElement,value);
+                objMirrKonfirmasi.put("datapekerjaan",objMirrDataPekerjaan);
+            }
+            else if (session == 3){
+                objMirrDataKeuangan.put(nameElement,value);
+                objMirrKonfirmasi.put("datakeuangan",objMirrDataKeuangan);
+            }
+
+        }
+        catch (Exception e){
+            GlobalExceptionHandler.getLog(e);
+        }
+
+    }
+
     private void processValidationActionForm() {
         int child = llFormBuild.getChildCount();
         String getNasabah = sessions.getNasabah();
@@ -3027,22 +3061,26 @@ public class frag_update_data extends Fragment {
                                                     } else if(dataNasabah.has("namaLengkap")) {
                                                         valEl = dataNasabah.getString("namaLengkap");
                                                     }
-
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
+
                                                 }
                                                 else if ((nameDataEl.contains("no") || nameDataEl.contains("nomor")) && nameDataEl.contains("identitas")) {
                                                     if(dataNasabah.has("nomorId")) {
                                                         String valEl = dataNasabah.getString("nomorId");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3054,9 +3092,11 @@ public class frag_update_data extends Fragment {
                                                         }
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     } else if (dataNasabah.has("noHp")) {
                                                         String valEl = dataNasabah.getString("noHp");
@@ -3065,9 +3105,11 @@ public class frag_update_data extends Fragment {
                                                         }
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3076,9 +3118,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("noPhone1");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3090,9 +3134,11 @@ public class frag_update_data extends Fragment {
                                                             if (sp[0].trim().length() == 2) {
                                                                 if (charSequence.toString().equalsIgnoreCase(gettglLahir)){
                                                                     arrayValueBerubah.put(nameDataEl,null);
+                                                                    saveValueMirroringKonfirmasi(nameDataEl,null);
                                                                 }
                                                                 else {
                                                                     arrayValueBerubah.put(nameDataEl,gettglLahir);
+                                                                    saveValueMirroringKonfirmasi(nameDataEl,gettglLahir);
                                                                 }
                                                             } else if (sp[0].trim().length() == 4) {
                                                                 String tahun = sp[0].trim();
@@ -3101,9 +3147,11 @@ public class frag_update_data extends Fragment {
                                                                 String valEl = tgl+"-"+bln+"-"+tahun;
                                                                 if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                                     arrayValueBerubah.put(nameDataEl,null);
+                                                                    saveValueMirroringKonfirmasi(nameDataEl,null);
                                                                 }
                                                                 else {
                                                                     arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                    saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                                 }
                                                             }
                                                         } else if (gettglLahir.charAt(0) != '0') {
@@ -3113,9 +3161,11 @@ public class frag_update_data extends Fragment {
                                                             String valEl = tgl+"-"+bln+"-"+tahun;
                                                             if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                             }
                                                         } else {
                                                             String tahun = gettglLahir.substring(6, 8);
@@ -3124,9 +3174,11 @@ public class frag_update_data extends Fragment {
                                                             String valEl = tgl+"-"+bln+"-"+tahun;
                                                             if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                             }
                                                         }
                                                     }
@@ -3144,9 +3196,11 @@ public class frag_update_data extends Fragment {
                                                     valEl = valEl.trim();
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("alamat") && nameDataEl.contains("tinggal")) {
@@ -3169,19 +3223,21 @@ public class frag_update_data extends Fragment {
 
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("domisili1")) {
                                                     if (dataNasabah.has("domisili1")) {
                                                         String valEl = dataNasabah.getString("domisili1");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
-                                                            arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
-                                                            arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3190,9 +3246,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("domisili2");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3201,9 +3259,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("domisili3");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3212,9 +3272,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("domisili4");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3243,9 +3305,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.equals("rt")) {
@@ -3281,9 +3345,11 @@ public class frag_update_data extends Fragment {
 
                                                     if (charSequence.toString().equalsIgnoreCase(valEl.replace("/",""))){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.equals("rw")) {
@@ -3308,9 +3374,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl.replace("RW",""))){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("kelurahan")) {
@@ -3322,27 +3390,33 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("tempat") && nameDataEl.contains("lahir")) {
                                                     String valEl = dataNasabah.getString("tempatLahir");
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("email")) {
                                                     String valEl = dataNasabah.getString("email");
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("kecamatan")) {
@@ -3354,9 +3428,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("kabupaten")) {
@@ -3368,9 +3444,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("provinsi")) {
@@ -3380,9 +3458,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("kodepos")) {
@@ -3408,9 +3488,11 @@ public class frag_update_data extends Fragment {
                                                         int intZipCode = Integer.parseInt(valEl);
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3421,9 +3503,11 @@ public class frag_update_data extends Fragment {
                                                             int intvalEl = Integer.parseInt(valEl);
                                                             if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                             }
                                                         }
                                                     }
@@ -3435,9 +3519,11 @@ public class frag_update_data extends Fragment {
                                                             int intvalEl = Integer.parseInt(valEl);
                                                             if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                             }
                                                         }
                                                     }
@@ -3449,9 +3535,11 @@ public class frag_update_data extends Fragment {
                                                             int intvalEl = Integer.parseInt(valEl);
                                                             if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,charSequence);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                             }
                                                         }
                                                     }
@@ -3463,9 +3551,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("agama")) {
@@ -3473,9 +3563,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("agama");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3484,9 +3576,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("statusKawin");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3495,9 +3589,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("npwp");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3506,9 +3602,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("namaIbu");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3517,9 +3615,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("nik");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3533,9 +3633,11 @@ public class frag_update_data extends Fragment {
 
                                                         if (charSequence.toString().equalsIgnoreCase(warganegara)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,warganegara);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,warganegara);
                                                         }
                                                     }
                                                 }
@@ -3555,9 +3657,11 @@ public class frag_update_data extends Fragment {
 
                                                         if (charSequence.toString().equalsIgnoreCase(negara)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,negara);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,negara);
                                                         }
                                                     }
                                                 }
@@ -3587,9 +3691,11 @@ public class frag_update_data extends Fragment {
                                                     }
                                                     if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                         arrayValueBerubah.put(nameDataEl,null);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,null);
                                                     }
                                                     else {
                                                         arrayValueBerubah.put(nameDataEl,charSequence);
+                                                        saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                     }
                                                 }
                                                 else if (nameDataEl.contains("nama") && nameDataEl.contains("perusahaan")) {
@@ -3597,9 +3703,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("namaUsaha");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3608,9 +3716,11 @@ public class frag_update_data extends Fragment {
                                                         String valEl = dataNasabah.getString("areaPhone1");
                                                         if (charSequence.toString().equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,charSequence);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,charSequence.toString());
                                                         }
                                                     }
                                                 }
@@ -3731,7 +3841,6 @@ public class frag_update_data extends Fragment {
                                     RelativeLayout rl = (RelativeLayout) llFormBuild.getChildAt(i);
                                     if (rl.getChildAt(0) instanceof Spinner) {
                                         objEl.put(nameDataEl, "");
-                                        Log.e("TAG","nameDataEl = "+nameDataEl);
                                         Spinner spin = (Spinner) rl.getChildAt(0);
 
                                         boolean flagDot = false;
@@ -3854,9 +3963,11 @@ public class frag_update_data extends Fragment {
 
                                                         if (resultzz.equalsIgnoreCase(valEl)){
                                                             arrayValueBerubah.put(nameDataEl,null);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,null);
                                                         }
                                                         else {
                                                             arrayValueBerubah.put(nameDataEl,resultzz);
+                                                            saveValueMirroringKonfirmasi(nameDataEl,resultzz);
                                                         }
                                                     }
                                                     else if (nameDataEl.contains("kelamin")) {
@@ -3866,9 +3977,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getId());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3879,9 +3992,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getId());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3892,9 +4007,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getCode());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3905,9 +4022,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getId());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3918,9 +4037,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getId());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3931,9 +4052,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getId());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3944,9 +4067,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getCode());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3957,9 +4082,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = dataSpin.getName();
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3972,9 +4099,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = resultzz.replaceAll("\n", " / ");
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3985,9 +4114,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = String.valueOf(dataSpin.getCode());
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -3998,9 +4129,11 @@ public class frag_update_data extends Fragment {
                                                             resultzz = dataSpin.getCode();
                                                             if (resultzz.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,dataSpin.getName());
+                                                                saveValueMirroringKonfirmasi(nameDataEl,dataSpin.getName());
                                                             }
                                                         }
                                                     }
@@ -4049,9 +4182,11 @@ public class frag_update_data extends Fragment {
 
                                                             if (results.equalsIgnoreCase(valEl)){
                                                                 arrayValueBerubah.put(nameDataEl,null);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,null);
                                                             }
                                                             else {
                                                                 arrayValueBerubah.put(nameDataEl,results);
+                                                                saveValueMirroringKonfirmasi(nameDataEl,results);
                                                             }
 
                                                         }
@@ -4177,8 +4312,6 @@ public class frag_update_data extends Fragment {
                 }
             }
         }
-
-        Log.e("TAG","OBJ = "+arrayValueBerubah);
     }
 
     private JSONObject dataReqFormMirroring() {

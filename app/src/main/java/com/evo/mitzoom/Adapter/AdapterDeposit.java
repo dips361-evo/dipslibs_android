@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +24,10 @@ import com.evo.mitzoom.Session.SessionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import us.zoom.sdk.ZoomVideoSDK;
 
@@ -164,6 +169,24 @@ public class AdapterDeposit extends RecyclerView.Adapter<AdapterDeposit.ItemHold
                 }
             }
 
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date targetDate = dateFormat.parse(dueDate);
+
+            // Get the current date
+            Date currentDate = new Date();
+
+            // Validate if the current date is before the target date
+
+            if (idService.equals("193")){
+                if (currentDate.before(targetDate)) {
+                    holder.itemView.setEnabled(true);
+                } else {
+                    holder.cardDeposito.setBackgroundTintList(mContext.getResources().getColorStateList(R.color.btnFalse));
+                    holder.itemView.setEnabled(false);
+                }
+            }
+
+
             holder.tvTitle.setText(titleCard);
             holder.tvValueJangka.setText(timePeriod);
             holder.tvValueTempo.setText(jatuhTempo);
@@ -199,6 +222,8 @@ public class AdapterDeposit extends RecyclerView.Adapter<AdapterDeposit.ItemHold
             });
 
         } catch (JSONException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
             throw new RuntimeException(e);
         }
 
@@ -280,6 +305,7 @@ public class AdapterDeposit extends RecyclerView.Adapter<AdapterDeposit.ItemHold
         private final TextView tvValueJangka;
         private final TextView tvValueTempo;
         private final TextView tvNominal;
+        private final CardView cardDeposito;
 
         public ItemHolder(@NonNull View itemView) {
             super(itemView);
@@ -290,6 +316,7 @@ public class AdapterDeposit extends RecyclerView.Adapter<AdapterDeposit.ItemHold
             tvValueJangka = (TextView) itemView.findViewById(R.id.tvValueJangka);
             tvValueTempo = (TextView) itemView.findViewById(R.id.tvValueTempo);
             tvNominal = (TextView) itemView.findViewById(R.id.tvNominal);
+            cardDeposito = (CardView) itemView.findViewById(R.id.cardDeposito);
 
             if (idService.equals("193")) {
                 imgPencil.setVisibility(View.VISIBLE);

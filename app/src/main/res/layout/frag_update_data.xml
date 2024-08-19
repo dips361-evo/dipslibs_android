@@ -21,8 +21,7 @@
         <RelativeLayout
             android:id="@+id/mainPage"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone">
+            android:layout_height="match_parent">
             <LinearLayout
                 android:id="@+id/TopBar"
                 android:layout_width="match_parent"
@@ -345,7 +344,7 @@
             android:id="@+id/confirmPage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible">
+            android:visibility="gone">
             <LinearLayout
                 android:id="@+id/TopBarconfirmPage"
                 android:layout_width="match_parent"

@@ -105,7 +105,6 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
 
         holder.ads.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            Log.e("TAG","dataList.get(position).getId() "+dataList.get(position).getId());
             switch (dataList.get(position).getId()){
                 case "0" :
                     ConnectionRabbitHttp.mirroringEndpoint(201);
@@ -176,7 +175,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "5" :
-                    if (isSessionZoom) {
+                    if (!isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(250);
                         //bundle.putInt("idGenerateForm",59);
                         bundle.putInt("idGenerateForm",77);
@@ -209,7 +208,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "18" :
-                    if (isSessionZoom) {
+                    if (!isSessionZoom) {
                         ConnectionRabbitHttp.mirroringEndpoint(280);
                         bundle.putInt("idTrx",Integer.parseInt(dataList.get(position).getId()));
                         bundle.putString("subLayanan",labelserv);
@@ -240,7 +239,7 @@ public class ItemServiceGridAdapter extends RecyclerView.Adapter<ItemServiceGrid
                     }
                     break;
                 case "181" :
-                    if (isSessionZoom) {
+                    if (!isSessionZoom) {
                         if (isSessionZoom) {
                             BaseMeetingActivity.showProgress(true);
                         } else {

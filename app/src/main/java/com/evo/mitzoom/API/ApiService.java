@@ -253,11 +253,11 @@ public interface ApiService {
 
 
     @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
-    @GET("spanduk/publish")
+    @GET("promo/daftar")
     Call<JsonObject> getSpandukPublish(@Header("Authorization") String authHeader,
                                        @Header("exchangeToken") String exchangeToken);
 
-    @GET("spanduk/media/{id}")
+    @GET("produk-media/data/{id}")
     Call<ResponseBody> getSpandukMedia(@Path("id") int id,
                                        @Header("Authorization") String authHeader,
                                        @Header("exchangeToken") String exchangeToken);
@@ -503,7 +503,7 @@ public interface ApiService {
                               @Header("Authorization") String authHeader,
                               @Header("exchangeToken") String exchangeToken);
     @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
-    @POST("deposit")
+    @POST("deposit/register")
     Call<JsonObject> APIDeposit(@Body RequestBody body,
                                          @Header("Authorization") String authHeader,
                                          @Header("exchangeToken") String exchangeToken);
@@ -513,6 +513,14 @@ public interface ApiService {
     Call<JsonObject> ActiveDeposit(@Path("noCif") String noCif,
                                     @Header("Authorization") String authHeader,
                                     @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @GET("config/by-name/daybreak")
+    Call<JsonObject> DayBreak(@Header("Authorization") String authHeader,
+                                   @Header("exchangeToken") String exchangeToken);
+    @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
+    @GET("config/by-name/dayaro")
+    Call<JsonObject> DayARO(@Header("Authorization") String authHeader,
+                              @Header("exchangeToken") String exchangeToken);
 
     @Headers("Content-Type: "+ MyConstants.CONTENT_TYPE)
     @GET("deposit-type/get-deposito-code-channel")

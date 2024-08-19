@@ -385,5 +385,7 @@
     <string name="storage_permission_not_allowed" translatable="false">Silahkan izinkan penyimpanan file</string>
     <string name="wording_melebihi_sumber_dana" translatable="false">Terdapat transaksi yang melebihi sumber dana!</string>
     <string name="foto_diri_ektp" translatable="false">*Foto Diri dengan eKTP untuk memperbarui data</string>
+    <string name="wording_break" translatable="false">*Pencairan dapat dilakukan dari tanggal </string>
+    <string name="wording_break2" translatable="false">sampai dengan tanggal</string>
     <string name="wording_maintenance" translatable="false">Fitur Ini akan segera hadir di Digital Operations</string>
 </resources>

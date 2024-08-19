@@ -383,6 +383,8 @@
     <string name="rejected_transaksi" translatable="false">Rejected Transaction</string>
     <string name="wording_gagal" translatable="false">Failed!</string>
     <string name="minimum_deposito_alert" translatable="false">Minimum Deposito</string>
+    <string name="wording_break" translatable="false">*Withdrawal date start from  </string>
+    <string name="wording_break2" translatable="false">until</string>
     <string name="storage_permission_not_allowed" translatable="false">Please allow storage permission</string>
     <string name="wording_melebihi_sumber_dana" translatable="false">There are transactions that exceed the source of funds!</string>
     <string name="wording_maintenance" translatable="false">This feature will be ready soon in Digital Operations</string>

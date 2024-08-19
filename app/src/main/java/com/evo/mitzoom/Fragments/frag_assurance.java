@@ -62,7 +62,6 @@ import us.zoom.sdk.ZoomVideoSDK;
 
 public class frag_assurance extends Fragment {
 
-    private static final String TAG = "frag_assurance";
     private final int REQUESTCODE_FILE = 202;
     private final int REQUESTCODE_GALLERY = 2;
     private Context mContext;

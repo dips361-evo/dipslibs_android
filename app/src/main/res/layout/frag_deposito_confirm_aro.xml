@@ -353,6 +353,14 @@
                                 android:focusable="false"
                                 android:textSize="12dp"/>
                             <TextView
+                                android:id="@+id/tvCairWording"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="15dp"
+                                android:layout_marginTop="10dp"
+                                tools:text="*Pencairan dapat dilakukan dari tanggal 12-08-2024 - 08-09-2024"
+                                android:textColor="@color/red_btn_bg_color" />
+                            <TextView
                                 android:id="@+id/tvCairDate"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"

@@ -176,6 +176,8 @@ public class frag_deposito_online_aro extends Fragment {
             });
         }
 
+
+
         if (isSessionZoom) {
             BaseMeetingActivity.showProgress(true);
         } else {

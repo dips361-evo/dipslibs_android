@@ -29,7 +29,6 @@ import us.zoom.sdk.ZoomVideoSDKVideoView;
 
 public class UserVideoAdapter extends RecyclerView.Adapter<UserVideoAdapter.BaseHolder> {
 
-    private static final String TAG = "CEK_UserVideoAdapter";
     public interface ItemTapListener {
         void onSingleTap(ZoomVideoSDKUser user);
     }

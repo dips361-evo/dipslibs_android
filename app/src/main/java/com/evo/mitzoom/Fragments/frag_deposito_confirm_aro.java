@@ -55,6 +55,8 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -141,6 +143,11 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
     private String norekKredit = "";
     private String noRekSource = "";
     private String labelAro = "";
+    private int dayBreak = 0;
+    private int dayAro = 0;
+    private String tglJatuhTempo = "";
+    private String startPencairan ="", endPencairan="";
+    private TextView tvCairWording;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -260,7 +267,7 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
         edCairDate = (EditText) views.findViewById(R.id.edCairDate);
         tvCairDate = (TextView) views.findViewById(R.id.tvCairDate);
         btnOperation = (Button) views.findViewById(R.id.btnOperation);
-
+        tvCairWording = (TextView) views.findViewById(R.id.tvCairWording);
         ll_head = (LinearLayout) views.findViewById(R.id.ll_head);
         tvFotoKTP = (TextView) views.findViewById(R.id.tvFotoKTP);
         scrollOTP = (NestedScrollView) views.findViewById(R.id.scrollOTP);
@@ -305,12 +312,15 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
         if (idService.equals("192")) {
             keyMirr = "pencairandeposito";
             btnOperation.setText(getResources().getString(R.string.cairkan));
+            getDayBreak();
         } else if (idService.equals("193")){
             keyMirr = "perubahandeposito";
             btnOperation.setText(getResources().getString(R.string.save));
         } else {
             keyMirr = "perubahandeposito";
         }
+
+
         btnOperation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -334,6 +344,7 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
             } else if (dataObj.has("tanggalJTempo")) {
                 dueDate = dataObj.getString("tanggalJTempo");
             }
+            tglJatuhTempo = dueDate;
             String nominal = dataObj.getString("nominal");
             String flagAro = "";
             String nasabah = "";
@@ -485,13 +496,15 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
                 llSpinInstruksi.setVisibility(View.GONE);
                 tvCairDate.setVisibility(View.GONE);
                 edCairDate.setVisibility(View.VISIBLE);
-
+                tvCairWording.setVisibility(View.VISIBLE);
                 tvInstruksi.setText(labelAro);
 
                 edCairDate.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Calendar maxDate = parseDateString(endPencairan);
                         final Calendar c = Calendar.getInstance();
+                        c.add(Calendar.DAY_OF_MONTH,dayBreak);
                         year = c.get(Calendar.YEAR);
                         month = c.get(Calendar.MONTH);
                         day = c.get(Calendar.DAY_OF_MONTH);
@@ -502,6 +515,8 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
                                     c.get(Calendar.MONTH),
                                     c.get(Calendar.DAY_OF_MONTH)
                             );
+                            dpd.setMinDate(c);
+                            dpd.setMaxDate(maxDate);
                         } else {
                             dpd.initialize(
                                     frag_deposito_confirm_aro.this,
@@ -509,6 +524,8 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
                                     c.get(Calendar.MONTH),
                                     c.get(Calendar.DAY_OF_MONTH)
                             );
+                            dpd.setMinDate(c);
+                            dpd.setMaxDate(maxDate);
                         }
 
                         // restrict to weekdays only
@@ -522,7 +539,9 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
                             day.add(Calendar.DATE, 1);
                         }
                         Calendar[] weekdayDays = weekdays.toArray(new Calendar[weekdays.size()]);
+
                         dpd.setSelectableDays(weekdayDays);
+
 
                         dpd.setOnCancelListener(dialog -> {
                             dpd = null;
@@ -536,7 +555,7 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
                 llSpinInstruksi.setVisibility(View.VISIBLE);
                 tvCairDate.setVisibility(View.VISIBLE);
                 edCairDate.setVisibility(View.GONE);
-
+                tvCairWording.setVisibility(View.GONE);
                 tvCairDate.setText(jatuhTempo2);
 
                 if (isSessionZoom) {
@@ -562,6 +581,226 @@ public class frag_deposito_confirm_aro extends Fragment implements DatePickerDia
 
     }
 
+    private Calendar parseDateString(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        try {
+            Date date = dateFormat.parse(dateString);
+            if (date != null) {
+                calendar.setTime(date);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parse exception
+        }
+        return calendar;
+    }
+
+    private void getDayBreak() {
+        if (isSessionZoom) {
+            BaseMeetingActivity.showProgress(true);
+        } else {
+            DipsSwafoto.showProgress(true);
+        }
+        String authAccess = "Bearer " + sessions.getAuthToken();
+        String exchangeToken = sessions.getExchangeToken();
+        Server.getAPIService().DayBreak(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                if (response.isSuccessful()) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    try {
+                        String dataS = response.body().toString();
+                        JSONObject dataObj = new JSONObject(dataS);
+                        if (dataObj.has("token")) {
+                            String accessToken = dataObj.getString("token");
+                            String exchangeToken = dataObj.getString("exchange");
+                            sessions.saveAuthToken(accessToken);
+                            sessions.saveExchangeToken(exchangeToken);
+                        }
+
+                        if (dataObj.has("data")){
+                            String dayBreakResponse = dataObj.getJSONObject("data").getString("value");
+                            dayBreak = Integer.parseInt(dayBreakResponse);
+
+                            LocalDate currentDate;
+                            String formattedDate = "";
+                            LocalDate nextDay;
+                            DateTimeFormatter formatter;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                currentDate = LocalDate.now();
+                                nextDay = currentDate.plusDays(dayBreak);
+                                formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                                formattedDate = nextDay.format(formatter);
+                            }
+                            startPencairan = formattedDate;
+                            getDayARO();
+                        }
+                    }
+                    catch (Exception e){
+
+                    }
+                } else {
+                    running = true;
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    try {
+                        String msg = "";
+                        if (response.body() != null) {
+                            String dataS = response.body().toString();
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("message")) {
+                                msg = dataObj.getString("message");
+                            }
+                        } else {
+                            if (response.errorBody().toString().isEmpty()) {
+                                String dataS = response.errorBody().toString();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                if (dataObj.has("message")) {
+                                    msg = dataObj.getString("message");
+                                }
+                            } else {
+                                String dataS = null;
+                                dataS = response.errorBody().string();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                if (dataObj.has("message")) {
+                                    msg = dataObj.getString("message");
+                                }
+                            }
+                        }
+                        Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                running = true;
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void getDayARO() {
+        if (isSessionZoom) {
+            BaseMeetingActivity.showProgress(true);
+        } else {
+            DipsSwafoto.showProgress(true);
+        }
+        String authAccess = "Bearer " + sessions.getAuthToken();
+        String exchangeToken = sessions.getExchangeToken();
+        Server.getAPIService().DayARO(authAccess,exchangeToken).enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+
+                if (response.isSuccessful()) {
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    try {
+                        String dataS = response.body().toString();
+                        JSONObject dataObj = new JSONObject(dataS);
+                        if (dataObj.has("token")) {
+                            String accessToken = dataObj.getString("token");
+                            String exchangeToken = dataObj.getString("exchange");
+                            sessions.saveAuthToken(accessToken);
+                            sessions.saveExchangeToken(exchangeToken);
+                        }
+
+                        if (dataObj.has("data")){
+                            String dayAroResponse = dataObj.getJSONObject("data").getString("value");
+                            dayAro = Integer.parseInt(dayAroResponse);
+
+                            String formattedDate = "";
+
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                LocalDate date = LocalDate.parse(tglJatuhTempo, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                                LocalDate newDate = date.minusDays(dayAro);
+                                formattedDate = newDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                            }
+                            endPencairan = formattedDate;
+                            String wording = getString(R.string.wording_break)+" "+startPencairan+" "+getString(R.string.wording_break2)+" "+endPencairan;
+                            tvCairWording.setText(wording);
+
+
+
+                        }
+                    }
+                    catch (Exception e){
+
+                    }
+
+                } else {
+                    running = true;
+                    if (isSessionZoom) {
+                        BaseMeetingActivity.showProgress(false);
+                    } else {
+                        DipsSwafoto.showProgress(false);
+                    }
+                    try {
+                        String msg = "";
+                        if (response.body() != null) {
+                            String dataS = response.body().toString();
+                            JSONObject dataObj = new JSONObject(dataS);
+                            if (dataObj.has("message")) {
+                                msg = dataObj.getString("message");
+                            }
+                        } else {
+                            if (response.errorBody().toString().isEmpty()) {
+                                String dataS = response.errorBody().toString();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                if (dataObj.has("message")) {
+                                    msg = dataObj.getString("message");
+                                }
+                            } else {
+                                String dataS = null;
+                                dataS = response.errorBody().string();
+                                JSONObject dataObj = new JSONObject(dataS);
+                                if (dataObj.has("message")) {
+                                    msg = dataObj.getString("message");
+                                }
+                            }
+                        }
+                        Toast.makeText(mContext,msg,Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                running = true;
+                if (isSessionZoom) {
+                    BaseMeetingActivity.showProgress(false);
+                } else {
+                    DipsSwafoto.showProgress(false);
+                }
+                Toast.makeText(mContext,t.getMessage(),Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
     private String ConveredDate(String dataDate, String InputFormat, String OutputFormat) {
         DateFormat inputFormat = new SimpleDateFormat(InputFormat);

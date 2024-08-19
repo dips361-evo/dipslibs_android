@@ -29,7 +29,6 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class DipsSplashScreen extends AppCompatActivity {
 
-    private static final String TAG = "CEK_DipsSplashScreen";
     private TextView tvVersion;
     private RelativeLayout rlBGTransparant;
     private SessionManager sessionManager;
@@ -51,7 +50,7 @@ public class DipsSplashScreen extends AppCompatActivity {
         //Untuk mengambil version dari Apps
         try {
             PackageInfo info = getApplication().getPackageManager().getPackageInfo(getPackageName(),0);
-            String version = "1.0.47";
+            String version = "1.0.48";
             version = "V "+version;
             tvVersion.setText(version);
         }
