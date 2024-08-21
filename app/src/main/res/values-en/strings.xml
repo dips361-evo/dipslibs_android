@@ -388,4 +388,5 @@
     <string name="storage_permission_not_allowed" translatable="false">Please allow storage permission</string>
     <string name="wording_melebihi_sumber_dana" translatable="false">There are transactions that exceed the source of funds!</string>
     <string name="wording_maintenance" translatable="false">This feature will be ready soon in Digital Operations</string>
+    <string name="nik_different" translatable="false">Your NIK is not same with current data</string>
 </resources>

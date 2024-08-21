@@ -388,4 +388,5 @@
     <string name="wording_break" translatable="false">*Pencairan dapat dilakukan dari tanggal </string>
     <string name="wording_break2" translatable="false">sampai dengan tanggal</string>
     <string name="wording_maintenance" translatable="false">Fitur Ini akan segera hadir di Digital Operations</string>
+    <string name="nik_different" translatable="false">NIK Anda Tidak Sesuai</string>
 </resources>

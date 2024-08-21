@@ -50,6 +50,7 @@ import com.evo.mitzoom.API.ApiService;
 import com.evo.mitzoom.API.Server;
 import com.evo.mitzoom.BaseMeetingActivity;
 import com.evo.mitzoom.Helper.ConnectionRabbitHttp;
+import com.evo.mitzoom.Helper.GlobalExceptionHandler;
 import com.evo.mitzoom.R;
 import com.evo.mitzoom.Session.SessionManager;
 import com.evo.mitzoom.ui.Alternative.DipsSwafoto;
@@ -1523,14 +1524,29 @@ public class frag_swafoto extends Fragment {
                         if (fragDest.equals("cifNew")) {
                             sessions.saveFormCOde(22);
                             fragment = new frag_cif_new();
+                            fragment.setArguments(bundle);
+                            getFragmentPage(fragment);
                         } else {
-                            //bundle.putInt("idGenerateForm", 59);
-                            bundle.putInt("idGenerateForm", 77);
-                            bundle.putBoolean("isCreateCIF",true);
-                            fragment = new frag_update_data();
+                            try{
+                                String getNasabah = sessions.getNasabah();
+                                JSONObject dataNasabah = new JSONObject(getNasabah);
+                                String currentNik = dataNasabah.getString("nik");
+                                if (currentNik.equals(nik)){
+                                    bundle.putInt("idGenerateForm", 77);
+                                    bundle.putBoolean("isCreateCIF",true);
+                                    fragment = new frag_update_data();
+                                    fragment.setArguments(bundle);
+                                    getFragmentPage(fragment);
+                                }
+                                else {
+                                    Toast.makeText(mContext, getString(R.string.nik_different), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            catch (Exception e){
+                                GlobalExceptionHandler.getLog(e);
+                            }
                         }
-                        fragment.setArguments(bundle);
-                        getFragmentPage(fragment);
+
                     }
                     else{
                         Toast.makeText(mContext, ""+getString(R.string.validate_nama_ibu), Toast.LENGTH_SHORT).show();
